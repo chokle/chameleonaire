@@ -64,8 +64,8 @@ function Scanner() {
           datasetId: null,
         },
       }),
-    onSuccess: (r: { count?: number }) => {
-      toast.success(`Surfaced ${r?.count ?? 0} creators in the ${bracket.label} bracket.`);
+    onSuccess: (r: { found: number }) => {
+      toast.success(`Surfaced ${r?.found ?? 0} creators in the ${bracket.label} bracket.`);
       qc.invalidateQueries({ queryKey: ["creators"] });
       qc.invalidateQueries({ queryKey: ["scans"] });
     },
