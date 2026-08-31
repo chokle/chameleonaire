@@ -201,13 +201,13 @@ export async function executeScan(args: ScanArgs) {
     for (const row of rows) {
       const { data: creator } = await db
         .from("creators")
-        .insert({ ...row.creator, scan_id: scan.id })
+        .insert({ ...row.creator, scan_id: scan.id } as never)
         .select("id")
         .single();
       if (creator && row.videos.length) {
         await db
           .from("creator_videos")
-          .insert(row.videos.map((v) => ({ ...v, creator_id: creator.id })));
+          .insert(row.videos.map((v) => ({ ...v, creator_id: creator.id })) as never);
       }
     }
 
