@@ -311,6 +311,24 @@ export type Database = {
           },
         ]
       }
+      cron_config: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       generated_videos: {
         Row: {
           approved: boolean
@@ -699,7 +717,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      run_publish_tick: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

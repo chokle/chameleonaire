@@ -19,6 +19,7 @@ import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
 import { Route as ApiPublicHooksPublishTickRouteImport } from './routes/api/public/hooks/publish-tick'
+import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
 import { Route as ApiPublicYoutubeCallbackRouteImport } from './routes/api/public/youtube.callback'
 
 const IndexRoute = IndexRouteImport.update({
@@ -72,6 +73,12 @@ const ApiPublicHooksPublishTickRoute =
     path: '/api/public/hooks/publish-tick',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSyncCronSecretRoute =
+  ApiPublicHooksSyncCronSecretRouteImport.update({
+    id: '/api/public/hooks/sync-cron-secret',
+    path: '/api/public/hooks/sync-cron-secret',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicYoutubeCallbackRoute =
   ApiPublicYoutubeCallbackRouteImport.update({
     id: '/api/public/youtube/callback',
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
+  '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -103,6 +111,7 @@ export interface FileRoutesByTo {
   '/blueprints': typeof BlueprintsIndexRoute
   '/channels': typeof ChannelsIndexRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
+  '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
 }
 export interface FileRoutesById {
@@ -117,6 +126,7 @@ export interface FileRoutesById {
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
+  '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
 }
 export interface FileRouteTypes {
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/blueprints/'
     | '/channels/'
     | '/api/public/hooks/publish-tick'
+    | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/blueprints'
     | '/channels'
     | '/api/public/hooks/publish-tick'
+    | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
   id:
     | '__root__'
@@ -158,6 +170,7 @@ export interface FileRouteTypes {
     | '/blueprints/'
     | '/channels/'
     | '/api/public/hooks/publish-tick'
+    | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
   fileRoutesById: FileRoutesById
 }
@@ -172,6 +185,7 @@ export interface RootRouteChildren {
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
   ApiPublicHooksPublishTickRoute: typeof ApiPublicHooksPublishTickRoute
+  ApiPublicHooksSyncCronSecretRoute: typeof ApiPublicHooksSyncCronSecretRoute
   ApiPublicYoutubeCallbackRoute: typeof ApiPublicYoutubeCallbackRoute
 }
 
@@ -247,6 +261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksPublishTickRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-cron-secret': {
+      id: '/api/public/hooks/sync-cron-secret'
+      path: '/api/public/hooks/sync-cron-secret'
+      fullPath: '/api/public/hooks/sync-cron-secret'
+      preLoaderRoute: typeof ApiPublicHooksSyncCronSecretRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/youtube/callback': {
       id: '/api/public/youtube/callback'
       path: '/api/public/youtube/callback'
@@ -268,6 +289,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlueprintsIndexRoute: BlueprintsIndexRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
   ApiPublicHooksPublishTickRoute: ApiPublicHooksPublishTickRoute,
+  ApiPublicHooksSyncCronSecretRoute: ApiPublicHooksSyncCronSecretRoute,
   ApiPublicYoutubeCallbackRoute: ApiPublicYoutubeCallbackRoute,
 }
 export const routeTree = rootRouteImport
