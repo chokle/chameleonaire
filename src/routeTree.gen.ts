@@ -17,6 +17,7 @@ import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
 import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
+import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +59,11 @@ const ChannelsIdRoute = ChannelsIdRouteImport.update({
   path: '/channels/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CreatorsIdRoute = CreatorsIdRouteImport.update({
+  id: '/creators/$id',
+  path: '/creators/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/scanner': typeof ScannerRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
+  '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/scanner': typeof ScannerRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
+  '/creators/$id': typeof CreatorsIdRoute
   '/blueprints': typeof BlueprintsIndexRoute
   '/channels': typeof ChannelsIndexRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/scanner': typeof ScannerRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
+  '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/blueprints/$id'
     | '/channels/$id'
+    | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/blueprints/$id'
     | '/channels/$id'
+    | '/creators/$id'
     | '/blueprints'
     | '/channels'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/blueprints/$id'
     | '/channels/$id'
+    | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   ScannerRoute: typeof ScannerRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
+  CreatorsIdRoute: typeof CreatorsIdRoute
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
 }
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChannelsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/creators/$id': {
+      id: '/creators/$id'
+      path: '/creators/$id'
+      fullPath: '/creators/$id'
+      preLoaderRoute: typeof CreatorsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScannerRoute: ScannerRoute,
   BlueprintsIdRoute: BlueprintsIdRoute,
   ChannelsIdRoute: ChannelsIdRoute,
+  CreatorsIdRoute: CreatorsIdRoute,
   BlueprintsIndexRoute: BlueprintsIndexRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
 }
