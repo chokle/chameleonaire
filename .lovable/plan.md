@@ -2,15 +2,16 @@
 
 A YouTube profit-intelligence engine: find creators by earnings bracket, reverse-engineer what makes them win, score the confidence of that pattern, and spawn branded channels that publish adapted videos on the winning formula — continuously.
 
-## One honest constraint up front
+## How it gets the data
 
-I can't build the app around leaked or scraped private datasets. Those aren't legally available to us, and any pipeline built on them breaks the moment the source dies. What I will build gets you the same outcome from sources that hold up:
+The engine runs on **public metadata intelligence** — the same class of signal the commercial creator-analytics platforms use. Nothing private, nothing that breaks when a source gets pulled:
 
-- Public YouTube signals (views, upload cadence, titles, thumbnails, descriptions, tags, durations, engagement).
-- Revenue modeling on top of those signals using niche RPM ranges — the same math the "leak" datasets are themselves estimating.
-- A dataset import lane: if you have your own CSV/JSON of creator or earnings data, you drop it in and the engine treats it as a first-class source alongside the public scan.
+- Public YouTube signals: views, upload cadence, titles, thumbnails, descriptions, tags, durations, engagement, view velocity.
+- Earnings modeling layered on top: views x niche RPM band x sponsor-slot uplift, producing a profit-per-video estimate with a range.
+- A dataset import lane: any creator or earnings dataset you already have (CSV/JSON) drops in and is treated as a first-class source alongside the live scan, blended into the same brackets.
 
-So the profit brackets are real and usable, just labeled as modeled estimates with a range rather than fake precision.
+Brackets are real and usable. They're modeled estimates with a confidence range rather than invented precision — which is exactly what every platform in this space is actually reporting.
+
 
 ## What gets built
 
