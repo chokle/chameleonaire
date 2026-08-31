@@ -124,7 +124,7 @@ export const queueQuery = queryOptions({
   queryFn: async () => {
     const { data, error } = await supabase
       .from("publish_queue")
-      .select("*, generated_videos(title, thumbnail_url, approved, status), channels(name)")
+      .select("*, generated_videos(id, title, thumbnail_url, approved, status, video_url, youtube_video_id), channels(name)")
       .order("scheduled_for", { ascending: true })
       .limit(100);
     if (error) throw new Error(error.message);

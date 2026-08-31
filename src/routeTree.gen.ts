@@ -18,6 +18,8 @@ import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
+import { Route as ApiPublicHooksPublishTickRouteImport } from './routes/api/public/hooks/publish-tick'
+import { Route as ApiPublicYoutubeCallbackRouteImport } from './routes/api/public/youtube.callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +66,18 @@ const CreatorsIdRoute = CreatorsIdRouteImport.update({
   path: '/creators/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksPublishTickRoute =
+  ApiPublicHooksPublishTickRouteImport.update({
+    id: '/api/public/hooks/publish-tick',
+    path: '/api/public/hooks/publish-tick',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicYoutubeCallbackRoute =
+  ApiPublicYoutubeCallbackRouteImport.update({
+    id: '/api/public/youtube/callback',
+    path: '/api/public/youtube/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +89,8 @@ export interface FileRoutesByFullPath {
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
+  '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +102,8 @@ export interface FileRoutesByTo {
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints': typeof BlueprintsIndexRoute
   '/channels': typeof ChannelsIndexRoute
+  '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
+  '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +116,8 @@ export interface FileRoutesById {
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
+  '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +131,8 @@ export interface FileRouteTypes {
     | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
+    | '/api/public/hooks/publish-tick'
+    | '/api/public/youtube/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +144,8 @@ export interface FileRouteTypes {
     | '/creators/$id'
     | '/blueprints'
     | '/channels'
+    | '/api/public/hooks/publish-tick'
+    | '/api/public/youtube/callback'
   id:
     | '__root__'
     | '/'
@@ -133,6 +157,8 @@ export interface FileRouteTypes {
     | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
+    | '/api/public/hooks/publish-tick'
+    | '/api/public/youtube/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +171,8 @@ export interface RootRouteChildren {
   CreatorsIdRoute: typeof CreatorsIdRoute
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
+  ApiPublicHooksPublishTickRoute: typeof ApiPublicHooksPublishTickRoute
+  ApiPublicYoutubeCallbackRoute: typeof ApiPublicYoutubeCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +240,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/publish-tick': {
+      id: '/api/public/hooks/publish-tick'
+      path: '/api/public/hooks/publish-tick'
+      fullPath: '/api/public/hooks/publish-tick'
+      preLoaderRoute: typeof ApiPublicHooksPublishTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/youtube/callback': {
+      id: '/api/public/youtube/callback'
+      path: '/api/public/youtube/callback'
+      fullPath: '/api/public/youtube/callback'
+      preLoaderRoute: typeof ApiPublicYoutubeCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +267,8 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIdRoute: CreatorsIdRoute,
   BlueprintsIndexRoute: BlueprintsIndexRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
+  ApiPublicHooksPublishTickRoute: ApiPublicHooksPublishTickRoute,
+  ApiPublicYoutubeCallbackRoute: ApiPublicYoutubeCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

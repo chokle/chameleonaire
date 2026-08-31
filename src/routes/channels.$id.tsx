@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Image as ImageIcon, Loader2, Sparkles } from "lucide-react";
+import { Film, Image as ImageIcon, Link2, Loader2, Sparkles, Unlink } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/accordion";
 import { channelQuery, channelVideosQuery } from "@/lib/queries";
 import { chameleonize, renderThumbnail } from "@/lib/chameleon.functions";
+import {
+  renderVideo,
+  youtubeConnectUrl,
+  youtubeDisconnect,
+  youtubeReady,
+} from "@/lib/publish.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/channels/$id")({
   head: () => ({
@@ -38,6 +45,61 @@ function ChannelDetail() {
   const { data: videos } = useQuery(channelVideosQuery(id));
   const spawn = useServerFn(chameleonize);
   const thumb = useServerFn(renderThumbnail);
+  const connect = useServerFn(youtubeConnectUrl);
+  const disconnectFn = useServerFn(youtubeDisconnect);
+  const readyFn = useServerFn(youtubeReady);
+  const render = useServerFn(renderVideo);
+
+  const { data: ready } = useQuery({
+    queryKey: ["youtube-ready"],
+    queryFn: () => readyFn({}),
+  });
+
+  const connecting = useMutation({
+    mutationFn: () => connect({ data: { channelId: id, origin: window.location.origin } }),
+    onSuccess: (r: { url: string }) => {
+      window.location.href = r.url;
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const disconnecting = useMutation({
+    mutationFn: () => disconnectFn({ data: { channelId: id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["channel", id] });
+      toast.success("YouTube disconnected.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const rendering = useMutation({
+    mutationFn: (videoId: string) => render({ data: { videoId } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["channel-videos", id] });
+      toast.success("Video rendered and stored.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const approving = useMutation({
+    mutationFn: async ({ videoId, approved }: { videoId: string; approved: boolean }) => {
+      const { error } = await supabase
+        .from("generated_videos")
+        .update({ approved })
+        .eq("id", videoId);
+      if (error) throw new Error(error.message);
+      await supabase
+        .from("publish_queue")
+        .update({ status: approved ? "scheduled" : "awaiting_approval" })
+        .eq("generated_video_id", videoId)
+        .in("status", ["awaiting_approval", "scheduled"]);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["channel-videos", id] });
+      qc.invalidateQueries({ queryKey: ["queue"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const generating = useMutation({
     mutationFn: () => spawn({ data: { channelId: id, count: 3 } }),
@@ -84,6 +146,53 @@ function ChannelDetail() {
         </Button>
       }
     >
+      <Card className="mb-6 spectrum-border">
+        <CardHeader>
+          <CardTitle className="text-base">YouTube destination</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-3">
+          {channel.connected ? (
+            <>
+              <Badge>Connected</Badge>
+              <p className="text-sm text-muted-foreground">
+                Uploads go to {channel.youtube_title ?? channel.youtube_channel_id ?? "your channel"} as
+                private videos you can flip public.
+              </p>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="ml-auto"
+                onClick={() => disconnecting.mutate()}
+                disabled={disconnecting.isPending}
+              >
+                <Unlink className="mr-1 size-4" /> Disconnect
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                {ready?.oauth
+                  ? "Not connected. Authorise this channel once and the queue can publish on its own."
+                  : "Add your Google OAuth client id and secret to enable publishing."}
+              </p>
+              <Button
+                size="sm"
+                className="ml-auto"
+                onClick={() => connecting.mutate()}
+                disabled={connecting.isPending || !ready?.oauth}
+              >
+                {connecting.isPending ? (
+                  <Loader2 className="mr-1 size-4 animate-spin" />
+                ) : (
+                  <Link2 className="mr-1 size-4" />
+                )}
+                Connect YouTube
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Chameleonized output ({videos?.length ?? 0})</CardTitle>
@@ -150,6 +259,29 @@ function ChannelDetail() {
                         <ImageIcon className="mr-1 size-4" />
                       )}
                       {v.thumbnail_url ? "Re-render thumbnail" : "Render thumbnail"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="ml-2"
+                      onClick={() => rendering.mutate(v.id)}
+                      disabled={rendering.isPending || Boolean(v.video_url)}
+                    >
+                      {rendering.isPending ? (
+                        <Loader2 className="mr-1 size-4 animate-spin" />
+                      ) : (
+                        <Film className="mr-1 size-4" />
+                      )}
+                      {v.video_url ? "Video rendered" : "Render video"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="ml-2"
+                      variant={v.approved ? "outline" : "default"}
+                      onClick={() => approving.mutate({ videoId: v.id, approved: !v.approved })}
+                      disabled={approving.isPending}
+                    >
+                      {v.approved ? "Approved — revoke" : "Approve for publish"}
                     </Button>
                   </AccordionContent>
                 </AccordionItem>

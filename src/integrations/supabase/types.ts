@@ -127,6 +127,7 @@ export type Database = {
           updated_at: string
           uploads_per_week: number
           youtube_channel_id: string | null
+          youtube_title: string | null
         }
         Insert: {
           auto_publish?: boolean
@@ -142,6 +143,7 @@ export type Database = {
           updated_at?: string
           uploads_per_week?: number
           youtube_channel_id?: string | null
+          youtube_title?: string | null
         }
         Update: {
           auto_publish?: boolean
@@ -157,6 +159,7 @@ export type Database = {
           updated_at?: string
           uploads_per_week?: number
           youtube_channel_id?: string | null
+          youtube_title?: string | null
         }
         Relationships: [
           {
@@ -317,8 +320,11 @@ export type Database = {
           created_at: string
           description: string | null
           divergence_applied: number
+          duration_seconds: number | null
           hook: string | null
           id: string
+          render_error: string | null
+          render_status: string
           script: string | null
           status: string
           tags: string[]
@@ -327,6 +333,7 @@ export type Database = {
           title: string
           updated_at: string
           video_url: string | null
+          youtube_video_id: string | null
         }
         Insert: {
           approved?: boolean
@@ -336,8 +343,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           divergence_applied?: number
+          duration_seconds?: number | null
           hook?: string | null
           id?: string
+          render_error?: string | null
+          render_status?: string
           script?: string | null
           status?: string
           tags?: string[]
@@ -346,6 +356,7 @@ export type Database = {
           title: string
           updated_at?: string
           video_url?: string | null
+          youtube_video_id?: string | null
         }
         Update: {
           approved?: boolean
@@ -355,8 +366,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           divergence_applied?: number
+          duration_seconds?: number | null
           hook?: string | null
           id?: string
+          render_error?: string | null
+          render_status?: string
           script?: string | null
           status?: string
           tags?: string[]
@@ -365,6 +379,7 @@ export type Database = {
           title?: string
           updated_at?: string
           video_url?: string | null
+          youtube_video_id?: string | null
         }
         Relationships: [
           {
@@ -442,6 +457,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      oauth_states: {
+        Row: {
+          channel_id: string
+          created_at: string
+          redirect_uri: string
+          state: string
+        }
+        Insert: {
+          channel_id: string
+          created_at?: string
+          redirect_uri: string
+          state: string
+        }
+        Update: {
+          channel_id?: string
+          created_at?: string
+          redirect_uri?: string
+          state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "oauth_states_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       performance_snapshots: {
         Row: {
@@ -602,6 +646,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      youtube_accounts: {
+        Row: {
+          access_token: string | null
+          channel_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          refresh_token: string | null
+          scopes: string | null
+          updated_at: string
+          youtube_channel_id: string | null
+          youtube_title: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          channel_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          refresh_token?: string | null
+          scopes?: string | null
+          updated_at?: string
+          youtube_channel_id?: string | null
+          youtube_title?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          channel_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          refresh_token?: string | null
+          scopes?: string | null
+          updated_at?: string
+          youtube_channel_id?: string | null
+          youtube_title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "youtube_accounts_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: true
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
