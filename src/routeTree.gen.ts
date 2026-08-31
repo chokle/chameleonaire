@@ -10,33 +10,141 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BrandsRouteImport } from './routes/brands'
+import { Route as QueueRouteImport } from './routes/queue'
+import { Route as ScannerRouteImport } from './routes/scanner'
+import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
+import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
+import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
+import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
+import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BrandsRoute = BrandsRouteImport.update({
+  id: '/brands',
+  path: '/brands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QueueRoute = QueueRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScannerRoute = ScannerRouteImport.update({
+  id: '/scanner',
+  path: '/scanner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlueprintsIndexRoute = BlueprintsIndexRouteImport.update({
+  id: '/blueprints/',
+  path: '/blueprints/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlueprintsIdRoute = BlueprintsIdRouteImport.update({
+  id: '/blueprints/$id',
+  path: '/blueprints/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChannelsIndexRoute = ChannelsIndexRouteImport.update({
+  id: '/channels/',
+  path: '/channels/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChannelsIdRoute = ChannelsIdRouteImport.update({
+  id: '/channels/$id',
+  path: '/channels/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreatorsIdRoute = CreatorsIdRouteImport.update({
+  id: '/creators/$id',
+  path: '/creators/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/brands': typeof BrandsRoute
+  '/queue': typeof QueueRoute
+  '/scanner': typeof ScannerRoute
+  '/blueprints/$id': typeof BlueprintsIdRoute
+  '/channels/$id': typeof ChannelsIdRoute
+  '/creators/$id': typeof CreatorsIdRoute
+  '/blueprints/': typeof BlueprintsIndexRoute
+  '/channels/': typeof ChannelsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/brands': typeof BrandsRoute
+  '/queue': typeof QueueRoute
+  '/scanner': typeof ScannerRoute
+  '/blueprints/$id': typeof BlueprintsIdRoute
+  '/channels/$id': typeof ChannelsIdRoute
+  '/creators/$id': typeof CreatorsIdRoute
+  '/blueprints': typeof BlueprintsIndexRoute
+  '/channels': typeof ChannelsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/brands': typeof BrandsRoute
+  '/queue': typeof QueueRoute
+  '/scanner': typeof ScannerRoute
+  '/blueprints/$id': typeof BlueprintsIdRoute
+  '/channels/$id': typeof ChannelsIdRoute
+  '/creators/$id': typeof CreatorsIdRoute
+  '/blueprints/': typeof BlueprintsIndexRoute
+  '/channels/': typeof ChannelsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/brands'
+    | '/queue'
+    | '/scanner'
+    | '/blueprints/$id'
+    | '/channels/$id'
+    | '/creators/$id'
+    | '/blueprints/'
+    | '/channels/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/brands'
+    | '/queue'
+    | '/scanner'
+    | '/blueprints/$id'
+    | '/channels/$id'
+    | '/creators/$id'
+    | '/blueprints'
+    | '/channels'
+  id:
+    | '__root__'
+    | '/'
+    | '/brands'
+    | '/queue'
+    | '/scanner'
+    | '/blueprints/$id'
+    | '/channels/$id'
+    | '/creators/$id'
+    | '/blueprints/'
+    | '/channels/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BrandsRoute: typeof BrandsRoute
+  QueueRoute: typeof QueueRoute
+  ScannerRoute: typeof ScannerRoute
+  BlueprintsIdRoute: typeof BlueprintsIdRoute
+  ChannelsIdRoute: typeof ChannelsIdRoute
+  CreatorsIdRoute: typeof CreatorsIdRoute
+  BlueprintsIndexRoute: typeof BlueprintsIndexRoute
+  ChannelsIndexRoute: typeof ChannelsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/brands': {
+      id: '/brands'
+      path: '/brands'
+      fullPath: '/brands'
+      preLoaderRoute: typeof BrandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/queue': {
+      id: '/queue'
+      path: '/queue'
+      fullPath: '/queue'
+      preLoaderRoute: typeof QueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scanner': {
+      id: '/scanner'
+      path: '/scanner'
+      fullPath: '/scanner'
+      preLoaderRoute: typeof ScannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blueprints/': {
+      id: '/blueprints/'
+      path: '/blueprints'
+      fullPath: '/blueprints/'
+      preLoaderRoute: typeof BlueprintsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blueprints/$id': {
+      id: '/blueprints/$id'
+      path: '/blueprints/$id'
+      fullPath: '/blueprints/$id'
+      preLoaderRoute: typeof BlueprintsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/channels/': {
+      id: '/channels/'
+      path: '/channels'
+      fullPath: '/channels/'
+      preLoaderRoute: typeof ChannelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/channels/$id': {
+      id: '/channels/$id'
+      path: '/channels/$id'
+      fullPath: '/channels/$id'
+      preLoaderRoute: typeof ChannelsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creators/$id': {
+      id: '/creators/$id'
+      path: '/creators/$id'
+      fullPath: '/creators/$id'
+      preLoaderRoute: typeof CreatorsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BrandsRoute: BrandsRoute,
+  QueueRoute: QueueRoute,
+  ScannerRoute: ScannerRoute,
+  BlueprintsIdRoute: BlueprintsIdRoute,
+  ChannelsIdRoute: ChannelsIdRoute,
+  CreatorsIdRoute: CreatorsIdRoute,
+  BlueprintsIndexRoute: BlueprintsIndexRoute,
+  ChannelsIndexRoute: ChannelsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

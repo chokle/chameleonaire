@@ -12,33 +12,37 @@ The engine runs on **public metadata intelligence** — the same class of signal
 
 Brackets are real and usable. They're modeled estimates with a confidence range rather than invented precision — which is exactly what every platform in this space is actually reporting.
 
-
 ## What gets built
 
 ### 1. Profit scanner
+
 - Pick a niche and a profit-per-video bracket (e.g. $500-2k, $2k-10k, $10k+).
 - Engine pulls channels/videos in that niche, computes estimated profit per video (views x niche RPM band x sponsor-slot uplift), and filters to the bracket.
 - Ranked results table: channel, est. profit/video, est. monthly, upload cadence, view velocity, consistency score.
 - Sources: YouTube Data API (you supply a key) plus any imported dataset.
 
 ### 2. Blueprint extractor
+
 - Select one or many creators, run extraction.
 - AI digests their catalog into a structured blueprint: hook pattern, title formula, thumbnail grammar (composition, color, face/no-face, text length), pacing and retention structure, script skeleton, upload cadence, topic ladder, monetization mix.
 - Every field carries evidence (which videos support it) and a per-field confidence.
-- An overall confidence score. Below 95%, the blueprint is marked "not deployable" and the engine tells you exactly what data would raise it (more videos, longer history, tighter niche).
+- An overall confidence score. Below 95%, the blueprint is marked "not deployable" and the engine tells you exactly what data would raise it (more videos, longer history, tighter niche). Ideal deployment range is 97%-98%+ 
 
 ### 3. Chameleonizer
+
 - Takes an approved blueprint plus your brand profile (name, voice, palette, subject) and produces a near-identical structural clone where only the surface metadata differs: your topics, your angles, your wording, your thumbnails.
 - Divergence dial: how far each output drifts from the source formula.
 - Guardrails: no copying of source scripts, titles verbatim, thumbnails, or likenesses. Structure is copied; content is original.
 
 ### 4. Channel spawner + auto-deploy
+
 - Create multiple virtual channels, each bound to a blueprint plus a brand identity.
 - Per channel: generate video concepts, scripts, titles, descriptions, tags, and thumbnails; render short-form video from generated clips and voiceover; queue with a publish schedule matching the blueprint's cadence.
 - Publishing runs through YouTube OAuth per channel. Channels you haven't connected yet stay in "ready to publish" state with everything rendered and downloadable.
 - Manual approval gate on by default; flip to fully automatic per channel.
 
 ### 5. The forever loop
+
 - After each publish, the engine pulls back that video's performance.
 - Winners raise the weight of their blueprint variants; losers lower it.
 - Scheduled re-scan re-runs the profit scanner on the niche, catches newly emerging winners, and refreshes blueprints as formulas drift.
@@ -47,7 +51,7 @@ Brackets are real and usable. They're modeled estimates with a confidence range 
 ## Build order
 
 1. Cloud database, design system, shell and dashboard.
-2. Profit scanner with bracket filtering + dataset import (seeded with sample data so the flow is visible immediately).
+2. Profit scanner with bracket filtering + dataset import (seeded with sample data so the flow is visible immediately). Persistent Competitor scanner to stay up to date with new camouflages that 1 up the competition 
 3. Blueprint extractor with evidence and the 95% confidence gate.
 4. Chameleonizer + brand profiles.
 5. Channel spawner, generation queue, script/thumbnail output, render pipeline.
