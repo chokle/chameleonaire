@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
+import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,34 +29,43 @@ const BlueprintsIndexRoute = BlueprintsIndexRouteImport.update({
   path: '/blueprints/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlueprintsIdRoute = BlueprintsIdRouteImport.update({
+  id: '/blueprints/$id',
+  path: '/blueprints/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/scanner': typeof ScannerRoute
+  '/blueprints/$id': typeof BlueprintsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/scanner': typeof ScannerRoute
+  '/blueprints/$id': typeof BlueprintsIdRoute
   '/blueprints': typeof BlueprintsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/scanner': typeof ScannerRoute
+  '/blueprints/$id': typeof BlueprintsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/scanner' | '/blueprints/'
+  fullPaths: '/' | '/scanner' | '/blueprints/$id' | '/blueprints/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/scanner' | '/blueprints'
-  id: '__root__' | '/' | '/scanner' | '/blueprints/'
+  to: '/' | '/scanner' | '/blueprints/$id' | '/blueprints'
+  id: '__root__' | '/' | '/scanner' | '/blueprints/$id' | '/blueprints/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ScannerRoute: typeof ScannerRoute
+  BlueprintsIdRoute: typeof BlueprintsIdRoute
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
 }
 
@@ -82,12 +92,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlueprintsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blueprints/$id': {
+      id: '/blueprints/$id'
+      path: '/blueprints/$id'
+      fullPath: '/blueprints/$id'
+      preLoaderRoute: typeof BlueprintsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ScannerRoute: ScannerRoute,
+  BlueprintsIdRoute: BlueprintsIdRoute,
   BlueprintsIndexRoute: BlueprintsIndexRoute,
 }
 export const routeTree = rootRouteImport
