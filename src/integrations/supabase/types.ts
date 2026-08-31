@@ -14,7 +14,595 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blueprints: {
+        Row: {
+          confidence: number
+          created_at: string
+          deployable: boolean
+          evidence: Json
+          gap_notes: string | null
+          generation: number
+          id: string
+          name: string
+          niche: string
+          parent_id: string | null
+          source_creator_ids: string[]
+          status: string
+          strategy: Json
+          updated_at: string
+          win_rate: number
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          deployable?: boolean
+          evidence?: Json
+          gap_notes?: string | null
+          generation?: number
+          id?: string
+          name: string
+          niche?: string
+          parent_id?: string | null
+          source_creator_ids?: string[]
+          status?: string
+          strategy?: Json
+          updated_at?: string
+          win_rate?: number
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          deployable?: boolean
+          evidence?: Json
+          gap_notes?: string | null
+          generation?: number
+          id?: string
+          name?: string
+          niche?: string
+          parent_id?: string | null
+          source_creator_ids?: string[]
+          status?: string
+          strategy?: Json
+          updated_at?: string
+          win_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprints_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "blueprints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brands: {
+        Row: {
+          audience: string | null
+          banned_topics: string | null
+          created_at: string
+          id: string
+          name: string
+          palette: string | null
+          subject: string | null
+          updated_at: string
+          voice: string | null
+        }
+        Insert: {
+          audience?: string | null
+          banned_topics?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          palette?: string | null
+          subject?: string | null
+          updated_at?: string
+          voice?: string | null
+        }
+        Update: {
+          audience?: string | null
+          banned_topics?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          palette?: string | null
+          subject?: string | null
+          updated_at?: string
+          voice?: string | null
+        }
+        Relationships: []
+      }
+      channels: {
+        Row: {
+          auto_publish: boolean
+          blueprint_id: string | null
+          brand_id: string | null
+          connected: boolean
+          created_at: string
+          divergence: number
+          est_monthly: number
+          id: string
+          name: string
+          status: string
+          updated_at: string
+          uploads_per_week: number
+          youtube_channel_id: string | null
+        }
+        Insert: {
+          auto_publish?: boolean
+          blueprint_id?: string | null
+          brand_id?: string | null
+          connected?: boolean
+          created_at?: string
+          divergence?: number
+          est_monthly?: number
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string
+          uploads_per_week?: number
+          youtube_channel_id?: string | null
+        }
+        Update: {
+          auto_publish?: boolean
+          blueprint_id?: string | null
+          brand_id?: string | null
+          connected?: boolean
+          created_at?: string
+          divergence?: number
+          est_monthly?: number
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+          uploads_per_week?: number
+          youtube_channel_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channels_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "blueprints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channels_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creator_videos: {
+        Row: {
+          created_at: string
+          creator_id: string
+          duration_seconds: number | null
+          est_profit: number
+          hook: string | null
+          id: string
+          published_at: string | null
+          thumbnail_desc: string | null
+          title: string
+          video_url: string | null
+          views: number
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          duration_seconds?: number | null
+          est_profit?: number
+          hook?: string | null
+          id?: string
+          published_at?: string | null
+          thumbnail_desc?: string | null
+          title: string
+          video_url?: string | null
+          views?: number
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          duration_seconds?: number | null
+          est_profit?: number
+          hook?: string | null
+          id?: string
+          published_at?: string | null
+          thumbnail_desc?: string | null
+          title?: string
+          video_url?: string | null
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_videos_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      creators: {
+        Row: {
+          avg_views: number
+          channel_name: string
+          channel_url: string | null
+          consistency_score: number
+          created_at: string
+          data_source: string
+          est_monthly: number
+          est_profit_high: number
+          est_profit_low: number
+          est_profit_per_video: number
+          format: string | null
+          handle: string | null
+          id: string
+          niche: string
+          notes: string | null
+          rpm_high: number
+          rpm_low: number
+          scan_id: string | null
+          subscribers: number
+          updated_at: string
+          uploads_per_month: number
+          view_velocity: number
+        }
+        Insert: {
+          avg_views?: number
+          channel_name: string
+          channel_url?: string | null
+          consistency_score?: number
+          created_at?: string
+          data_source?: string
+          est_monthly?: number
+          est_profit_high?: number
+          est_profit_low?: number
+          est_profit_per_video?: number
+          format?: string | null
+          handle?: string | null
+          id?: string
+          niche?: string
+          notes?: string | null
+          rpm_high?: number
+          rpm_low?: number
+          scan_id?: string | null
+          subscribers?: number
+          updated_at?: string
+          uploads_per_month?: number
+          view_velocity?: number
+        }
+        Update: {
+          avg_views?: number
+          channel_name?: string
+          channel_url?: string | null
+          consistency_score?: number
+          created_at?: string
+          data_source?: string
+          est_monthly?: number
+          est_profit_high?: number
+          est_profit_low?: number
+          est_profit_per_video?: number
+          format?: string | null
+          handle?: string | null
+          id?: string
+          niche?: string
+          notes?: string | null
+          rpm_high?: number
+          rpm_low?: number
+          scan_id?: string | null
+          subscribers?: number
+          updated_at?: string
+          uploads_per_month?: number
+          view_velocity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creators_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_videos: {
+        Row: {
+          approved: boolean
+          blueprint_id: string | null
+          channel_id: string
+          concept: string | null
+          created_at: string
+          description: string | null
+          divergence_applied: number
+          hook: string | null
+          id: string
+          script: string | null
+          status: string
+          tags: string[]
+          thumbnail_prompt: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          approved?: boolean
+          blueprint_id?: string | null
+          channel_id: string
+          concept?: string | null
+          created_at?: string
+          description?: string | null
+          divergence_applied?: number
+          hook?: string | null
+          id?: string
+          script?: string | null
+          status?: string
+          tags?: string[]
+          thumbnail_prompt?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          approved?: boolean
+          blueprint_id?: string | null
+          channel_id?: string
+          concept?: string | null
+          created_at?: string
+          description?: string | null
+          divergence_applied?: number
+          hook?: string | null
+          id?: string
+          script?: string | null
+          status?: string
+          tags?: string[]
+          thumbnail_prompt?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_videos_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "blueprints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generated_videos_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      imported_datasets: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          raw: Json
+          row_count: number
+          source_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          raw?: Json
+          row_count?: number
+          source_type?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          raw?: Json
+          row_count?: number
+          source_type?: string
+        }
+        Relationships: []
+      }
+      job_state: {
+        Row: {
+          id: string
+          last_run_at: string | null
+          lease_until: string | null
+          pause_reason: string | null
+          paused: boolean
+          runs: number
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          last_run_at?: string | null
+          lease_until?: string | null
+          pause_reason?: string | null
+          paused?: boolean
+          runs?: number
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          last_run_at?: string | null
+          lease_until?: string | null
+          pause_reason?: string | null
+          paused?: boolean
+          runs?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      performance_snapshots: {
+        Row: {
+          blueprint_id: string | null
+          captured_at: string
+          channel_id: string | null
+          ctr: number | null
+          est_revenue: number
+          generated_video_id: string | null
+          id: string
+          outcome: string
+          retention: number | null
+          views: number
+        }
+        Insert: {
+          blueprint_id?: string | null
+          captured_at?: string
+          channel_id?: string | null
+          ctr?: number | null
+          est_revenue?: number
+          generated_video_id?: string | null
+          id?: string
+          outcome?: string
+          retention?: number | null
+          views?: number
+        }
+        Update: {
+          blueprint_id?: string | null
+          captured_at?: string
+          channel_id?: string | null
+          ctr?: number | null
+          est_revenue?: number
+          generated_video_id?: string | null
+          id?: string
+          outcome?: string
+          retention?: number | null
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_snapshots_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "blueprints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_snapshots_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_snapshots_generated_video_id_fkey"
+            columns: ["generated_video_id"]
+            isOneToOne: false
+            referencedRelation: "generated_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publish_queue: {
+        Row: {
+          attempts: number
+          channel_id: string
+          created_at: string
+          generated_video_id: string
+          id: string
+          last_error: string | null
+          published_at: string | null
+          scheduled_for: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          channel_id: string
+          created_at?: string
+          generated_video_id: string
+          id?: string
+          last_error?: string | null
+          published_at?: string | null
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          channel_id?: string
+          created_at?: string
+          generated_video_id?: string
+          id?: string
+          last_error?: string | null
+          published_at?: string | null
+          scheduled_for?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publish_queue_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publish_queue_generated_video_id_fkey"
+            columns: ["generated_video_id"]
+            isOneToOne: false
+            referencedRelation: "generated_videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scans: {
+        Row: {
+          bracket_max: number | null
+          bracket_min: number
+          created_at: string
+          error: string | null
+          id: string
+          is_persistent: boolean
+          last_run_at: string | null
+          niche: string
+          results_count: number
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bracket_max?: number | null
+          bracket_min?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          is_persistent?: boolean
+          last_run_at?: string | null
+          niche: string
+          results_count?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bracket_max?: number | null
+          bracket_min?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          is_persistent?: boolean
+          last_run_at?: string | null
+          niche?: string
+          results_count?: number
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
