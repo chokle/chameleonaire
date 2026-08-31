@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/public/hooks/publish-tick")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env["LOVABLE_CRON_SECRET"];
+        const secret = process.env["PUBLISH_CRON_SECRET"];
         const provided =
           request.headers.get("x-cron-secret") ??
           request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
