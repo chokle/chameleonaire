@@ -27,7 +27,7 @@ export const Route = createFileRoute("/blueprints/$id")({
   component: BlueprintDetail,
 });
 
-function Field({ label, value }: { label: string; value?: string }) {
+function Field({ label, value }: { label: string; value?: string | undefined }) {
   if (!value) return null;
   return (
     <div>
