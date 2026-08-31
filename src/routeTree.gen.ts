@@ -14,6 +14,7 @@ import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
 import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
+import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const BlueprintsIdRoute = BlueprintsIdRouteImport.update({
   path: '/blueprints/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChannelsIndexRoute = ChannelsIndexRouteImport.update({
+  id: '/channels/',
+  path: '/channels/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/scanner': typeof ScannerRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
+  '/channels/': typeof ChannelsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/scanner': typeof ScannerRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/blueprints': typeof BlueprintsIndexRoute
+  '/channels': typeof ChannelsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,12 +70,25 @@ export interface FileRoutesById {
   '/scanner': typeof ScannerRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
+  '/channels/': typeof ChannelsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/brands' | '/scanner' | '/blueprints/$id' | '/blueprints/'
+  fullPaths:
+    | '/'
+    | '/brands'
+    | '/scanner'
+    | '/blueprints/$id'
+    | '/blueprints/'
+    | '/channels/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/brands' | '/scanner' | '/blueprints/$id' | '/blueprints'
+  to:
+    | '/'
+    | '/brands'
+    | '/scanner'
+    | '/blueprints/$id'
+    | '/blueprints'
+    | '/channels'
   id:
     | '__root__'
     | '/'
@@ -75,6 +96,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/blueprints/$id'
     | '/blueprints/'
+    | '/channels/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -83,6 +105,7 @@ export interface RootRouteChildren {
   ScannerRoute: typeof ScannerRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
+  ChannelsIndexRoute: typeof ChannelsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlueprintsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/channels/': {
+      id: '/channels/'
+      path: '/channels'
+      fullPath: '/channels/'
+      preLoaderRoute: typeof ChannelsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -131,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScannerRoute: ScannerRoute,
   BlueprintsIdRoute: BlueprintsIdRoute,
   BlueprintsIndexRoute: BlueprintsIndexRoute,
+  ChannelsIndexRoute: ChannelsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
