@@ -140,6 +140,7 @@ function Channels() {
                 <span className="font-mono text-muted-foreground">{divergence}%</span>
               </div>
               <Slider
+                aria-label="Divergence from the source blueprint"
                 value={[divergence]}
                 min={5}
                 max={80}
@@ -157,6 +158,7 @@ function Channels() {
                 <span className="font-mono text-muted-foreground">{uploads}</span>
               </div>
               <Slider
+                aria-label="Uploads per week"
                 value={[uploads]}
                 min={1}
                 max={14}
@@ -170,7 +172,7 @@ function Channels() {
                 <p className="text-sm font-medium">Auto-schedule</p>
                 <p className="text-xs text-muted-foreground">Queue new videos without approval</p>
               </div>
-              <Switch checked={autoPublish} onCheckedChange={setAutoPublish} />
+              <Switch aria-label="Auto-schedule new videos" checked={autoPublish} onCheckedChange={setAutoPublish} />
             </div>
 
             <Button

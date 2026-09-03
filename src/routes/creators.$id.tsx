@@ -7,17 +7,24 @@ import { creatorQuery } from "@/lib/queries";
 import { compact, money } from "@/lib/domain";
 
 export const Route = createFileRoute("/creators/$id")({
-  head: () => ({
-    meta: [
-      { title: "Creator breakdown — chamele-on-air" },
-      {
-        name: "description",
-        content: "Modelled earnings, cadence, consistency and the sampled videos behind one creator's numbers.",
-      },
-      { property: "og:title", content: "Creator breakdown" },
-      { property: "og:description", content: "How the profit-per-video estimate was built." },
-    ],
-  }),
+  head: ({ params }) => {
+    const ref = params.id.slice(0, 8);
+    const title = `Creator ${ref} — chamele-on-air`;
+    const description = `Earnings model, cadence, consistency and sampled videos behind creator ${ref}'s profit-per-video estimate.`;
+    const url = `https://chameleonaire.lovable.app/creators/${params.id}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "profile" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: CreatorDetail,
 });
 

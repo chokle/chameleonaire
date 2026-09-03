@@ -13,17 +13,24 @@ import { DEPLOY_THRESHOLD, type BlueprintEvidence, type StrategyBlueprint } from
 import { refineBlueprint } from "@/lib/blueprint.functions";
 
 export const Route = createFileRoute("/blueprints/$id")({
-  head: () => ({
-    meta: [
-      { title: "Blueprint breakdown — chamele-on-air" },
-      {
-        name: "description",
-        content: "The decoded structure: hook pattern, title formula, beats, pacing and the evidence behind it.",
-      },
-      { property: "og:title", content: "Blueprint breakdown" },
-      { property: "og:description", content: "Structure, evidence and confidence for one winning formula." },
-    ],
-  }),
+  head: ({ params }) => {
+    const ref = params.id.slice(0, 8);
+    const title = `Blueprint ${ref} — chamele-on-air`;
+    const description = `Decoded structure for blueprint ${ref}: hook pattern, title formula, beats, pacing and the evidence behind its confidence score.`;
+    const url = `https://chameleonaire.lovable.app/blueprints/${params.id}`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: BlueprintDetail,
 });
 

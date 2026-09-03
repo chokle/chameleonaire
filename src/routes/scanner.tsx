@@ -138,6 +138,7 @@ function Scanner() {
                 <span className="font-mono text-muted-foreground">{count}</span>
               </div>
               <Slider
+                aria-label="Number of creators to surface"
                 value={[count]}
                 min={3}
                 max={24}
@@ -151,7 +152,7 @@ function Scanner() {
                 <p className="text-sm font-medium">Keep scanning</p>
                 <p className="text-xs text-muted-foreground">Re-sweep this niche for new winners</p>
               </div>
-              <Switch checked={persistent} onCheckedChange={setPersistent} />
+              <Switch aria-label="Keep scanning this niche" checked={persistent} onCheckedChange={setPersistent} />
             </div>
 
             <Button
@@ -197,6 +198,7 @@ function Scanner() {
                 {rows.map((c) => (
                   <li key={c.id} className="flex items-center gap-3 py-3">
                     <Checkbox
+                      aria-label={`Select ${c.channel_name} for blueprint extraction`}
                       checked={selected.includes(c.id)}
                       onCheckedChange={() => toggle(c.id)}
                     />
