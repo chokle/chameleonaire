@@ -102,22 +102,30 @@ function Channels() {
               <Label>Blueprint</Label>
               <Select value={blueprintId} onValueChange={setBlueprintId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pick a cleared blueprint" />
+                  <SelectValue placeholder="Pick a blueprint (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {deployable.length === 0 ? (
+                  {allBlueprints.length === 0 ? (
                     <div className="px-3 py-2 text-xs text-muted-foreground">
-                      No blueprint has passed the {DEPLOY_THRESHOLD}% gate yet.
+                      No blueprints yet — extract one from a scan first.
                     </div>
                   ) : (
-                    deployable.map((b) => (
+                    allBlueprints.map((b) => (
                       <SelectItem key={b.id} value={b.id}>
                         {b.name} · {Math.round(Number(b.confidence))}%
+                        {Number(b.confidence) < DEPLOY_THRESHOLD ? " · locked" : ""}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
+              {selectedLocked ? (
+                <p className="text-xs text-muted-foreground">
+                  This blueprint sits below the {DEPLOY_THRESHOLD}% gate. You can still spawn the
+                  channel and connect YouTube — video generation stays locked until confidence
+                  clears the gate.
+                </p>
+              ) : null}
             </div>
 
             <div className="space-y-2">
