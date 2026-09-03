@@ -1,4 +1,6 @@
-import { auth, defineMcp, type AnyToolDefinition } from "@lovable.dev/mcp-js";
+import { auth, defineMcp } from "@lovable.dev/mcp-js";
+
+type McpTools = Parameters<typeof defineMcp>[0]["tools"];
 import listScans from "./tools/list-scans";
 import listCreators from "./tools/list-creators";
 import listBlueprints from "./tools/list-blueprints";
