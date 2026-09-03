@@ -19,5 +19,13 @@ export default defineMcp({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
   }),
-  tools: [listScans, listCreators, listBlueprints, listChannels, estimateEarnings],
+  // Tools declare no outputSchema; the SDK's type treats that key as required
+  // under exactOptionalPropertyTypes, so widen to the shared tool type here.
+  tools: [
+    listScans,
+    listCreators,
+    listBlueprints,
+    listChannels,
+    estimateEarnings,
+  ] as unknown as AnyToolDefinition[],
 });
