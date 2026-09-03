@@ -54,9 +54,11 @@ function Channels() {
   const [uploads, setUploads] = useState(3);
   const [autoPublish, setAutoPublish] = useState(true);
 
-  const deployable = (blueprints.data ?? []).filter(
-    (b) => Number(b.confidence) >= DEPLOY_THRESHOLD,
+  const allBlueprints = (blueprints.data ?? []).slice().sort(
+    (a, b) => Number(b.confidence) - Number(a.confidence),
   );
+  const selected = allBlueprints.find((b) => b.id === blueprintId) ?? null;
+  const selectedLocked = selected ? Number(selected.confidence) < DEPLOY_THRESHOLD : false;
 
   const spawnChannel = useServerFn(createChannel);
   const create = useMutation({
@@ -100,22 +102,30 @@ function Channels() {
               <Label>Blueprint</Label>
               <Select value={blueprintId} onValueChange={setBlueprintId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pick a cleared blueprint" />
+                  <SelectValue placeholder="Pick a blueprint (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {deployable.length === 0 ? (
+                  {allBlueprints.length === 0 ? (
                     <div className="px-3 py-2 text-xs text-muted-foreground">
-                      No blueprint has passed the {DEPLOY_THRESHOLD}% gate yet.
+                      No blueprints yet — extract one from a scan first.
                     </div>
                   ) : (
-                    deployable.map((b) => (
+                    allBlueprints.map((b) => (
                       <SelectItem key={b.id} value={b.id}>
                         {b.name} · {Math.round(Number(b.confidence))}%
+                        {Number(b.confidence) < DEPLOY_THRESHOLD ? " · locked" : ""}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
+              {selectedLocked ? (
+                <p className="text-xs text-muted-foreground">
+                  This blueprint sits below the {DEPLOY_THRESHOLD}% gate. You can still spawn the
+                  channel and connect YouTube — video generation stays locked until confidence
+                  clears the gate.
+                </p>
+              ) : null}
             </div>
 
             <div className="space-y-2">
@@ -177,11 +187,15 @@ function Channels() {
 
             <Button
               className="w-full"
-              disabled={!name.trim() || !blueprintId || create.isPending}
+              disabled={!name.trim() || create.isPending}
               onClick={() => create.mutate()}
             >
-              <Plus className="mr-1 size-4" /> Spawn channel
+              <Plus className="mr-1 size-4" />
+              {create.isPending ? "Spawning…" : "Spawn channel"}
             </Button>
+            {!name.trim() ? (
+              <p className="text-xs text-muted-foreground">Give the channel a name to spawn it.</p>
+            ) : null}
           </CardContent>
         </Card>
 
