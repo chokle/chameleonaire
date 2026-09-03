@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { brandsQuery } from "@/lib/queries";
-import { supabase } from "@/integrations/supabase/client";
+import { createBrand, deleteBrand } from "@/lib/console.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/brands")({
   head: () => ({
@@ -33,11 +34,12 @@ function Brands() {
   const qc = useQueryClient();
   const { data } = useQuery(brandsQuery);
   const [form, setForm] = useState(EMPTY);
+  const addBrand = useServerFn(createBrand);
+  const removeBrand = useServerFn(deleteBrand);
 
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("brands").insert(form);
-      if (error) throw new Error(error.message);
+      await addBrand({ data: form });
     },
     onSuccess: () => {
       setForm(EMPTY);
@@ -49,8 +51,7 @@ function Brands() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("brands").delete().eq("id", id);
-      if (error) throw new Error(error.message);
+      await removeBrand({ data: { id } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["brands"] }),
     onError: (e: Error) => toast.error(e.message),

@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/select";
 import { blueprintsQuery, brandsQuery, channelsQuery } from "@/lib/queries";
 import { DEPLOY_THRESHOLD } from "@/lib/domain";
-import { supabase } from "@/integrations/supabase/client";
+import { createChannel } from "@/lib/console.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/channels/")({
   validateSearch: z.object({ blueprint: z.string().optional() }),
@@ -57,17 +58,19 @@ function Channels() {
     (b) => Number(b.confidence) >= DEPLOY_THRESHOLD,
   );
 
+  const spawnChannel = useServerFn(createChannel);
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("channels").insert({
-        name,
-        blueprint_id: blueprintId || null,
-        brand_id: brandId || null,
-        divergence,
-        uploads_per_week: uploads,
-        auto_publish: autoPublish,
+      await spawnChannel({
+        data: {
+          name,
+          blueprint_id: blueprintId || null,
+          brand_id: brandId || null,
+          divergence,
+          uploads_per_week: uploads,
+          auto_publish: autoPublish,
+        },
       });
-      if (error) throw new Error(error.message);
     },
     onSuccess: () => {
       setName("");

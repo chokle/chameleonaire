@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { queueQuery, snapshotsQuery } from "@/lib/queries";
-import { supabase } from "@/integrations/supabase/client";
+import { setQueueStatus } from "@/lib/console.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact } from "@/lib/domain";
@@ -56,16 +56,10 @@ function Queue() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const queueStatus = useServerFn(setQueueStatus);
   const setStatus = useMutation({
     mutationFn: async ({ id, status, videoId }: { id: string; status: string; videoId?: string }) => {
-      const { error } = await supabase.from("publish_queue").update({ status }).eq("id", id);
-      if (error) throw new Error(error.message);
-      if (videoId) {
-        await supabase
-          .from("generated_videos")
-          .update({ approved: status === "scheduled" })
-          .eq("id", videoId);
-      }
+      await queueStatus({ data: { id, status, videoId: videoId ?? null } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["queue"] }),
     onError: (e: Error) => toast.error(e.message),
