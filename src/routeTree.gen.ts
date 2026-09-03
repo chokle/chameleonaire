@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScannerRouteImport } from './routes/scanner'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
 import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
@@ -46,6 +47,11 @@ const QueueRoute = QueueRouteImport.update({
 const ScannerRoute = ScannerRouteImport.update({
   id: '/scanner',
   path: '/scanner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlueprintsIndexRoute = BlueprintsIndexRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/brands': typeof BrandsRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/creators/$id': typeof CreatorsIdRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/brands': typeof BrandsRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/creators/$id': typeof CreatorsIdRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/brands': typeof BrandsRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/creators/$id': typeof CreatorsIdRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/queue'
     | '/scanner'
+    | '/sitemap.xml'
     | '/blueprints/$id'
     | '/channels/$id'
     | '/creators/$id'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/queue'
     | '/scanner'
+    | '/sitemap.xml'
     | '/blueprints/$id'
     | '/channels/$id'
     | '/creators/$id'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/queue'
     | '/scanner'
+    | '/sitemap.xml'
     | '/blueprints/$id'
     | '/channels/$id'
     | '/creators/$id'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   BrandsRoute: typeof BrandsRoute
   QueueRoute: typeof QueueRoute
   ScannerRoute: typeof ScannerRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
   CreatorsIdRoute: typeof CreatorsIdRoute
@@ -237,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/scanner'
       fullPath: '/scanner'
       preLoaderRoute: typeof ScannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blueprints/': {
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandsRoute: BrandsRoute,
   QueueRoute: QueueRoute,
   ScannerRoute: ScannerRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   BlueprintsIdRoute: BlueprintsIdRoute,
   ChannelsIdRoute: ChannelsIdRoute,
   CreatorsIdRoute: CreatorsIdRoute,
