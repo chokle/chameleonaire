@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -66,14 +65,6 @@ function AuthPage() {
     }
   };
 
-  const google = async () => {
-    try {
-      await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Google sign-in failed");
-    }
-  };
-
   return (
     <div className="grid-glow min-h-screen place-items-center px-4 py-16">
       <Card className="w-full max-w-sm spectrum-border">
@@ -86,10 +77,6 @@ function AuthPage() {
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button variant="outline" className="w-full" onClick={google}>
-            Continue with Google
-          </Button>
-          <div className="text-center text-xs uppercase tracking-widest text-muted-foreground">or</div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
