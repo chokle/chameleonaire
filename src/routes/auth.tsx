@@ -7,7 +7,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+// Only same-origin relative paths may be used as a post-login destination.
+function safeNext(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>) => {
+    const next = safeNext(s['next']);
+    // Omit the key entirely when absent so `/auth` stays linkable without search params.
+    return next ? { next } : {};
+  },
   head: () => ({
     meta: [
       { title: "Sign in — chamele-on-air" },
@@ -30,16 +42,25 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
 
+  // `next` is validated as a same-origin relative path, so a raw href keeps
+  // OAuth consent round-trips (which are not typed routes) intact.
+  const goNext = () => {
+    if (next) window.location.href = next;
+    else navigate({ to: "/" });
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/" });
+      if (data.session) goNext();
     });
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, next]);
 
   const submit = async () => {
     setBusy(true);
@@ -48,7 +69,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: next ? window.location.origin + next : window.location.origin },
         });
         if (error) throw error;
         toast.success("Account created. Check your inbox if confirmation is required.");
@@ -57,7 +78,7 @@ function AuthPage() {
         if (error) throw error;
       }
       const { data } = await supabase.auth.getSession();
-      if (data.session) navigate({ to: "/" });
+      if (data.session) goNext();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Authentication failed");
     } finally {

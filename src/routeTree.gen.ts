@@ -13,14 +13,17 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
 import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicHooksPublishTickRouteImport } from './routes/api/public/hooks/publish-tick'
 import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
 import { Route as ApiPublicYoutubeCallbackRouteImport } from './routes/api/public/youtube.callback'
@@ -45,6 +48,11 @@ const CalculatorRoute = CalculatorRouteImport.update({
   path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QueueRoute = QueueRouteImport.update({
   id: '/queue',
   path: '/queue',
@@ -60,6 +68,12 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlueprintsIndexRoute = BlueprintsIndexRouteImport.update({
   id: '/blueprints/',
   path: '/blueprints/',
@@ -83,6 +97,11 @@ const ChannelsIdRoute = ChannelsIdRouteImport.update({
 const CreatorsIdRoute = CreatorsIdRouteImport.update({
   id: '/creators/$id',
   path: '/creators/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHooksPublishTickRoute =
@@ -109,14 +128,17 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/mcp': typeof McpRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -126,14 +148,17 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/mcp': typeof McpRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints': typeof BlueprintsIndexRoute
   '/channels': typeof ChannelsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -144,14 +169,17 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/mcp': typeof McpRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -163,14 +191,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/mcp'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
+    | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
     | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
+    | '/.lovable/oauth/consent'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -180,14 +211,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/mcp'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
+    | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
     | '/creators/$id'
     | '/blueprints'
     | '/channels'
+    | '/.lovable/oauth/consent'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -197,14 +231,17 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/mcp'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
+    | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
     | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
+    | '/.lovable/oauth/consent'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -215,14 +252,17 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
+  McpRoute: typeof McpRoute
   QueueRoute: typeof QueueRoute
   ScannerRoute: typeof ScannerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
   CreatorsIdRoute: typeof CreatorsIdRoute
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicHooksPublishTickRoute: typeof ApiPublicHooksPublishTickRoute
   ApiPublicHooksSyncCronSecretRoute: typeof ApiPublicHooksSyncCronSecretRoute
   ApiPublicYoutubeCallbackRoute: typeof ApiPublicYoutubeCallbackRoute
@@ -258,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/queue': {
       id: '/queue'
       path: '/queue'
@@ -277,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blueprints/': {
@@ -314,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/publish-tick': {
       id: '/api/public/hooks/publish-tick'
       path: '/api/public/hooks/publish-tick'
@@ -343,14 +404,18 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
+  McpRoute: McpRoute,
   QueueRoute: QueueRoute,
   ScannerRoute: ScannerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlueprintsIdRoute: BlueprintsIdRoute,
   ChannelsIdRoute: ChannelsIdRoute,
   CreatorsIdRoute: CreatorsIdRoute,
   BlueprintsIndexRoute: BlueprintsIndexRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicHooksPublishTickRoute: ApiPublicHooksPublishTickRoute,
   ApiPublicHooksSyncCronSecretRoute: ApiPublicHooksSyncCronSecretRoute,
   ApiPublicYoutubeCallbackRoute: ApiPublicYoutubeCallbackRoute,

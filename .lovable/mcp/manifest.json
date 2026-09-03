@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "sdk_version": "1.0.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://bqtuzsgjwsfgeaagqfvz.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "chameleonaire",
+      "version": "0.1.0",
+      "title": "Chameleonaire"
+    },
+    "tools": [
+      {
+        "name": "list_scans",
+        "title": "List profit scans",
+        "description": "List recent creator profit scans with their niche, profit bracket, status and result count.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "default": 10,
+              "description": "How many scans to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_creators",
+        "title": "List surfaced creators",
+        "description": "List creators surfaced by scans, with subscribers, average views and estimated profit per video. Filter by niche, scan or minimum profit.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "niche": {
+              "description": "Only creators in this niche.",
+              "type": "string",
+              "minLength": 1
+            },
+            "scan_id": {
+              "description": "Only creators from this scan.",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "min_profit_per_video": {
+              "description": "Minimum estimated profit per video, in USD.",
+              "type": "number",
+              "minimum": 0
+            },
+            "limit": {
+              "default": 20,
+              "description": "How many creators to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_blueprints",
+        "title": "List strategy blueprints",
+        "description": "List extracted strategy blueprints with their niche, confidence score, generation and whether they are deployable.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "niche": {
+              "description": "Only blueprints in this niche.",
+              "type": "string",
+              "minLength": 1
+            },
+            "min_confidence": {
+              "description": "Minimum confidence score (0-100).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "limit": {
+              "default": 20,
+              "description": "How many blueprints to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_channels",
+        "title": "List spawned channels",
+        "description": "List spawned channels with their brand, blueprint, auto-publish setting and status.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "default": 20,
+              "description": "How many channels to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "estimate_earnings",
+        "title": "Estimate channel earnings",
+        "description": "Estimate YouTube earnings from average views per video, upload cadence and niche RPM. Returns per-video, monthly and yearly low/high ranges in USD.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "avg_views_per_video": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Average views per video."
+            },
+            "videos_per_month": {
+              "default": 8,
+              "description": "Videos published per month.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 300
+            },
+            "niche": {
+              "default": "finance",
+              "description": "Content niche. Known niches: finance, business, tech, ai, real estate, health, fitness, education, gaming, entertainment, lifestyle, travel, food, automotive, true crime, general.",
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "avg_views_per_video"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
