@@ -15,7 +15,11 @@ function safeNext(value: unknown): string | undefined {
 }
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({ next: safeNext(s['next']) }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const next = safeNext(s['next']);
+    // Omit the key entirely when absent so `/auth` stays linkable without search params.
+    return next ? { next } : {};
+  },
   head: () => ({
     meta: [
       { title: "Sign in — chamele-on-air" },
