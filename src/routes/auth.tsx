@@ -38,16 +38,25 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
 
+  // `next` is validated as a same-origin relative path, so a raw href keeps
+  // OAuth consent round-trips (which are not typed routes) intact.
+  const goNext = () => {
+    if (next) window.location.href = next;
+    else navigate({ to: "/" });
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/" });
+      if (data.session) goNext();
     });
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, next]);
 
   const submit = async () => {
     setBusy(true);
@@ -56,7 +65,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: next ? window.location.origin + next : window.location.origin },
         });
         if (error) throw error;
         toast.success("Account created. Check your inbox if confirmation is required.");
@@ -65,7 +74,7 @@ function AuthPage() {
         if (error) throw error;
       }
       const { data } = await supabase.auth.getSession();
-      if (data.session) navigate({ to: "/" });
+      if (data.session) goNext();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Authentication failed");
     } finally {
