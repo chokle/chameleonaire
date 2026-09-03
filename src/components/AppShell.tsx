@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Boxes,
+  Calculator,
   CalendarClock,
   Fingerprint,
   Gauge,
@@ -16,6 +17,7 @@ import type { ReactNode } from "react";
 const NAV = [
   { to: "/", label: "Command", icon: Gauge },
   { to: "/scanner", label: "Profit scanner", icon: Radar },
+  { to: "/calculator", label: "Money calculator", icon: Calculator },
   { to: "/blueprints", label: "Blueprints", icon: Fingerprint },
   { to: "/brands", label: "Brands", icon: Palette },
   { to: "/channels", label: "Channels", icon: Boxes },
