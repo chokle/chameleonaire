@@ -211,7 +211,7 @@ function Scanner() {
                           {c.channel_name}
                         </a>
                         <Badge variant="outline" className="shrink-0 text-[10px]">
-                          {c.data_source === "youtube" ? "verified metadata" : "modelled"}
+                          {c.data_source?.startsWith("youtube") ? "verified metadata" : "modelled"}
                         </Badge>
                       </div>
                       <p className="truncate text-xs text-muted-foreground">
