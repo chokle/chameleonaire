@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
+import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -37,6 +38,11 @@ const AuthRoute = AuthRouteImport.update({
 const BrandsRoute = BrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QueueRoute = QueueRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
+  '/calculator': typeof CalculatorRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
+  '/calculator': typeof CalculatorRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
+  '/calculator': typeof CalculatorRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/brands'
+    | '/calculator'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/brands'
+    | '/calculator'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/brands'
+    | '/calculator'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   BrandsRoute: typeof BrandsRoute
+  CalculatorRoute: typeof CalculatorRoute
   QueueRoute: typeof QueueRoute
   ScannerRoute: typeof ScannerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -236,6 +249,13 @@ declare module '@tanstack/react-router' {
       path: '/brands'
       fullPath: '/brands'
       preLoaderRoute: typeof BrandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/queue': {
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   BrandsRoute: BrandsRoute,
+  CalculatorRoute: CalculatorRoute,
   QueueRoute: QueueRoute,
   ScannerRoute: ScannerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
