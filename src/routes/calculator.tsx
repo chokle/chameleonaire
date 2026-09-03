@@ -73,6 +73,7 @@ function CalculatorPage() {
 
   return (
     <AppShell
+      publicPage
       title="YouTube money calculator"
       subtitle="Estimate what a channel earns — per video, per month, per year — from views, niche RPM and sponsorship uplift."
     >
