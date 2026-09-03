@@ -118,7 +118,19 @@ export function AppShell({
             </div>
             {action}
           </div>
-          {children}
+          {locked ? (
+            <div className="rounded-lg border border-dashed border-border p-10 text-center">
+              <p className="text-sm text-muted-foreground">
+                Sign in to run scans, extract blueprints and manage channels.
+              </p>
+              <Button className="mt-4" onClick={() => navigate({ to: "/auth" })}>
+                Sign in
+              </Button>
+            </div>
+          ) : (
+            children
+          )}
+
         </div>
       </main>
     </div>
