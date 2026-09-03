@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const ScanInput = z.object({
@@ -11,13 +12,15 @@ const ScanInput = z.object({
 });
 
 export const runScan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ScanInput.parse(input))
   .handler(async ({ data }) => {
     const { executeScan } = await import("./scan.server");
     return executeScan(data);
   });
 
-export const rescanPersistent = createServerFn({ method: "POST" }).handler(async () => {
+export const rescanPersistent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth]).handler(async () => {
   const { runPersistentSweep } = await import("./scan.server");
   return runPersistentSweep();
 });

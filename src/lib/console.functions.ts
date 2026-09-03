@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 /**
@@ -26,6 +27,7 @@ async function admin() {
 }
 
 export const createBrand = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => brandInput.parse(data))
   .handler(async ({ data }) => {
     const db = await admin();
@@ -35,6 +37,7 @@ export const createBrand = createServerFn({ method: "POST" })
   });
 
 export const deleteBrand = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: uuid }).parse(data))
   .handler(async ({ data }) => {
     const db = await admin();
@@ -44,6 +47,7 @@ export const deleteBrand = createServerFn({ method: "POST" })
   });
 
 export const createChannel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
     z
       .object({
@@ -64,6 +68,7 @@ export const createChannel = createServerFn({ method: "POST" })
   });
 
 export const setQueueStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
     z
       .object({
@@ -87,6 +92,7 @@ export const setQueueStatus = createServerFn({ method: "POST" })
   });
 
 export const setVideoApproval = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
     z.object({ videoId: uuid, approved: z.boolean() }).parse(data),
   )
