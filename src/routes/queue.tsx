@@ -56,16 +56,10 @@ function Queue() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const queueStatus = useServerFn(setQueueStatus);
   const setStatus = useMutation({
     mutationFn: async ({ id, status, videoId }: { id: string; status: string; videoId?: string }) => {
-      const { error } = await supabase.from("publish_queue").update({ status }).eq("id", id);
-      if (error) throw new Error(error.message);
-      if (videoId) {
-        await supabase
-          .from("generated_videos")
-          .update({ approved: status === "scheduled" })
-          .eq("id", videoId);
-      }
+      await queueStatus({ data: { id, status, videoId: videoId ?? null } });
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["queue"] }),
     onError: (e: Error) => toast.error(e.message),
