@@ -187,11 +187,15 @@ function Channels() {
 
             <Button
               className="w-full"
-              disabled={!name.trim() || !blueprintId || create.isPending}
+              disabled={!name.trim() || create.isPending}
               onClick={() => create.mutate()}
             >
-              <Plus className="mr-1 size-4" /> Spawn channel
+              <Plus className="mr-1 size-4" />
+              {create.isPending ? "Spawning…" : "Spawn channel"}
             </Button>
+            {!name.trim() ? (
+              <p className="text-xs text-muted-foreground">Give the channel a name to spawn it.</p>
+            ) : null}
           </CardContent>
         </Card>
 
