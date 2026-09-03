@@ -21,6 +21,7 @@ import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
 import { Route as ChannelsIndexRouteImport } from './routes/channels.index'
 import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as ApiPublicHooksPublishTickRouteImport } from './routes/api/public/hooks/publish-tick'
 import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
 import { Route as ApiPublicYoutubeCallbackRouteImport } from './routes/api/public/youtube.callback'
@@ -85,6 +86,11 @@ const CreatorsIdRoute = CreatorsIdRouteImport.update({
   path: '/creators/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksPublishTickRoute =
   ApiPublicHooksPublishTickRouteImport.update({
     id: '/api/public/hooks/publish-tick',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints': typeof BlueprintsIndexRoute
   '/channels': typeof ChannelsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/creators/$id': typeof CreatorsIdRoute
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
+    | '/.lovable/oauth/consent'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/creators/$id'
     | '/blueprints'
     | '/channels'
+    | '/.lovable/oauth/consent'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/creators/$id'
     | '/blueprints/'
     | '/channels/'
+    | '/.lovable/oauth/consent'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   CreatorsIdRoute: typeof CreatorsIdRoute
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicHooksPublishTickRoute: typeof ApiPublicHooksPublishTickRoute
   ApiPublicHooksSyncCronSecretRoute: typeof ApiPublicHooksSyncCronSecretRoute
   ApiPublicYoutubeCallbackRoute: typeof ApiPublicYoutubeCallbackRoute
@@ -314,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreatorsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/publish-tick': {
       id: '/api/public/hooks/publish-tick'
       path: '/api/public/hooks/publish-tick'
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreatorsIdRoute: CreatorsIdRoute,
   BlueprintsIndexRoute: BlueprintsIndexRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicHooksPublishTickRoute: ApiPublicHooksPublishTickRoute,
   ApiPublicHooksSyncCronSecretRoute: ApiPublicHooksSyncCronSecretRoute,
   ApiPublicYoutubeCallbackRoute: ApiPublicYoutubeCallbackRoute,
