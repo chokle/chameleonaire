@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { queueQuery, snapshotsQuery } from "@/lib/queries";
-import { supabase } from "@/integrations/supabase/client";
+import { setQueueStatus } from "@/lib/console.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact } from "@/lib/domain";

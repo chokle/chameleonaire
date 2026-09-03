@@ -21,7 +21,7 @@ import {
   youtubeDisconnect,
   youtubeReady,
 } from "@/lib/publish.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { setVideoApproval } from "@/lib/console.functions";
 
 export const Route = createFileRoute("/channels/$id")({
   head: () => ({
@@ -81,18 +81,10 @@ function ChannelDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const approve = useServerFn(setVideoApproval);
   const approving = useMutation({
     mutationFn: async ({ videoId, approved }: { videoId: string; approved: boolean }) => {
-      const { error } = await supabase
-        .from("generated_videos")
-        .update({ approved })
-        .eq("id", videoId);
-      if (error) throw new Error(error.message);
-      await supabase
-        .from("publish_queue")
-        .update({ status: approved ? "scheduled" : "awaiting_approval" })
-        .eq("generated_video_id", videoId)
-        .in("status", ["awaiting_approval", "scheduled"]);
+      await approve({ data: { videoId, approved } });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["channel-videos", id] });

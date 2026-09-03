@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/select";
 import { blueprintsQuery, brandsQuery, channelsQuery } from "@/lib/queries";
 import { DEPLOY_THRESHOLD } from "@/lib/domain";
-import { supabase } from "@/integrations/supabase/client";
+import { createChannel } from "@/lib/console.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/channels/")({
   validateSearch: z.object({ blueprint: z.string().optional() }),
