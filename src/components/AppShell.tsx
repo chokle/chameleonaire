@@ -1,4 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Boxes,
   CalendarClock,
@@ -30,6 +33,17 @@ export function AppShell({
   subtitle?: string;
   action?: ReactNode;
 }) {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setEmail(session?.user.email ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
@@ -43,6 +57,27 @@ export function AppShell({
                 chamele<span className="spectrum-text">-on-</span>air
               </span>
             </Link>
+            <div className="ml-auto flex items-center gap-2">
+              {email ? (
+                <>
+                  <span className="hidden text-xs text-muted-foreground sm:inline">{email}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      navigate({ to: "/auth" });
+                    }}
+                  >
+                    Sign out
+                  </Button>
+                </>
+              ) : (
+                <Button size="sm" variant="outline" onClick={() => navigate({ to: "/auth" })}>
+                  Sign in
+                </Button>
+              )}
+            </div>
           </div>
           <nav className="-mx-1 flex gap-1 overflow-x-auto pb-1">
             {NAV.map(({ to, label, icon: Icon }) => (
