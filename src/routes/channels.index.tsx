@@ -54,9 +54,11 @@ function Channels() {
   const [uploads, setUploads] = useState(3);
   const [autoPublish, setAutoPublish] = useState(true);
 
-  const deployable = (blueprints.data ?? []).filter(
-    (b) => Number(b.confidence) >= DEPLOY_THRESHOLD,
+  const allBlueprints = (blueprints.data ?? []).slice().sort(
+    (a, b) => Number(b.confidence) - Number(a.confidence),
   );
+  const selected = allBlueprints.find((b) => b.id === blueprintId) ?? null;
+  const selectedLocked = selected ? Number(selected.confidence) < DEPLOY_THRESHOLD : false;
 
   const spawnChannel = useServerFn(createChannel);
   const create = useMutation({
