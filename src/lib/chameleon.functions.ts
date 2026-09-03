@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const SpawnInput = z.object({
@@ -7,6 +8,7 @@ const SpawnInput = z.object({
 });
 
 export const chameleonize = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SpawnInput.parse(input))
   .handler(async ({ data }) => {
     const { generateForChannel } = await import("./chameleon.server");
@@ -16,6 +18,7 @@ export const chameleonize = createServerFn({ method: "POST" })
 const ThumbInput = z.object({ videoId: z.string().uuid() });
 
 export const renderThumbnail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ThumbInput.parse(input))
   .handler(async ({ data }) => {
     const { makeThumbnail } = await import("./chameleon.server");
@@ -25,6 +28,7 @@ export const renderThumbnail = createServerFn({ method: "POST" })
 const LoopInput = z.object({ channelId: z.string().uuid().nullable().default(null) });
 
 export const runFeedbackLoop = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => LoopInput.parse(input))
   .handler(async ({ data }) => {
     const { learnFromPerformance } = await import("./chameleon.server");

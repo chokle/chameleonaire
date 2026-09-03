@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const ExtractInput = z.object({
@@ -7,6 +8,7 @@ const ExtractInput = z.object({
 });
 
 export const extractBlueprint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ExtractInput.parse(input))
   .handler(async ({ data }) => {
     const { buildBlueprint } = await import("./blueprint.server");
@@ -16,6 +18,7 @@ export const extractBlueprint = createServerFn({ method: "POST" })
 const RefineInput = z.object({ blueprintId: z.string().uuid() });
 
 export const refineBlueprint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => RefineInput.parse(input))
   .handler(async ({ data }) => {
     const { evolveBlueprint } = await import("./blueprint.server");
