@@ -29,22 +29,32 @@ export function AppShell({
   title,
   subtitle,
   action,
+  publicPage = false,
 }: {
   children: ReactNode;
   title: string;
   subtitle?: string;
   action?: ReactNode;
+  publicPage?: boolean;
 }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setEmail(data.session?.user.email ?? null));
+    supabase.auth.getSession().then(({ data }) => {
+      setEmail(data.session?.user.email ?? null);
+      setReady(true);
+    });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setEmail(session?.user.email ?? null);
+      setReady(true);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  const locked = !publicPage && ready && !email;
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -108,7 +118,19 @@ export function AppShell({
             </div>
             {action}
           </div>
-          {children}
+          {locked ? (
+            <div className="rounded-lg border border-dashed border-border p-10 text-center">
+              <p className="text-sm text-muted-foreground">
+                Sign in to run scans, extract blueprints and manage channels.
+              </p>
+              <Button className="mt-4" onClick={() => navigate({ to: "/auth" })}>
+                Sign in
+              </Button>
+            </div>
+          ) : (
+            children
+          )}
+
         </div>
       </main>
     </div>
