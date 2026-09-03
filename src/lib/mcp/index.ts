@@ -29,5 +29,5 @@ export default defineMcp({
     listBlueprints,
     listChannels,
     estimateEarnings,
-  ] as unknown as AnyToolDefinition[],
+  ] as unknown as McpTools,
 });
