@@ -2,6 +2,8 @@
 
 const AUTH = "https://accounts.google.com/o/oauth2/v2/auth";
 const TOKEN = "https://oauth2.googleapis.com/token";
+const YOUTUBE_CALLBACK_URL =
+  "https://chameleonaire.lovable.app/api/public/youtube/callback";
 
 export const YT_SCOPES = [
   "https://www.googleapis.com/auth/youtube.upload",
@@ -20,12 +22,12 @@ async function admin() {
   return supabaseAdmin;
 }
 
-export function callbackUrl(origin: string): string {
-  return `${origin.replace(/\/$/, "")}/api/public/youtube/callback`;
+export function callbackUrl(): string {
+  return YOUTUBE_CALLBACK_URL;
 }
 
 /** Builds the Google consent URL for a spawned channel and stores the CSRF state. */
-export async function buildConsentUrl(channelId: string, origin: string): Promise<string> {
+export async function buildConsentUrl(channelId: string): Promise<string> {
   const creds = oauthCreds();
   if (!creds) {
     throw new Error(
@@ -34,7 +36,9 @@ export async function buildConsentUrl(channelId: string, origin: string): Promis
   }
   const db = await admin();
   const state = crypto.randomUUID().replace(/-/g, "");
-  const redirect = callbackUrl(origin);
+  // OAuth providers require an exact callback match. Always use the registered,
+  // stable production callback even when the flow starts on preview/custom domains.
+  const redirect = callbackUrl();
 
   const { error } = await db
     .from("oauth_states")

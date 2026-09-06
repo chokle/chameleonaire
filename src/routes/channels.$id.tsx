@@ -63,7 +63,7 @@ function ChannelDetail() {
   });
 
   const connecting = useMutation({
-    mutationFn: () => connect({ data: { channelId: id, origin: window.location.origin } }),
+    mutationFn: () => connect({ data: { channelId: id } }),
     onSuccess: (r: { url: string }) => {
       window.location.href = r.url;
     },
