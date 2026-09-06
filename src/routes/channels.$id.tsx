@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useRef } from "react";
 import { Film, Image as ImageIcon, Link2, Loader2, Sparkles, Unlink } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -56,6 +57,7 @@ function ChannelDetail() {
   const disconnectFn = useServerFn(youtubeDisconnect);
   const readyFn = useServerFn(youtubeReady);
   const render = useServerFn(renderVideo);
+  const youtubePopup = useRef<Window | null>(null);
 
   const { data: ready } = useQuery({
     queryKey: ["youtube-ready"],
@@ -65,10 +67,28 @@ function ChannelDetail() {
   const connecting = useMutation({
     mutationFn: () => connect({ data: { channelId: id } }),
     onSuccess: (r: { url: string }) => {
+      if (youtubePopup.current && !youtubePopup.current.closed) {
+        youtubePopup.current.location.href = r.url;
+        youtubePopup.current.focus();
+        return;
+      }
       window.location.href = r.url;
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      youtubePopup.current?.close();
+      youtubePopup.current = null;
+      toast.error(e.message);
+    },
   });
+
+  const startYouTubeConnection = () => {
+    youtubePopup.current = window.open(
+      "about:blank",
+      "youtube-oauth",
+      "popup,width=600,height=760",
+    );
+    connecting.mutate();
+  };
 
   const disconnecting = useMutation({
     mutationFn: () => disconnectFn({ data: { channelId: id } }),
@@ -177,7 +197,7 @@ function ChannelDetail() {
               <Button
                 size="sm"
                 className="ml-auto"
-                onClick={() => connecting.mutate()}
+                onClick={startYouTubeConnection}
                 disabled={connecting.isPending || !ready?.oauth}
               >
                 {connecting.isPending ? (
