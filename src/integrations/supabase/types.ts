@@ -26,6 +26,7 @@ export type Database = {
           name: string
           niche: string
           parent_id: string | null
+          signal_coverage: number
           source_creator_ids: string[]
           status: string
           strategy: Json
@@ -43,6 +44,7 @@ export type Database = {
           name: string
           niche?: string
           parent_id?: string | null
+          signal_coverage?: number
           source_creator_ids?: string[]
           status?: string
           strategy?: Json
@@ -60,6 +62,7 @@ export type Database = {
           name?: string
           niche?: string
           parent_id?: string | null
+          signal_coverage?: number
           source_creator_ids?: string[]
           status?: string
           strategy?: Json
@@ -180,39 +183,54 @@ export type Database = {
       }
       creator_videos: {
         Row: {
+          comments: number
           created_at: string
           creator_id: string
+          ctr_proxy: number | null
           duration_seconds: number | null
+          engagement_rate: number
           est_profit: number
           hook: string | null
           id: string
+          likes: number
           published_at: string | null
+          retention_proxy: number | null
           thumbnail_desc: string | null
           title: string
           video_url: string | null
           views: number
         }
         Insert: {
+          comments?: number
           created_at?: string
           creator_id: string
+          ctr_proxy?: number | null
           duration_seconds?: number | null
+          engagement_rate?: number
           est_profit?: number
           hook?: string | null
           id?: string
+          likes?: number
           published_at?: string | null
+          retention_proxy?: number | null
           thumbnail_desc?: string | null
           title: string
           video_url?: string | null
           views?: number
         }
         Update: {
+          comments?: number
           created_at?: string
           creator_id?: string
+          ctr_proxy?: number | null
           duration_seconds?: number | null
+          engagement_rate?: number
           est_profit?: number
           hook?: string | null
           id?: string
+          likes?: number
           published_at?: string | null
+          retention_proxy?: number | null
           thumbnail_desc?: string | null
           title?: string
           video_url?: string | null
@@ -235,7 +253,9 @@ export type Database = {
           channel_url: string | null
           consistency_score: number
           created_at: string
+          ctr_proxy: number | null
           data_source: string
+          engagement_rate: number
           est_monthly: number
           est_profit_high: number
           est_profit_low: number
@@ -245,9 +265,11 @@ export type Database = {
           id: string
           niche: string
           notes: string | null
+          retention_proxy: number | null
           rpm_high: number
           rpm_low: number
           scan_id: string | null
+          signal_coverage: number
           subscribers: number
           updated_at: string
           uploads_per_month: number
@@ -259,7 +281,9 @@ export type Database = {
           channel_url?: string | null
           consistency_score?: number
           created_at?: string
+          ctr_proxy?: number | null
           data_source?: string
+          engagement_rate?: number
           est_monthly?: number
           est_profit_high?: number
           est_profit_low?: number
@@ -269,9 +293,11 @@ export type Database = {
           id?: string
           niche?: string
           notes?: string | null
+          retention_proxy?: number | null
           rpm_high?: number
           rpm_low?: number
           scan_id?: string | null
+          signal_coverage?: number
           subscribers?: number
           updated_at?: string
           uploads_per_month?: number
@@ -283,7 +309,9 @@ export type Database = {
           channel_url?: string | null
           consistency_score?: number
           created_at?: string
+          ctr_proxy?: number | null
           data_source?: string
+          engagement_rate?: number
           est_monthly?: number
           est_profit_high?: number
           est_profit_low?: number
@@ -293,9 +321,11 @@ export type Database = {
           id?: string
           niche?: string
           notes?: string | null
+          retention_proxy?: number | null
           rpm_high?: number
           rpm_low?: number
           scan_id?: string | null
+          signal_coverage?: number
           subscribers?: number
           updated_at?: string
           uploads_per_month?: number

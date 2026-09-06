@@ -1,5 +1,5 @@
 import { callAI, parseJSON } from "./ai.server";
-import { estimateProfit, rpmBandFor } from "./domain";
+import { ctrProxy, engagementRate, estimateProfit, retentionProxy, rpmBandFor } from "./domain";
 import { getChannels, getRecentVideos, searchChannels, youtubeKey } from "./youtube.server";
 
 type ScanArgs = {
@@ -64,6 +64,13 @@ async function scanViaApi(args: ScanArgs, key: string) {
     const consistency = Math.max(0, Math.min(100, Math.round(100 - Math.sqrt(variance) * 60)));
     const newest = videos.slice(0, 3).reduce((s, v) => s + v.views, 0) / Math.min(3, videos.length);
 
+    const vidSignals = videos.map((v) => ({
+      engagement: engagementRate(v),
+      retention: retentionProxy(v),
+      ctr: ctrProxy(v, ch.subscribers),
+    }));
+    const mean0 = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+
     rows.push({
       creator: {
         channel_name: ch.title,
@@ -83,6 +90,10 @@ async function scanViaApi(args: ScanArgs, key: string) {
         consistency_score: consistency,
         format: videos[0] && videos[0].durationSeconds < 90 ? "short-form" : "long-form",
         data_source: "youtube_api",
+        engagement_rate: Number(mean0(vidSignals.map((s) => s.engagement)).toFixed(3)),
+        retention_proxy: Number(mean0(vidSignals.map((s) => s.retention)).toFixed(1)),
+        ctr_proxy: Number(mean0(vidSignals.map((s) => s.ctr)).toFixed(1)),
+        signal_coverage: 100,
       },
       videos: videos.slice(0, 10).map((v) => ({
         title: v.title,
@@ -91,6 +102,11 @@ async function scanViaApi(args: ScanArgs, key: string) {
         duration_seconds: v.durationSeconds,
         published_at: v.publishedAt,
         est_profit: estimateProfit(v.views, args.niche).profit,
+        likes: v.likes,
+        comments: v.comments,
+        engagement_rate: engagementRate(v),
+        retention_proxy: retentionProxy(v),
+        ctr_proxy: ctrProxy(v, ch.subscribers),
       })),
     });
   }
@@ -150,6 +166,10 @@ async function scanViaModel(args: ScanArgs, datasetRows: unknown[]) {
           format: c.format ?? "long-form",
           data_source: datasetRows.length ? "model+dataset" : "model",
           notes: c.notes ?? null,
+          engagement_rate: 0,
+          retention_proxy: null,
+          ctr_proxy: null,
+          signal_coverage: 0,
         },
         videos: (c.videos ?? []).slice(0, 8).map((v) => ({
           title: v.title,
