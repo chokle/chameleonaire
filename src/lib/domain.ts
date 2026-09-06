@@ -104,3 +104,105 @@ export type BlueprintEvidence = {
 
 export const DEPLOY_THRESHOLD = 95;
 export const IDEAL_THRESHOLD = 97;
+
+/* ---------------------------------------------------------------------------
+ * Signal layer
+ *
+ * True retention and CTR are private to a channel owner (YouTube Analytics).
+ * From public metadata we derive calibrated *proxies* and always report how
+ * much real signal backs a score, so confidence is earned rather than claimed.
+ * ------------------------------------------------------------------------ */
+
+export type VideoSignals = {
+  views: number;
+  likes?: number | null;
+  comments?: number | null;
+  durationSeconds?: number | null;
+  publishedAt?: string | null;
+};
+
+/** Likes + comments per 1,000 views, expressed as a percentage of views. */
+export function engagementRate(v: VideoSignals): number {
+  const views = Math.max(1, Number(v.views) || 0);
+  const inter = (Number(v.likes) || 0) + (Number(v.comments) || 0);
+  return Number(((inter / views) * 100).toFixed(3));
+}
+
+/**
+ * Watch-through proxy (0-100). Engagement per view correlates strongly with
+ * average view percentage; longer videos need more of it to hold an audience,
+ * so the score is length-normalised.
+ */
+export function retentionProxy(v: VideoSignals): number {
+  const er = engagementRate(v);
+  const mins = Math.max(0.5, (Number(v.durationSeconds) || 480) / 60);
+  const lengthPenalty = Math.min(1, 8 / mins); // 8 minutes = neutral
+  const raw = (er / 4) * 100 * (0.55 + 0.45 * lengthPenalty);
+  return Number(Math.max(0, Math.min(100, raw)).toFixed(1));
+}
+
+/**
+ * Click-through proxy (0-100). Views earned per subscriber, aged by how long
+ * the video has been live — a young video already over its subscriber base is
+ * being clicked hard in browse and suggested.
+ */
+export function ctrProxy(v: VideoSignals, subscribers: number): number {
+  const subs = Math.max(1, Number(subscribers) || 0);
+  const ratio = (Number(v.views) || 0) / subs;
+  const ageDays = v.publishedAt
+    ? Math.max(1, (Date.now() - new Date(v.publishedAt).getTime()) / 86_400_000)
+    : 30;
+  const aged = ratio * Math.min(1.6, 30 / ageDays + 0.4);
+  // 0.25 views/sub ≈ typical browse CTR; 1.5+ ≈ breakout reach.
+  return Number(Math.max(0, Math.min(100, (aged / 1.5) * 100)).toFixed(1));
+}
+
+export type SignalCoverage = {
+  score: number; // 0-100, how much verified signal backs an extraction
+  missing: string[];
+};
+
+/**
+ * How trustworthy the evidence base is. Drives the confidence ceiling so a
+ * blueprint can only clear the 95% gate on real, broad, engagement-rich data.
+ */
+export function signalCoverage(input: {
+  videoCount: number;
+  channelCount: number;
+  withEngagement: number;
+  withRetention: number;
+  withCtr: number;
+  verifiedSources: number; // channels sourced from the YouTube API, not modelled
+}): SignalCoverage {
+  const missing: string[] = [];
+  const pct = (n: number) => (input.videoCount ? n / input.videoCount : 0);
+
+  const volume = Math.min(1, input.videoCount / 60);
+  const breadth = Math.min(1, input.channelCount / 4);
+  const engagement = pct(input.withEngagement);
+  const retention = pct(input.withRetention);
+  const ctr = pct(input.withCtr);
+  const verified = input.channelCount ? input.verifiedSources / input.channelCount : 0;
+
+  if (input.videoCount < 60) missing.push(`${60 - input.videoCount} more sampled videos`);
+  if (input.channelCount < 4) missing.push(`${4 - input.channelCount} more source channels`);
+  if (engagement < 0.8) missing.push("like/comment data on more videos");
+  if (retention < 0.8) missing.push("watch-through signal on more videos");
+  if (ctr < 0.8) missing.push("click-through signal on more videos");
+  if (verified < 0.8) missing.push("more channels pulled live from YouTube instead of modelled");
+
+  const score =
+    volume * 20 + breadth * 15 + engagement * 20 + retention * 15 + ctr * 15 + verified * 15;
+
+  return { score: Math.round(Math.max(0, Math.min(100, score))), missing };
+}
+
+/** Confidence ceiling implied by the evidence base. */
+export function confidenceCeiling(coverage: number): number {
+  if (coverage >= 90) return 99;
+  if (coverage >= 80) return 97;
+  if (coverage >= 70) return 95;
+  if (coverage >= 55) return 92;
+  if (coverage >= 40) return 88;
+  return 82;
+}
