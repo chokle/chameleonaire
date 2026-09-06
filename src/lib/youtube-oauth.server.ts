@@ -51,7 +51,9 @@ export async function buildConsentUrl(channelId: string): Promise<string> {
     response_type: "code",
     scope: YT_SCOPES,
     access_type: "offline",
-    prompt: "consent",
+    // Force account selection so a restricted Workspace account can be swapped
+    // for the Google account that owns the intended YouTube channel.
+    prompt: "select_account consent",
     include_granted_scopes: "true",
     state,
   });
