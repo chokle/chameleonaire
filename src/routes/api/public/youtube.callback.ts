@@ -13,16 +13,27 @@ a{color:#8ef;display:inline-block;margin-top:16px}</style></head>
   );
 }
 
+function googleErrorMessage(error: string, description: string | null): string {
+  if (error === "access_denied") {
+    return "Google denied access. If the OAuth app is still in Testing, add this Google account under OAuth Audience → Test users, then try again.";
+  }
+  if (error === "redirect_uri_mismatch") {
+    return "Google rejected the callback address. The authorized redirect URI must exactly match the app’s published YouTube callback.";
+  }
+  return description ? `Google returned: ${error} — ${description}` : `Google returned: ${error}`;
+}
+
 export const Route = createFileRoute("/api/public/youtube/callback")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const error = url.searchParams.get("error");
+        const errorDescription = url.searchParams.get("error_description");
         const code = url.searchParams.get("code");
         const state = url.searchParams.get("state");
 
-        if (error) return page("Connection cancelled", `Google returned: ${error}`, false);
+        if (error) return page("Connection blocked", googleErrorMessage(error, errorDescription), false);
         if (!code || !state) return page("Invalid callback", "Missing authorization code.", false);
 
         try {

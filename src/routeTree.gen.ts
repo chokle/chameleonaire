@@ -14,9 +14,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
 import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
@@ -53,6 +55,11 @@ const McpRoute = McpRouteImport.update({
   path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QueueRoute = QueueRouteImport.update({
   id: '/queue',
   path: '/queue',
@@ -66,6 +73,11 @@ const ScannerRoute = ScannerRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
@@ -129,9 +141,11 @@ export interface FileRoutesByFullPath {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/privacy': typeof PrivacyRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
@@ -149,9 +163,11 @@ export interface FileRoutesByTo {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/privacy': typeof PrivacyRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
@@ -170,9 +186,11 @@ export interface FileRoutesById {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/privacy': typeof PrivacyRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
@@ -192,9 +210,11 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/privacy'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
+    | '/terms'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
@@ -212,9 +232,11 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/privacy'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
+    | '/terms'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
@@ -232,9 +254,11 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/privacy'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
+    | '/terms'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
@@ -253,9 +277,11 @@ export interface RootRouteChildren {
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
   McpRoute: typeof McpRoute
+  PrivacyRoute: typeof PrivacyRoute
   QueueRoute: typeof QueueRoute
   ScannerRoute: typeof ScannerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
@@ -305,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/queue': {
       id: '/queue'
       path: '/queue'
@@ -324,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/oauth-protected-resource': {
@@ -405,9 +445,11 @@ const rootRouteChildren: RootRouteChildren = {
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
   McpRoute: McpRoute,
+  PrivacyRoute: PrivacyRoute,
   QueueRoute: QueueRoute,
   ScannerRoute: ScannerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlueprintsIdRoute: BlueprintsIdRoute,
