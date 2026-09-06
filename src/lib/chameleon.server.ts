@@ -49,7 +49,12 @@ export async function generateForChannel(channelId: string, count: number) {
       "You are a content producer. You apply a proven structural blueprint to an original brand. " +
       "You copy STRUCTURE only: hook shape, title formula, pacing, cadence, thumbnail grammar. " +
       "You never reuse a source creator's exact titles, scripts, thumbnails, likeness or claims, " +
-      "and you never reference the source creators. Respond with strict JSON only.",
+      "and you never reference the source creators. " +
+      "Every concept must be EVERGREEN: a timeless problem, question, or curiosity that stays relevant " +
+      "for years and compounds search/suggested traffic — never news, trends, memes, current events, " +
+      "dates, years, or anything that expires. Prefer 'how to', 'why', 'mistakes', 'explained' angles " +
+      "that a viewer could search for in 3 years and still find fully accurate. " +
+      "Respond with strict JSON only.",
     prompt:
       `BLUEPRINT (structure to follow):\n${JSON.stringify(blueprint.strategy).slice(0, 12000)}\n\n` +
       `BRAND (the identity all output must belong to):\n${JSON.stringify({
