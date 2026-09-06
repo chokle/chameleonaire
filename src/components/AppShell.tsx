@@ -133,6 +133,13 @@ export function AppShell({
 
         </div>
       </main>
+      <footer className="border-t border-border/70 px-4 py-6">
+        <div className="mx-auto flex max-w-7xl items-center gap-5 text-xs text-muted-foreground lg:px-4">
+          <span>© 2026 chamele-on-air</span>
+          <Link to="/privacy" className="ml-auto hover:text-foreground">Privacy</Link>
+          <Link to="/terms" className="hover:text-foreground">Terms</Link>
+        </div>
+      </footer>
     </div>
   );
 }
