@@ -2,14 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-const ChannelInput = z.object({ channelId: z.string().uuid(), origin: z.string().url() });
+const ChannelInput = z.object({ channelId: z.string().uuid() });
 
 export const youtubeConnectUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ChannelInput.parse(input))
   .handler(async ({ data }) => {
     const { buildConsentUrl } = await import("./youtube-oauth.server");
-    return { url: await buildConsentUrl(data.channelId, data.origin) };
+    return { url: await buildConsentUrl(data.channelId) };
   });
 
 const IdInput = z.object({ channelId: z.string().uuid() });
