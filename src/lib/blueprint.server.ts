@@ -30,7 +30,7 @@ export async function buildBlueprint(creatorIds: string[], name?: string) {
     .select("*")
     .in("creator_id", creatorIds)
     .order("views", { ascending: false })
-    .limit(80);
+    .limit(120);
 
   const corpus = creators.map((c) => ({
     channel: c.channel_name,
