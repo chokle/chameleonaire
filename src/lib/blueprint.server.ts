@@ -1,5 +1,11 @@
 import { callAI, parseJSON } from "./ai.server";
-import { DEPLOY_THRESHOLD, type BlueprintEvidence, type StrategyBlueprint } from "./domain";
+import {
+  confidenceCeiling,
+  DEPLOY_THRESHOLD,
+  signalCoverage,
+  type BlueprintEvidence,
+  type StrategyBlueprint,
+} from "./domain";
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -36,6 +42,10 @@ export async function buildBlueprint(creatorIds: string[], name?: string) {
     est_profit_per_video: c.est_profit_per_video,
     consistency: c.consistency_score,
     velocity: c.view_velocity,
+    engagement_rate: c.engagement_rate,
+    watch_through_proxy: c.retention_proxy,
+    click_through_proxy: c.ctr_proxy,
+    verified_source: c.data_source === "youtube_api",
     videos: (videos ?? [])
       .filter((v) => v.creator_id === c.id)
       .map((v) => ({
@@ -44,17 +54,34 @@ export async function buildBlueprint(creatorIds: string[], name?: string) {
         hook: v.hook,
         thumbnail: v.thumbnail_desc,
         seconds: v.duration_seconds,
+        likes: v.likes,
+        comments: v.comments,
+        engagement_rate: v.engagement_rate,
+        watch_through_proxy: v.retention_proxy,
+        click_through_proxy: v.ctr_proxy,
       })),
   }));
 
-  const totalVideos = (videos ?? []).length;
+  const sampled = videos ?? [];
+  const totalVideos = sampled.length;
+  const coverage = signalCoverage({
+    videoCount: totalVideos,
+    channelCount: creators.length,
+    withEngagement: sampled.filter((v) => Number(v.engagement_rate) > 0).length,
+    withRetention: sampled.filter((v) => v.retention_proxy !== null).length,
+    withCtr: sampled.filter((v) => v.ctr_proxy !== null).length,
+    verifiedSources: creators.filter((c) => c.data_source === "youtube_api").length,
+  });
+  const ceiling = confidenceCeiling(coverage.score);
 
   const raw = await callAI({
     model: "google/gemini-3.7-flash",
     system:
       "You reverse-engineer YouTube content strategy from public metadata. You extract STRUCTURE " +
       "(patterns, formulas, pacing, cadence), never verbatim copy. Every claim must be backed by " +
-      "specific video titles from the supplied corpus. You are strict and calibrated about " +
+      "specific video titles from the supplied corpus. Each video carries engagement rate, a " +
+      "watch-through proxy and a click-through proxy - weight patterns from high-retention, " +
+      "high-CTR videos far more heavily than raw view counts. You are strict and calibrated about " +
       "confidence: with fewer than 20 sampled videos or a single source channel, confidence must " +
       "stay below 90. Respond with strict JSON only.",
     prompt:
@@ -69,20 +96,21 @@ export async function buildBlueprint(creatorIds: string[], name?: string) {
       `  "evidence": [ { "claim": string, "supporting_videos": string[], "confidence": number } ] (6-10 items),\n` +
       `  "confidence": number 0-100 (overall, calibrated to sample size and signal agreement),\n` +
       `  "gap_notes": string (exactly what extra data would raise confidence)\n}\n` +
-      `Sample size: ${totalVideos} videos across ${creators.length} channels.`,
+      `Sample size: ${totalVideos} videos across ${creators.length} channels. ` +
+      `Verified-signal coverage: ${coverage.score}/100.`,
   });
 
   const result = parseJSON<ExtractResult>(raw);
 
   // Calibration floor: never let the model claim deployable confidence on thin evidence.
   let confidence = Math.max(0, Math.min(100, Number(result.confidence) || 0));
-  const cap = totalVideos >= 40 && creators.length >= 3 ? 99 : totalVideos >= 20 ? 94 : 82;
-  confidence = Math.min(confidence, cap);
+  confidence = Math.min(confidence, ceiling);
 
   const gapNotes =
     confidence < DEPLOY_THRESHOLD
-      ? result.gap_notes ||
-        `Sample is thin (${totalVideos} videos, ${creators.length} channels). Add more creators in the same bracket and re-extract.`
+      ? `Signal coverage ${coverage.score}/100 caps confidence at ${ceiling}%. To raise it: ` +
+        `${coverage.missing.join("; ")}.` +
+        (result.gap_notes ? ` ${result.gap_notes}` : "")
       : (result.gap_notes ?? "");
 
   const { data: blueprint, error } = await db
@@ -94,6 +122,7 @@ export async function buildBlueprint(creatorIds: string[], name?: string) {
       confidence,
       deployable: confidence >= DEPLOY_THRESHOLD,
       gap_notes: gapNotes,
+      signal_coverage: coverage.score,
       strategy: result.strategy ?? {},
       evidence: result.evidence ?? [],
       status: "ready",
