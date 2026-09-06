@@ -16,6 +16,8 @@ type YTVideo = {
   views: number;
   publishedAt: string;
   durationSeconds: number;
+  likes: number;
+  comments: number;
 };
 
 const API = "https://www.googleapis.com/youtube/v3";
@@ -100,7 +102,7 @@ export async function getRecentVideos(
     items?: Array<{
       id: string;
       snippet?: { title?: string; publishedAt?: string };
-      statistics?: { viewCount?: string };
+      statistics?: { viewCount?: string; likeCount?: string; commentCount?: string };
       contentDetails?: { duration?: string };
     }>;
   }>("videos", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
@@ -111,6 +113,8 @@ export async function getRecentVideos(
     views: Number(v.statistics?.viewCount ?? 0),
     publishedAt: v.snippet?.publishedAt ?? new Date().toISOString(),
     durationSeconds: isoToSeconds(v.contentDetails?.duration ?? ""),
+    likes: Number(v.statistics?.likeCount ?? 0),
+    comments: Number(v.statistics?.commentCount ?? 0),
   }));
 }
 
