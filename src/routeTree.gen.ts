@@ -15,6 +15,7 @@ import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -58,6 +59,11 @@ const McpRoute = McpRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QueueRoute = QueueRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/mcp'
     | '/privacy'
+    | '/profile'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/mcp'
     | '/privacy'
+    | '/profile'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/mcp'
     | '/privacy'
+    | '/profile'
     | '/queue'
     | '/scanner'
     | '/sitemap.xml'
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   CalculatorRoute: typeof CalculatorRoute
   McpRoute: typeof McpRoute
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   QueueRoute: typeof QueueRoute
   ScannerRoute: typeof ScannerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -336,6 +349,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/queue': {
@@ -446,6 +466,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculatorRoute: CalculatorRoute,
   McpRoute: McpRoute,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   QueueRoute: QueueRoute,
   ScannerRoute: ScannerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
