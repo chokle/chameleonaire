@@ -22,6 +22,7 @@ const NAV = [
   { to: "/brands", label: "Brands", icon: Palette },
   { to: "/channels", label: "Channels", icon: Boxes },
   { to: "/queue", label: "Queue", icon: CalendarClock },
+  { to: "/profile", label: "Profile", icon: UserRound },
 ] as const;
 
 export function AppShell({
