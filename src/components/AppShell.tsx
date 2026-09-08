@@ -11,6 +11,7 @@ import {
   Palette,
   Radar,
   Sparkles,
+  UserRound,
 } from "lucide-react";
 import type { ReactNode } from "react";
 
@@ -73,7 +74,12 @@ export function AppShell({
             <div className="ml-auto flex items-center gap-2">
               {email ? (
                 <>
-                  <span className="hidden text-xs text-muted-foreground sm:inline">{email}</span>
+                  <Link
+                    to="/profile"
+                    className="hidden text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline sm:inline"
+                  >
+                    {email}
+                  </Link>
                   <Button
                     size="sm"
                     variant="ghost"
