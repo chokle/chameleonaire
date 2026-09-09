@@ -116,3 +116,108 @@ export async function estimateEarningsForUser(_userId: string, input: EstimateIn
     },
   };
 }
+
+export type ListVideosInput = {
+  channel_id?: string | undefined;
+  status?: string | undefined;
+  approved?: boolean | undefined;
+  limit?: number;
+};
+export type ListQueueInput = {
+  channel_id?: string | undefined;
+  status?: string | undefined;
+  limit?: number;
+};
+
+export async function getChannelForUser(_userId: string, channelId: string) {
+  const supabase = await adminClient();
+  const { data: channel, error } = await supabase
+    .from("channels")
+    .select("*, brands(name, voice, palette), blueprints(id, name, niche, confidence, deployable)")
+    .eq("id", channelId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!channel) return null;
+
+  const { data: videos } = await supabase
+    .from("generated_videos")
+    .select(
+      "id, title, status, approved, render_status, duration_seconds, duration_target, youtube_video_id, video_url, created_at",
+    )
+    .eq("channel_id", channelId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  const { data: queue } = await supabase
+    .from("publish_queue")
+    .select("id, generated_video_id, status, scheduled_for, published_at, attempts, last_error")
+    .eq("channel_id", channelId)
+    .order("scheduled_for", { ascending: true })
+    .limit(50);
+
+  const list = videos ?? [];
+  return {
+    channel,
+    stats: {
+      videos: list.length,
+      published: list.filter((v) => v.youtube_video_id).length,
+      awaitingApproval: list.filter((v) => !v.approved).length,
+      queued: (queue ?? []).filter((q) => q.status === "queued" || q.status === "scheduled").length,
+    },
+    videos: list,
+    queue: queue ?? [],
+  };
+}
+
+export async function listVideosForUser(_userId: string, input: ListVideosInput = {}) {
+  const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
+  const supabase = await adminClient();
+  let query = supabase
+    .from("generated_videos")
+    .select(
+      "id, channel_id, title, concept, hook, status, approved, render_status, render_error, duration_seconds, duration_target, thumbnail_url, youtube_video_id, created_at",
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (input.channel_id) query = query.eq("channel_id", input.channel_id);
+  if (input.status) query = query.eq("status", input.status);
+  if (typeof input.approved === "boolean") query = query.eq("approved", input.approved);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return { videos: data ?? [] };
+}
+
+export async function listQueueForUser(_userId: string, input: ListQueueInput = {}) {
+  const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
+  const supabase = await adminClient();
+  let query = supabase
+    .from("publish_queue")
+    .select(
+      "id, channel_id, generated_video_id, status, scheduled_for, published_at, attempts, last_error, generated_videos(id, title, approved, render_status, youtube_video_id), channels(name)",
+    )
+    .order("scheduled_for", { ascending: true })
+    .limit(limit);
+  if (input.channel_id) query = query.eq("channel_id", input.channel_id);
+  if (input.status) query = query.eq("status", input.status);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return { queue: data ?? [] };
+}
+
+export async function setVideoApprovalForUser(_userId: string, videoId: string, approved: boolean) {
+  const supabase = await adminClient();
+  const { data, error } = await supabase
+    .from("generated_videos")
+    .update({ approved, status: approved ? "scheduled" : "awaiting_approval" })
+    .eq("id", videoId)
+    .select("id, title, approved, status")
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Video not found.");
+  return { video: data };
+}
+
+export async function publishQueueItemForUser(_userId: string, queueId: string) {
+  const { publishQueueItem } = await import("./publish.server");
+  return publishQueueItem(queueId);
+}
