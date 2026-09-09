@@ -5,7 +5,7 @@ const OPENAPI_SCHEMA = {
   info: {
     title: "Chameleonaire ChatGPT Actions",
     description:
-      "Read-only API for surfacing YouTube creator scans, blueprints, channels, and earnings estimates inside a ChatGPT Custom GPT.",
+      "API for surfacing YouTube creator scans, blueprints, channels, and earnings estimates inside a ChatGPT Custom GPT.",
     version: "1.0.0",
     contact: { name: "Chameleonaire", url: "https://chameleonaire.me" },
   },
@@ -22,6 +22,113 @@ const OPENAPI_SCHEMA = {
   },
   security: [{ ApiKeyAuth: [] }],
   paths: {
+    "/api/public/chatgpt/channels/{id}": {
+      get: {
+        operationId: "getChannel",
+        summary: "Get one channel with its videos and queue",
+        description:
+          "Returns a single channel, its brand and blueprint, aggregate stats, its generated videos and its publish queue entries.",
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
+        ],
+        responses: {
+          "200": { description: "Channel detail", content: { "application/json": { schema: { type: "object" } } } },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+          "404": { description: "Channel not found" },
+        },
+      },
+    },
+    "/api/public/chatgpt/videos": {
+      get: {
+        operationId: "listVideos",
+        summary: "List generated videos",
+        description:
+          "Returns generated videos with render status, approval state and YouTube video id. Filter by channel, status or approval.",
+        parameters: [
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+          { name: "channel_id", in: "query", schema: { type: "string", format: "uuid" } },
+          { name: "status", in: "query", schema: { type: "string" }, description: "e.g. awaiting_approval, scheduled, published." },
+          { name: "approved", in: "query", schema: { type: "boolean" } },
+        ],
+        responses: {
+          "200": { description: "List of videos", content: { "application/json": { schema: { type: "object" } } } },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+        },
+      },
+    },
+    "/api/public/chatgpt/queue": {
+      get: {
+        operationId: "listQueue",
+        summary: "List publish queue entries",
+        description: "Returns publish queue entries with schedule, attempts, last error and the linked video.",
+        parameters: [
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 50, default: 20 } },
+          { name: "channel_id", in: "query", schema: { type: "string", format: "uuid" } },
+          { name: "status", in: "query", schema: { type: "string" }, description: "e.g. queued, publishing, published, failed." },
+        ],
+        responses: {
+          "200": { description: "Queue entries", content: { "application/json": { schema: { type: "object" } } } },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+        },
+      },
+    },
+    "/api/public/chatgpt/approve": {
+      post: {
+        operationId: "setVideoApproval",
+        summary: "Approve or unapprove a generated video",
+        description: "Approving a video marks it scheduled so the publish worker can upload it.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["video_id"],
+                properties: {
+                  video_id: { type: "string", format: "uuid" },
+                  approved: { type: "boolean", default: true },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Updated video", content: { "application/json": { schema: { type: "object" } } } },
+          "400": { description: "Invalid request" },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+        },
+      },
+    },
+    "/api/public/chatgpt/publish": {
+      post: {
+        operationId: "publishQueueItem",
+        summary: "Publish a queued video to YouTube now",
+        description:
+          "Renders if needed and uploads the queued video to the connected YouTube channel. Returns the YouTube video id and URL.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["queue_id"],
+                properties: { queue_id: { type: "string", format: "uuid" } },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Published", content: { "application/json": { schema: { type: "object" } } } },
+          "400": { description: "Publish failed" },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+        },
+      },
+    },
     "/api/public/chatgpt/scans": {
       get: {
         operationId: "listScans",
