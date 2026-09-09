@@ -14,6 +14,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { channelQuery, channelVideosQuery } from "@/lib/queries";
 import { chameleonize, renderThumbnail } from "@/lib/chameleon.functions";
 import {
