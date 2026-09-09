@@ -582,37 +582,49 @@ export type Database = {
           blueprint_id: string | null
           captured_at: string
           channel_id: string | null
+          comments: number
           ctr: number | null
           est_revenue: number
           generated_video_id: string | null
           id: string
+          likes: number
           outcome: string
           retention: number | null
           views: number
+          watch_time_minutes: number
+          youtube_video_id: string | null
         }
         Insert: {
           blueprint_id?: string | null
           captured_at?: string
           channel_id?: string | null
+          comments?: number
           ctr?: number | null
           est_revenue?: number
           generated_video_id?: string | null
           id?: string
+          likes?: number
           outcome?: string
           retention?: number | null
           views?: number
+          watch_time_minutes?: number
+          youtube_video_id?: string | null
         }
         Update: {
           blueprint_id?: string | null
           captured_at?: string
           channel_id?: string | null
+          comments?: number
           ctr?: number | null
           est_revenue?: number
           generated_video_id?: string | null
           id?: string
+          likes?: number
           outcome?: string
           retention?: number | null
           views?: number
+          watch_time_minutes?: number
+          youtube_video_id?: string | null
         }
         Relationships: [
           {

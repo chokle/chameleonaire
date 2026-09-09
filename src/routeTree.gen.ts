@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as QueueRouteImport } from './routes/queue'
@@ -75,6 +76,11 @@ const CalculatorRoute = CalculatorRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerformanceRoute = PerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
@@ -329,6 +336,7 @@ export interface FileRoutesByTo {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
@@ -374,6 +382,7 @@ export interface FileRoutesById {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
@@ -420,6 +429,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/performance'
     | '/privacy'
     | '/profile'
     | '/queue'
@@ -464,6 +474,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/performance'
     | '/privacy'
     | '/profile'
     | '/queue'
@@ -508,6 +519,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/performance'
     | '/privacy'
     | '/profile'
     | '/queue'
@@ -553,6 +565,7 @@ export interface RootRouteChildren {
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
   McpRoute: typeof McpRoute
+  PerformanceRoute: typeof PerformanceRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   QueueRoute: typeof QueueRoute
@@ -626,6 +639,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/performance': {
+      id: '/performance'
+      path: '/performance'
+      fullPath: '/performance'
+      preLoaderRoute: typeof PerformanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -910,6 +930,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
   McpRoute: McpRoute,
+  PerformanceRoute: PerformanceRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   QueueRoute: QueueRoute,
