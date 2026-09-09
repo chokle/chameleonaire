@@ -102,11 +102,19 @@ function ChannelDetail() {
   });
 
   const rendering = useMutation({
-    mutationFn: (videoId: string) => render({ data: { videoId } }),
-    onSuccess: () => {
+    mutationFn: ({ videoId, durationTarget }: { videoId: string; durationTarget: number }) =>
+      render({ data: { videoId, durationTarget } }),
+    onSuccess: (r: { durationSeconds: number }) => {
       qc.invalidateQueries({ queryKey: ["channel-videos", id] });
-      toast.success("Video rendered and stored.");
+      toast.success(`Video rendered and stored (${r.durationSeconds}s).`);
     },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const setTarget = useMutation({
+    mutationFn: ({ videoId, durationTarget }: { videoId: string; durationTarget: number }) =>
+      setTargetFn({ data: { videoId, durationTarget } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["channel-videos", id] }),
     onError: (e: Error) => toast.error(e.message),
   });
 
