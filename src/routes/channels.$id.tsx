@@ -18,6 +18,7 @@ import { channelQuery, channelVideosQuery } from "@/lib/queries";
 import { chameleonize, renderThumbnail } from "@/lib/chameleon.functions";
 import {
   renderVideo,
+  setVideoDurationTarget,
   youtubeConnectUrl,
   youtubeDisconnect,
   youtubeReady,
