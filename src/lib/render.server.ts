@@ -180,7 +180,7 @@ export async function renderVideoFile(
     jobs.push({ id: baseJobId, status: "in_progress" });
     await db.from("generated_videos").update({ render_jobs: jobs }).eq("id", videoId);
     await waitForJob(baseJobId, 6 * 60_000);
-    jobs[0].status = "completed";
+    jobs[0]!.status = "completed";
     await db.from("generated_videos").update({ render_jobs: jobs }).eq("id", videoId);
     currentBytes = await downloadJob(baseJobId);
     totalSeconds += 8;
@@ -191,7 +191,7 @@ export async function renderVideoFile(
       jobs.push({ id: nextJobId, status: "in_progress" });
       await db.from("generated_videos").update({ render_jobs: jobs }).eq("id", videoId);
       await waitForJob(nextJobId, 6 * 60_000);
-      jobs[jobs.length - 1].status = "completed";
+      jobs[jobs.length - 1]!.status = "completed";
       await db.from("generated_videos").update({ render_jobs: jobs }).eq("id", videoId);
       currentBytes = await downloadJob(nextJobId);
       totalSeconds += 7;
