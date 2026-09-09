@@ -9,6 +9,8 @@ import {
   Fingerprint,
   Gauge,
   LayoutGrid,
+  LineChart,
+
 
   Palette,
   Plug,
@@ -27,6 +29,7 @@ const NAV = [
   { to: "/brands", label: "Brands", icon: Palette },
   { to: "/channels", label: "Channels", icon: Boxes },
   { to: "/queue", label: "Queue", icon: CalendarClock },
+  { to: "/performance", label: "Performance", icon: LineChart },
   { to: "/integrations/chatgpt", label: "ChatGPT", icon: Plug },
   { to: "/profile", label: "Profile", icon: UserRound },
 ] as const;

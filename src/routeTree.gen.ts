@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as QueueRouteImport } from './routes/queue'
@@ -39,6 +40,7 @@ import { Route as ApiPublicChatgptEstimateRouteImport } from './routes/api/publi
 import { Route as ApiPublicChatgptGenerateRouteImport } from './routes/api/public/chatgpt/generate'
 import { Route as ApiPublicChatgptNextActionsRouteImport } from './routes/api/public/chatgpt/next-actions'
 import { Route as ApiPublicChatgptOpenapiDotjsonRouteImport } from './routes/api/public/chatgpt/openapi[.]json'
+import { Route as ApiPublicChatgptPerformanceRouteImport } from './routes/api/public/chatgpt/performance'
 import { Route as ApiPublicChatgptPublishRouteImport } from './routes/api/public/chatgpt/publish'
 import { Route as ApiPublicChatgptQueueRouteImport } from './routes/api/public/chatgpt/queue'
 import { Route as ApiPublicChatgptRenderRouteImport } from './routes/api/public/chatgpt/render'
@@ -75,6 +77,11 @@ const CalculatorRoute = CalculatorRouteImport.update({
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerformanceRoute = PerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -212,6 +219,12 @@ const ApiPublicChatgptOpenapiDotjsonRoute =
     path: '/api/public/chatgpt/openapi.json',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicChatgptPerformanceRoute =
+  ApiPublicChatgptPerformanceRouteImport.update({
+    id: '/api/public/chatgpt/performance',
+    path: '/api/public/chatgpt/performance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicChatgptPublishRoute = ApiPublicChatgptPublishRouteImport.update({
   id: '/api/public/chatgpt/publish',
   path: '/api/public/chatgpt/publish',
@@ -285,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
@@ -310,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/api/public/chatgpt/generate': typeof ApiPublicChatgptGenerateRoute
   '/api/public/chatgpt/next-actions': typeof ApiPublicChatgptNextActionsRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/performance': typeof ApiPublicChatgptPerformanceRoute
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
@@ -329,6 +344,7 @@ export interface FileRoutesByTo {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
@@ -354,6 +370,7 @@ export interface FileRoutesByTo {
   '/api/public/chatgpt/generate': typeof ApiPublicChatgptGenerateRoute
   '/api/public/chatgpt/next-actions': typeof ApiPublicChatgptNextActionsRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/performance': typeof ApiPublicChatgptPerformanceRoute
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
@@ -374,6 +391,7 @@ export interface FileRoutesById {
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
   '/mcp': typeof McpRoute
+  '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
@@ -399,6 +417,7 @@ export interface FileRoutesById {
   '/api/public/chatgpt/generate': typeof ApiPublicChatgptGenerateRoute
   '/api/public/chatgpt/next-actions': typeof ApiPublicChatgptNextActionsRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/performance': typeof ApiPublicChatgptPerformanceRoute
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
@@ -420,6 +439,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/performance'
     | '/privacy'
     | '/profile'
     | '/queue'
@@ -445,6 +465,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/generate'
     | '/api/public/chatgpt/next-actions'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/performance'
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
@@ -464,6 +485,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/performance'
     | '/privacy'
     | '/profile'
     | '/queue'
@@ -489,6 +511,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/generate'
     | '/api/public/chatgpt/next-actions'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/performance'
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
@@ -508,6 +531,7 @@ export interface FileRouteTypes {
     | '/brands'
     | '/calculator'
     | '/mcp'
+    | '/performance'
     | '/privacy'
     | '/profile'
     | '/queue'
@@ -533,6 +557,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/generate'
     | '/api/public/chatgpt/next-actions'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/performance'
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
@@ -553,6 +578,7 @@ export interface RootRouteChildren {
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
   McpRoute: typeof McpRoute
+  PerformanceRoute: typeof PerformanceRoute
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   QueueRoute: typeof QueueRoute
@@ -578,6 +604,7 @@ export interface RootRouteChildren {
   ApiPublicChatgptGenerateRoute: typeof ApiPublicChatgptGenerateRoute
   ApiPublicChatgptNextActionsRoute: typeof ApiPublicChatgptNextActionsRoute
   ApiPublicChatgptOpenapiDotjsonRoute: typeof ApiPublicChatgptOpenapiDotjsonRoute
+  ApiPublicChatgptPerformanceRoute: typeof ApiPublicChatgptPerformanceRoute
   ApiPublicChatgptPublishRoute: typeof ApiPublicChatgptPublishRoute
   ApiPublicChatgptQueueRoute: typeof ApiPublicChatgptQueueRoute
   ApiPublicChatgptRenderRoute: typeof ApiPublicChatgptRenderRoute
@@ -626,6 +653,13 @@ declare module '@tanstack/react-router' {
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/performance': {
+      id: '/performance'
+      path: '/performance'
+      fullPath: '/performance'
+      preLoaderRoute: typeof PerformanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -803,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatgptOpenapiDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/performance': {
+      id: '/api/public/chatgpt/performance'
+      path: '/api/public/chatgpt/performance'
+      fullPath: '/api/public/chatgpt/performance'
+      preLoaderRoute: typeof ApiPublicChatgptPerformanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/chatgpt/publish': {
       id: '/api/public/chatgpt/publish'
       path: '/api/public/chatgpt/publish'
@@ -910,6 +951,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
   McpRoute: McpRoute,
+  PerformanceRoute: PerformanceRoute,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   QueueRoute: QueueRoute,
@@ -936,6 +978,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicChatgptGenerateRoute: ApiPublicChatgptGenerateRoute,
   ApiPublicChatgptNextActionsRoute: ApiPublicChatgptNextActionsRoute,
   ApiPublicChatgptOpenapiDotjsonRoute: ApiPublicChatgptOpenapiDotjsonRoute,
+  ApiPublicChatgptPerformanceRoute: ApiPublicChatgptPerformanceRoute,
   ApiPublicChatgptPublishRoute: ApiPublicChatgptPublishRoute,
   ApiPublicChatgptQueueRoute: ApiPublicChatgptQueueRoute,
   ApiPublicChatgptRenderRoute: ApiPublicChatgptRenderRoute,
