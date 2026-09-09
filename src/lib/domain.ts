@@ -102,7 +102,7 @@ export type BlueprintEvidence = {
   confidence: number;
 };
 
-export const DEPLOY_THRESHOLD = 95;
+export const DEPLOY_THRESHOLD = 85;
 export const IDEAL_THRESHOLD = 97;
 
 /* ---------------------------------------------------------------------------
