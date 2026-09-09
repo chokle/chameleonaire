@@ -26,6 +26,9 @@ function oauthApi(): OAuthNamespace {
   return (supabase.auth as unknown as { oauth: OAuthNamespace }).oauth;
 }
 
+// The authorization server only accepts consent requests from this origin.
+const CANONICAL_ORIGIN = "https://chameleonaire.lovable.app";
+
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   // Browser-only: the Supabase client reads its session from localStorage.
   ssr: false,
@@ -34,12 +37,23 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   }),
   beforeLoad: async ({ search }) => {
     if (!search.authorization_id) throw new Error("Missing authorization_id");
+    if (
+      typeof window !== "undefined" &&
+      window.location.hostname.endsWith("chameleonaire.me") &&
+      window.location.origin !== CANONICAL_ORIGIN
+    ) {
+      window.location.replace(
+        CANONICAL_ORIGIN + window.location.pathname + window.location.search,
+      );
+      await new Promise(() => {});
+    }
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       const next = window.location.pathname + window.location.search;
       throw redirect({ to: "/auth", search: { next } });
     }
   },
+
   loader: async ({ location }) => {
     const authorizationId = new URLSearchParams(location.search).get("authorization_id")!;
     const { data, error } = await oauthApi().getAuthorizationDetails(authorizationId);
