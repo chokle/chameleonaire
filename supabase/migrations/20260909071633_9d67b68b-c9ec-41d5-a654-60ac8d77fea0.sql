@@ -1,0 +1,2 @@
+alter table public.generated_videos add column if not exists duration_target integer not null default 30;
+alter table public.generated_videos add column if not exists render_jobs jsonb not null default '[]'::jsonb;
