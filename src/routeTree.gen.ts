@@ -28,15 +28,20 @@ import { Route as ChannelsIdRouteImport } from './routes/channels.$id'
 import { Route as CreatorsIdRouteImport } from './routes/creators.$id'
 import { Route as IntegrationsChatgptRouteImport } from './routes/integrations.chatgpt'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as ApiPublicChatgptApproveRouteImport } from './routes/api/public/chatgpt/approve'
 import { Route as ApiPublicChatgptBlueprintsRouteImport } from './routes/api/public/chatgpt/blueprints'
 import { Route as ApiPublicChatgptChannelsRouteImport } from './routes/api/public/chatgpt/channels'
 import { Route as ApiPublicChatgptCreatorsRouteImport } from './routes/api/public/chatgpt/creators'
 import { Route as ApiPublicChatgptEstimateRouteImport } from './routes/api/public/chatgpt/estimate'
 import { Route as ApiPublicChatgptOpenapiDotjsonRouteImport } from './routes/api/public/chatgpt/openapi[.]json'
+import { Route as ApiPublicChatgptPublishRouteImport } from './routes/api/public/chatgpt/publish'
+import { Route as ApiPublicChatgptQueueRouteImport } from './routes/api/public/chatgpt/queue'
 import { Route as ApiPublicChatgptScansRouteImport } from './routes/api/public/chatgpt/scans'
+import { Route as ApiPublicChatgptVideosRouteImport } from './routes/api/public/chatgpt/videos'
 import { Route as ApiPublicHooksPublishTickRouteImport } from './routes/api/public/hooks/publish-tick'
 import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
 import { Route as ApiPublicYoutubeCallbackRouteImport } from './routes/api/public/youtube.callback'
+import { Route as ApiPublicChatgptChannelsIdRouteImport } from './routes/api/public/chatgpt/channels.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -134,6 +139,11 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicChatgptApproveRoute = ApiPublicChatgptApproveRouteImport.update({
+  id: '/api/public/chatgpt/approve',
+  path: '/api/public/chatgpt/approve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicChatgptBlueprintsRoute =
   ApiPublicChatgptBlueprintsRouteImport.update({
     id: '/api/public/chatgpt/blueprints',
@@ -164,9 +174,24 @@ const ApiPublicChatgptOpenapiDotjsonRoute =
     path: '/api/public/chatgpt/openapi.json',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicChatgptPublishRoute = ApiPublicChatgptPublishRouteImport.update({
+  id: '/api/public/chatgpt/publish',
+  path: '/api/public/chatgpt/publish',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicChatgptQueueRoute = ApiPublicChatgptQueueRouteImport.update({
+  id: '/api/public/chatgpt/queue',
+  path: '/api/public/chatgpt/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicChatgptScansRoute = ApiPublicChatgptScansRouteImport.update({
   id: '/api/public/chatgpt/scans',
   path: '/api/public/chatgpt/scans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicChatgptVideosRoute = ApiPublicChatgptVideosRouteImport.update({
+  id: '/api/public/chatgpt/videos',
+  path: '/api/public/chatgpt/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHooksPublishTickRoute =
@@ -186,6 +211,12 @@ const ApiPublicYoutubeCallbackRoute =
     id: '/api/public/youtube/callback',
     path: '/api/public/youtube/callback',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicChatgptChannelsIdRoute =
+  ApiPublicChatgptChannelsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => ApiPublicChatgptChannelsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -208,15 +239,20 @@ export interface FileRoutesByFullPath {
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/api/public/chatgpt/approve': typeof ApiPublicChatgptApproveRoute
   '/api/public/chatgpt/blueprints': typeof ApiPublicChatgptBlueprintsRoute
-  '/api/public/chatgpt/channels': typeof ApiPublicChatgptChannelsRoute
+  '/api/public/chatgpt/channels': typeof ApiPublicChatgptChannelsRouteWithChildren
   '/api/public/chatgpt/creators': typeof ApiPublicChatgptCreatorsRoute
   '/api/public/chatgpt/estimate': typeof ApiPublicChatgptEstimateRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
+  '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/scans': typeof ApiPublicChatgptScansRoute
+  '/api/public/chatgpt/videos': typeof ApiPublicChatgptVideosRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
+  '/api/public/chatgpt/channels/$id': typeof ApiPublicChatgptChannelsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -238,15 +274,20 @@ export interface FileRoutesByTo {
   '/blueprints': typeof BlueprintsIndexRoute
   '/channels': typeof ChannelsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/api/public/chatgpt/approve': typeof ApiPublicChatgptApproveRoute
   '/api/public/chatgpt/blueprints': typeof ApiPublicChatgptBlueprintsRoute
-  '/api/public/chatgpt/channels': typeof ApiPublicChatgptChannelsRoute
+  '/api/public/chatgpt/channels': typeof ApiPublicChatgptChannelsRouteWithChildren
   '/api/public/chatgpt/creators': typeof ApiPublicChatgptCreatorsRoute
   '/api/public/chatgpt/estimate': typeof ApiPublicChatgptEstimateRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
+  '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/scans': typeof ApiPublicChatgptScansRoute
+  '/api/public/chatgpt/videos': typeof ApiPublicChatgptVideosRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
+  '/api/public/chatgpt/channels/$id': typeof ApiPublicChatgptChannelsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -269,15 +310,20 @@ export interface FileRoutesById {
   '/blueprints/': typeof BlueprintsIndexRoute
   '/channels/': typeof ChannelsIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/api/public/chatgpt/approve': typeof ApiPublicChatgptApproveRoute
   '/api/public/chatgpt/blueprints': typeof ApiPublicChatgptBlueprintsRoute
-  '/api/public/chatgpt/channels': typeof ApiPublicChatgptChannelsRoute
+  '/api/public/chatgpt/channels': typeof ApiPublicChatgptChannelsRouteWithChildren
   '/api/public/chatgpt/creators': typeof ApiPublicChatgptCreatorsRoute
   '/api/public/chatgpt/estimate': typeof ApiPublicChatgptEstimateRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
+  '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/scans': typeof ApiPublicChatgptScansRoute
+  '/api/public/chatgpt/videos': typeof ApiPublicChatgptVideosRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
+  '/api/public/chatgpt/channels/$id': typeof ApiPublicChatgptChannelsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -301,15 +347,20 @@ export interface FileRouteTypes {
     | '/blueprints/'
     | '/channels/'
     | '/.lovable/oauth/consent'
+    | '/api/public/chatgpt/approve'
     | '/api/public/chatgpt/blueprints'
     | '/api/public/chatgpt/channels'
     | '/api/public/chatgpt/creators'
     | '/api/public/chatgpt/estimate'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/publish'
+    | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/scans'
+    | '/api/public/chatgpt/videos'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
+    | '/api/public/chatgpt/channels/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -331,15 +382,20 @@ export interface FileRouteTypes {
     | '/blueprints'
     | '/channels'
     | '/.lovable/oauth/consent'
+    | '/api/public/chatgpt/approve'
     | '/api/public/chatgpt/blueprints'
     | '/api/public/chatgpt/channels'
     | '/api/public/chatgpt/creators'
     | '/api/public/chatgpt/estimate'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/publish'
+    | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/scans'
+    | '/api/public/chatgpt/videos'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
+    | '/api/public/chatgpt/channels/$id'
   id:
     | '__root__'
     | '/'
@@ -361,15 +417,20 @@ export interface FileRouteTypes {
     | '/blueprints/'
     | '/channels/'
     | '/.lovable/oauth/consent'
+    | '/api/public/chatgpt/approve'
     | '/api/public/chatgpt/blueprints'
     | '/api/public/chatgpt/channels'
     | '/api/public/chatgpt/creators'
     | '/api/public/chatgpt/estimate'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/publish'
+    | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/scans'
+    | '/api/public/chatgpt/videos'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
+    | '/api/public/chatgpt/channels/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -392,12 +453,16 @@ export interface RootRouteChildren {
   BlueprintsIndexRoute: typeof BlueprintsIndexRoute
   ChannelsIndexRoute: typeof ChannelsIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
+  ApiPublicChatgptApproveRoute: typeof ApiPublicChatgptApproveRoute
   ApiPublicChatgptBlueprintsRoute: typeof ApiPublicChatgptBlueprintsRoute
-  ApiPublicChatgptChannelsRoute: typeof ApiPublicChatgptChannelsRoute
+  ApiPublicChatgptChannelsRoute: typeof ApiPublicChatgptChannelsRouteWithChildren
   ApiPublicChatgptCreatorsRoute: typeof ApiPublicChatgptCreatorsRoute
   ApiPublicChatgptEstimateRoute: typeof ApiPublicChatgptEstimateRoute
   ApiPublicChatgptOpenapiDotjsonRoute: typeof ApiPublicChatgptOpenapiDotjsonRoute
+  ApiPublicChatgptPublishRoute: typeof ApiPublicChatgptPublishRoute
+  ApiPublicChatgptQueueRoute: typeof ApiPublicChatgptQueueRoute
   ApiPublicChatgptScansRoute: typeof ApiPublicChatgptScansRoute
+  ApiPublicChatgptVideosRoute: typeof ApiPublicChatgptVideosRoute
   ApiPublicHooksPublishTickRoute: typeof ApiPublicHooksPublishTickRoute
   ApiPublicHooksSyncCronSecretRoute: typeof ApiPublicHooksSyncCronSecretRoute
   ApiPublicYoutubeCallbackRoute: typeof ApiPublicYoutubeCallbackRoute
@@ -538,6 +603,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/approve': {
+      id: '/api/public/chatgpt/approve'
+      path: '/api/public/chatgpt/approve'
+      fullPath: '/api/public/chatgpt/approve'
+      preLoaderRoute: typeof ApiPublicChatgptApproveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/chatgpt/blueprints': {
       id: '/api/public/chatgpt/blueprints'
       path: '/api/public/chatgpt/blueprints'
@@ -573,11 +645,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatgptOpenapiDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/publish': {
+      id: '/api/public/chatgpt/publish'
+      path: '/api/public/chatgpt/publish'
+      fullPath: '/api/public/chatgpt/publish'
+      preLoaderRoute: typeof ApiPublicChatgptPublishRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/chatgpt/queue': {
+      id: '/api/public/chatgpt/queue'
+      path: '/api/public/chatgpt/queue'
+      fullPath: '/api/public/chatgpt/queue'
+      preLoaderRoute: typeof ApiPublicChatgptQueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/chatgpt/scans': {
       id: '/api/public/chatgpt/scans'
       path: '/api/public/chatgpt/scans'
       fullPath: '/api/public/chatgpt/scans'
       preLoaderRoute: typeof ApiPublicChatgptScansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/chatgpt/videos': {
+      id: '/api/public/chatgpt/videos'
+      path: '/api/public/chatgpt/videos'
+      fullPath: '/api/public/chatgpt/videos'
+      preLoaderRoute: typeof ApiPublicChatgptVideosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/publish-tick': {
@@ -601,8 +694,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicYoutubeCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/channels/$id': {
+      id: '/api/public/chatgpt/channels/$id'
+      path: '/$id'
+      fullPath: '/api/public/chatgpt/channels/$id'
+      preLoaderRoute: typeof ApiPublicChatgptChannelsIdRouteImport
+      parentRoute: typeof ApiPublicChatgptChannelsRoute
+    }
   }
 }
+
+interface ApiPublicChatgptChannelsRouteChildren {
+  ApiPublicChatgptChannelsIdRoute: typeof ApiPublicChatgptChannelsIdRoute
+}
+
+const ApiPublicChatgptChannelsRouteChildren: ApiPublicChatgptChannelsRouteChildren =
+  {
+    ApiPublicChatgptChannelsIdRoute: ApiPublicChatgptChannelsIdRoute,
+  }
+
+const ApiPublicChatgptChannelsRouteWithChildren =
+  ApiPublicChatgptChannelsRoute._addFileChildren(
+    ApiPublicChatgptChannelsRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -625,12 +739,16 @@ const rootRouteChildren: RootRouteChildren = {
   BlueprintsIndexRoute: BlueprintsIndexRoute,
   ChannelsIndexRoute: ChannelsIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
+  ApiPublicChatgptApproveRoute: ApiPublicChatgptApproveRoute,
   ApiPublicChatgptBlueprintsRoute: ApiPublicChatgptBlueprintsRoute,
-  ApiPublicChatgptChannelsRoute: ApiPublicChatgptChannelsRoute,
+  ApiPublicChatgptChannelsRoute: ApiPublicChatgptChannelsRouteWithChildren,
   ApiPublicChatgptCreatorsRoute: ApiPublicChatgptCreatorsRoute,
   ApiPublicChatgptEstimateRoute: ApiPublicChatgptEstimateRoute,
   ApiPublicChatgptOpenapiDotjsonRoute: ApiPublicChatgptOpenapiDotjsonRoute,
+  ApiPublicChatgptPublishRoute: ApiPublicChatgptPublishRoute,
+  ApiPublicChatgptQueueRoute: ApiPublicChatgptQueueRoute,
   ApiPublicChatgptScansRoute: ApiPublicChatgptScansRoute,
+  ApiPublicChatgptVideosRoute: ApiPublicChatgptVideosRoute,
   ApiPublicHooksPublishTickRoute: ApiPublicHooksPublishTickRoute,
   ApiPublicHooksSyncCronSecretRoute: ApiPublicHooksSyncCronSecretRoute,
   ApiPublicYoutubeCallbackRoute: ApiPublicYoutubeCallbackRoute,
