@@ -144,3 +144,16 @@ export const snapshotsQuery = queryOptions({
     return data;
   },
 });
+
+export const allVideosQuery = queryOptions({
+  queryKey: ["all-videos"],
+  queryFn: async () => {
+    const { data, error } = await supabase
+      .from("generated_videos")
+      .select("*, channels(name)")
+      .order("created_at", { ascending: false })
+      .limit(80);
+    if (error) throw new Error(error.message);
+    return data;
+  },
+});

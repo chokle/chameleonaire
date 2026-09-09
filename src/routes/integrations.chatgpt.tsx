@@ -32,6 +32,62 @@ type KeyRow = {
   revoked_at: string | null;
 };
 
+const GPT_NAME = "Chameleonaire Autopilot";
+
+const GPT_DESCRIPTION =
+  "Finds the YouTube channels actually earning in a niche, decodes their formula, writes evergreen videos in your voice, then renders, schedules and publishes them.";
+
+const GPT_INSTRUCTIONS = `You operate Chameleonaire, a YouTube metadata intelligence and publishing platform, on behalf of the owner. You have full API access through the configured actions.
+
+HOW TO WORK
+1. Start every session by calling getNextActions. It returns ranked cards with a kind, a title, a reason and a params object. Use those params as the body for the matching action.
+2. Explain in plain language what you are about to do, do it, then report the result. Do not ask the user to open the app unless an action requires something only they can do (connecting YouTube, defining a brand).
+3. For a new money-making run, prefer runAutopilot with mode "plan": it scans the niche, extracts a blueprint from the top earners, uses the connected channel (or spawns one) and writes evergreen videos. Use mode "full" only when the user explicitly asks you to publish.
+4. Step-by-step alternative: runScan -> listCreators -> extractBlueprint -> spawnChannel -> generateVideos -> renderVideo -> scheduleVideo -> publishVideo.
+
+RULES
+- Everything you produce must be EVERGREEN: timeless problems, questions and curiosity. Never news, trends, memes, current events, dates or years.
+- Copy STRUCTURE only: hook shape, title formula, pacing, cadence, thumbnail grammar. Never reuse a creator's titles, scripts, thumbnails, likeness or claims, and never name the source creators in output.
+- Never generate from a blueprint below the deploy gate. If extractBlueprint returns deployable false, tell the user the confidence and run another scan in the same niche to add evidence.
+- Rendering is slow. If renderVideo times out, poll listVideos and report render_status instead of retrying blindly.
+- Publishing uploads privately to YouTube. Tell the user they must flip it public in YouTube Studio.
+- Use estimateEarnings whenever the user asks what something is worth, and quote the low/mid/high range rather than a single number.
+
+TONE
+Direct and practical. Lead with money outcomes and the single next action. No hype, no filler.`;
+
+const GPT_STARTERS = `Find me a niche earning $2k+ per video and set it up
+What should I do next?
+Write and render three evergreen videos for my channel
+Publish the next video in my queue`;
+
+function CopyBlock({ label, value, multiline = false }: { label: string; value: string; multiline?: boolean }) {
+  return (
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <Label>{label}</Label>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 px-2 text-xs"
+          onClick={() => {
+            navigator.clipboard.writeText(value);
+            toast.success(`${label} copied`);
+          }}
+        >
+          Copy
+        </Button>
+      </div>
+      <pre
+        className={`overflow-auto rounded-lg border border-border bg-secondary/40 p-3 text-xs whitespace-pre-wrap text-foreground ${multiline ? "max-h-56" : ""}`}
+      >
+        {value}
+      </pre>
+    </div>
+  );
+}
+
+
 function ChatGptIntegrationPage() {
   const [keys, setKeys] = useState<KeyRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +138,7 @@ function ChatGptIntegrationPage() {
   return (
     <AppShell
       title="ChatGPT Integration"
-      subtitle="Give a Custom GPT read-only access to your scans, creators, blueprints, channels, and earnings estimates."
+      subtitle="Give a Custom GPT full control: it can scan, decode, write, render, schedule and publish for you."
     >
       <div className="grid max-w-3xl gap-6">
         <Card className="spectrum-border">
@@ -96,9 +152,23 @@ function ChatGptIntegrationPage() {
               <li>Set Schema URL to: <code className="rounded bg-secondary px-1 py-0.5 text-foreground">https://chameleonaire.lovable.app/api/public/chatgpt/openapi.json</code></li>
               <li>Set Authentication type to API key, header name <code className="rounded bg-secondary px-1 py-0.5 text-foreground">Authorization</code>, value <code className="rounded bg-secondary px-1 py-0.5 text-foreground">Bearer &lt;your_key&gt;</code>.</li>
               <li>Privacy policy: <code className="rounded bg-secondary px-1 py-0.5 text-foreground">https://chameleonaire.me/privacy</code></li>
+              <li>Paste the name, description, instructions and starters below into the GPT builder.</li>
             </ol>
           </CardContent>
         </Card>
+
+        <Card className="spectrum-border">
+          <CardHeader>
+            <CardTitle className="text-lg">Paste-ready Custom GPT</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <CopyBlock label="Name" value={GPT_NAME} />
+            <CopyBlock label="Description" value={GPT_DESCRIPTION} />
+            <CopyBlock label="Instructions" value={GPT_INSTRUCTIONS} multiline />
+            <CopyBlock label="Conversation starters" value={GPT_STARTERS} multiline />
+          </CardContent>
+        </Card>
+
 
         <Card className="spectrum-border">
           <CardHeader>

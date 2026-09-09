@@ -221,3 +221,117 @@ export async function publishQueueItemForUser(_userId: string, queueId: string) 
   const { publishQueueItem } = await import("./publish.server");
   return publishQueueItem(queueId);
 }
+
+/* ---------- write actions: plan, generate, render, schedule, autopilot ---------- */
+
+export type RunScanInput = {
+  niche: string;
+  min?: number | undefined;
+  max?: number | null | undefined;
+  count?: number | undefined;
+};
+
+export async function runScanForUser(_userId: string, input: RunScanInput) {
+  const { executeScan } = await import("./scan.server");
+  return executeScan({
+    niche: input.niche.trim().toLowerCase(),
+    min: input.min ?? 2000,
+    max: input.max ?? null,
+    count: Math.min(Math.max(input.count ?? 12, 3), 24),
+    persistent: false,
+    datasetId: null,
+  });
+}
+
+export async function extractBlueprintForUser(_userId: string, creatorIds: string[], name?: string) {
+  const { buildBlueprint } = await import("./blueprint.server");
+  const { DEPLOY_THRESHOLD } = await import("./domain");
+  const bp = await buildBlueprint(creatorIds.slice(0, 8), name);
+  const confidence = Math.round(Number(bp.confidence) || 0);
+  return {
+    blueprint: { id: bp.id, name: bp.name, niche: bp.niche, confidence, gap_notes: bp.gap_notes },
+    deployable: confidence >= DEPLOY_THRESHOLD,
+    deploy_threshold: DEPLOY_THRESHOLD,
+  };
+}
+
+export type SpawnChannelInput = {
+  name: string;
+  blueprint_id?: string | null | undefined;
+  brand_id?: string | null | undefined;
+  divergence?: number | undefined;
+  uploads_per_week?: number | undefined;
+  auto_publish?: boolean | undefined;
+};
+
+export async function spawnChannelForUser(_userId: string, input: SpawnChannelInput) {
+  const supabase = await adminClient();
+  const { data, error } = await supabase
+    .from("channels")
+    .insert({
+      name: input.name.trim(),
+      blueprint_id: input.blueprint_id ?? null,
+      brand_id: input.brand_id ?? null,
+      divergence: Math.min(Math.max(input.divergence ?? 35, 0), 100),
+      uploads_per_week: Math.min(Math.max(input.uploads_per_week ?? 3, 1), 21),
+      auto_publish: input.auto_publish ?? false,
+      status: "draft",
+    })
+    .select("id, name, blueprint_id, status")
+    .single();
+  if (error) throw new Error(error.message);
+  return { channel: data };
+}
+
+export async function generateVideosForUser(_userId: string, channelId: string, count: number) {
+  const { generateForChannel } = await import("./chameleon.server");
+  const result = await generateForChannel(channelId, Math.min(Math.max(count, 1), 6));
+  const supabase = await adminClient();
+  const { data } = await supabase
+    .from("generated_videos")
+    .select("id, title, hook, status, approved")
+    .eq("channel_id", channelId)
+    .order("created_at", { ascending: false })
+    .limit(result.created);
+  return { created: result.created, videos: data ?? [] };
+}
+
+export async function renderVideoForUser(_userId: string, videoId: string, durationTarget: number) {
+  const { renderVideoFile } = await import("./render.server");
+  return renderVideoFile(videoId, durationTarget);
+}
+
+export async function scheduleVideoForUser(_userId: string, videoId: string, scheduledFor: string | null) {
+  const { scheduleGeneratedVideo } = await import("./autopilot-actions.server");
+  return scheduleGeneratedVideo(videoId, scheduledFor);
+}
+
+export async function nextActionsForUser(_userId: string) {
+  const { nextActions } = await import("./autopilot.server");
+  const { actions } = await nextActions();
+  return { actions };
+}
+
+export async function autopilotForUser(
+  _userId: string,
+  input: {
+    niche: string;
+    min?: number | undefined;
+    max?: number | null | undefined;
+    channel_name?: string | undefined;
+    video_count?: number | undefined;
+    duration_target?: number | undefined;
+    mode?: "plan" | "full" | undefined;
+  },
+) {
+  const { runAutopilot } = await import("./autopilot.server");
+  return runAutopilot({
+    niche: input.niche,
+    min: input.min ?? 2000,
+    max: input.max ?? null,
+    channelName: input.channel_name,
+    videoCount: input.video_count ?? 3,
+    durationTarget: input.duration_target ?? 30,
+    mode: input.mode ?? "plan",
+  });
+}
