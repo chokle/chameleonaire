@@ -289,29 +289,52 @@ function ChannelDetail() {
                       )}
                       {v.thumbnail_url ? "Re-render thumbnail" : "Render thumbnail"}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="ml-2"
-                      onClick={() => rendering.mutate(v.id)}
-                      disabled={rendering.isPending || Boolean(v.video_url)}
-                    >
-                      {rendering.isPending ? (
-                        <Loader2 className="mr-1 size-4 animate-spin" />
-                      ) : (
-                        <Film className="mr-1 size-4" />
-                      )}
-                      {v.video_url ? "Video rendered" : "Render video"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="ml-2"
-                      variant={v.approved ? "outline" : "default"}
-                      onClick={() => approving.mutate({ videoId: v.id, approved: !v.approved })}
-                      disabled={approving.isPending}
-                    >
-                      {v.approved ? "Approved — revoke" : "Approve for publish"}
-                    </Button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Select
+                        value={String(v.duration_target ?? 30)}
+                        onValueChange={(val) =>
+                          setTarget.mutate({ videoId: v.id, durationTarget: Number(val) })
+                        }
+                        disabled={setTarget.isPending || rendering.isPending || Boolean(v.video_url)}
+                      >
+                        <SelectTrigger className="h-8 w-24 text-xs" aria-label="Target video length">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="30">30s</SelectItem>
+                          <SelectItem value="45">45s</SelectItem>
+                          <SelectItem value="60">60s</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          rendering.mutate({ videoId: v.id, durationTarget: v.duration_target ?? 30 })
+                        }
+                        disabled={rendering.isPending || Boolean(v.video_url)}
+                      >
+                        {rendering.isPending ? (
+                          <Loader2 className="mr-1 size-4 animate-spin" />
+                        ) : (
+                          <Film className="mr-1 size-4" />
+                        )}
+                        {v.video_url ? `Video rendered (${v.duration_seconds}s)` : "Render video"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={v.approved ? "outline" : "default"}
+                        onClick={() => approving.mutate({ videoId: v.id, approved: !v.approved })}
+                        disabled={approving.isPending}
+                      >
+                        {v.approved ? "Approved — revoke" : "Approve for publish"}
+                      </Button>
+                    </div>
+                    {v.render_status === "rendering" ? (
+                      <p className="text-xs text-muted-foreground">
+                        Rendering {v.duration_target ?? 30}s video… this takes several minutes.
+                      </p>
+                    ) : null}
                   </AccordionContent>
                 </AccordionItem>
               ))}
