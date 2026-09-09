@@ -9,6 +9,7 @@ import {
   Fingerprint,
   Gauge,
   Palette,
+  Plug,
   Radar,
   Sparkles,
   UserRound,
@@ -23,6 +24,7 @@ const NAV = [
   { to: "/brands", label: "Brands", icon: Palette },
   { to: "/channels", label: "Channels", icon: Boxes },
   { to: "/queue", label: "Queue", icon: CalendarClock },
+  { to: "/integrations/chatgpt", label: "ChatGPT", icon: Plug },
   { to: "/profile", label: "Profile", icon: UserRound },
 ] as const;
 
