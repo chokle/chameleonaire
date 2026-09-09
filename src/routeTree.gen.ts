@@ -40,6 +40,7 @@ import { Route as ApiPublicChatgptEstimateRouteImport } from './routes/api/publi
 import { Route as ApiPublicChatgptGenerateRouteImport } from './routes/api/public/chatgpt/generate'
 import { Route as ApiPublicChatgptNextActionsRouteImport } from './routes/api/public/chatgpt/next-actions'
 import { Route as ApiPublicChatgptOpenapiDotjsonRouteImport } from './routes/api/public/chatgpt/openapi[.]json'
+import { Route as ApiPublicChatgptPerformanceRouteImport } from './routes/api/public/chatgpt/performance'
 import { Route as ApiPublicChatgptPublishRouteImport } from './routes/api/public/chatgpt/publish'
 import { Route as ApiPublicChatgptQueueRouteImport } from './routes/api/public/chatgpt/queue'
 import { Route as ApiPublicChatgptRenderRouteImport } from './routes/api/public/chatgpt/render'
@@ -218,6 +219,12 @@ const ApiPublicChatgptOpenapiDotjsonRoute =
     path: '/api/public/chatgpt/openapi.json',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicChatgptPerformanceRoute =
+  ApiPublicChatgptPerformanceRouteImport.update({
+    id: '/api/public/chatgpt/performance',
+    path: '/api/public/chatgpt/performance',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicChatgptPublishRoute = ApiPublicChatgptPublishRouteImport.update({
   id: '/api/public/chatgpt/publish',
   path: '/api/public/chatgpt/publish',
@@ -317,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/api/public/chatgpt/generate': typeof ApiPublicChatgptGenerateRoute
   '/api/public/chatgpt/next-actions': typeof ApiPublicChatgptNextActionsRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/performance': typeof ApiPublicChatgptPerformanceRoute
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
@@ -362,6 +370,7 @@ export interface FileRoutesByTo {
   '/api/public/chatgpt/generate': typeof ApiPublicChatgptGenerateRoute
   '/api/public/chatgpt/next-actions': typeof ApiPublicChatgptNextActionsRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/performance': typeof ApiPublicChatgptPerformanceRoute
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
@@ -408,6 +417,7 @@ export interface FileRoutesById {
   '/api/public/chatgpt/generate': typeof ApiPublicChatgptGenerateRoute
   '/api/public/chatgpt/next-actions': typeof ApiPublicChatgptNextActionsRoute
   '/api/public/chatgpt/openapi.json': typeof ApiPublicChatgptOpenapiDotjsonRoute
+  '/api/public/chatgpt/performance': typeof ApiPublicChatgptPerformanceRoute
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
@@ -455,6 +465,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/generate'
     | '/api/public/chatgpt/next-actions'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/performance'
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
@@ -500,6 +511,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/generate'
     | '/api/public/chatgpt/next-actions'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/performance'
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
@@ -545,6 +557,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/generate'
     | '/api/public/chatgpt/next-actions'
     | '/api/public/chatgpt/openapi.json'
+    | '/api/public/chatgpt/performance'
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
@@ -591,6 +604,7 @@ export interface RootRouteChildren {
   ApiPublicChatgptGenerateRoute: typeof ApiPublicChatgptGenerateRoute
   ApiPublicChatgptNextActionsRoute: typeof ApiPublicChatgptNextActionsRoute
   ApiPublicChatgptOpenapiDotjsonRoute: typeof ApiPublicChatgptOpenapiDotjsonRoute
+  ApiPublicChatgptPerformanceRoute: typeof ApiPublicChatgptPerformanceRoute
   ApiPublicChatgptPublishRoute: typeof ApiPublicChatgptPublishRoute
   ApiPublicChatgptQueueRoute: typeof ApiPublicChatgptQueueRoute
   ApiPublicChatgptRenderRoute: typeof ApiPublicChatgptRenderRoute
@@ -823,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatgptOpenapiDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/performance': {
+      id: '/api/public/chatgpt/performance'
+      path: '/api/public/chatgpt/performance'
+      fullPath: '/api/public/chatgpt/performance'
+      preLoaderRoute: typeof ApiPublicChatgptPerformanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/chatgpt/publish': {
       id: '/api/public/chatgpt/publish'
       path: '/api/public/chatgpt/publish'
@@ -957,6 +978,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicChatgptGenerateRoute: ApiPublicChatgptGenerateRoute,
   ApiPublicChatgptNextActionsRoute: ApiPublicChatgptNextActionsRoute,
   ApiPublicChatgptOpenapiDotjsonRoute: ApiPublicChatgptOpenapiDotjsonRoute,
+  ApiPublicChatgptPerformanceRoute: ApiPublicChatgptPerformanceRoute,
   ApiPublicChatgptPublishRoute: ApiPublicChatgptPublishRoute,
   ApiPublicChatgptQueueRoute: ApiPublicChatgptQueueRoute,
   ApiPublicChatgptRenderRoute: ApiPublicChatgptRenderRoute,

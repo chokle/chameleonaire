@@ -335,3 +335,10 @@ export async function autopilotForUser(
     mode: input.mode ?? "plan",
   });
 }
+
+export async function performanceForUser(_userId: string, refresh: boolean) {
+  const { syncPerformance, readPerformance } = await import("./performance.server");
+  const sync = refresh ? await syncPerformance() : null;
+  const data = await readPerformance();
+  return { ...data, sync };
+}
