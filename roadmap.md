@@ -5,6 +5,12 @@
 - [ ] Full channel page: videos, views and earnings per channel
 - [ ] ChatGPT OAuth plugin flow (if user wants OAuth instead of API-key Actions)
 
+## Performance tracking (done 2026-09-09)
+- [x] /performance page: per-video views, likes, watch time, estimated revenue + blueprint leaderboard
+- [x] performance_snapshots extended (likes, comments, watch_time_minutes, youtube_video_id)
+- [x] getPerformance ChatGPT action
+- [x] Live run: finance blueprint (86%) -> 2 evergreen videos -> 36s render -> published https://youtube.com/watch?v=ZA-kAROx4PE
+
 ## Done
 - [x] Agent integrations (MCP): OAuth-protected MCP server at `/mcp` with read-only tools
 - [x] ChatGPT Custom GPT Actions: API-key auth, OpenAPI schema, key management UI, read-only endpoints
@@ -23,4 +29,4 @@
 - [x] Studio board with drag-and-drop recommendations and Draft/Approved/Scheduled/Published columns
 - [x] Start earning one-button flow + persistent next steps on home
 - [x] Paste-ready Custom GPT name/description/instructions/starters on /integrations/chatgpt
-- [ ] Publish the site so ChatGPT can load the updated schema
+- [x] Publish the site so ChatGPT can load the updated schema
