@@ -75,6 +75,20 @@ const OPENAPI_SCHEMA = {
         },
       },
     },
+    "/api/public/chatgpt/performance": {
+      get: {
+        operationId: "getPerformance",
+        summary: "Per-video performance and blueprint ranking",
+        description:
+          "Returns every published video with live YouTube views, likes and comments plus modelled watch time and estimated revenue, and ranks blueprints by earnings per video. Pass refresh=true to pull fresh numbers from YouTube first.",
+        parameters: [{ name: "refresh", in: "query", schema: { type: "boolean", default: false } }],
+        responses: {
+          "200": { description: "Performance data", content: { "application/json": { schema: { type: "object" } } } },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+        },
+      },
+    },
     "/api/public/chatgpt/approve": {
       post: {
         operationId: "setVideoApproval",
