@@ -58,6 +58,7 @@ function ChannelDetail() {
   const disconnectFn = useServerFn(youtubeDisconnect);
   const readyFn = useServerFn(youtubeReady);
   const render = useServerFn(renderVideo);
+  const setTargetFn = useServerFn(setVideoDurationTarget);
   const youtubePopup = useRef<Window | null>(null);
 
   const { data: ready } = useQuery({
