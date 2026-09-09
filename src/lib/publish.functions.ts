@@ -32,14 +32,34 @@ export const youtubeReady = createServerFn({ method: "GET" })
   };
 });
 
-const VideoInput = z.object({ videoId: z.string().uuid() });
+const VideoInput = z.object({
+  videoId: z.string().uuid(),
+  durationTarget: z.number().int().min(8).max(120).optional(),
+});
 
 export const renderVideo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => VideoInput.parse(input))
   .handler(async ({ data }) => {
     const { renderVideoFile } = await import("./render.server");
-    return renderVideoFile(data.videoId);
+    return renderVideoFile(data.videoId, data.durationTarget);
+  });
+
+const DurationInput = z.object({
+  videoId: z.string().uuid(),
+  durationTarget: z.number().int().min(8).max(120),
+});
+
+export const setVideoDurationTarget = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => DurationInput.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin
+      .from("generated_videos")
+      .update({ duration_target: data.durationTarget })
+      .eq("id", data.videoId);
+    return { ok: true };
   });
 
 const QueueInput = z.object({ queueId: z.string().uuid() });

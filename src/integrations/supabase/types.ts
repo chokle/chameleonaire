@@ -369,9 +369,11 @@ export type Database = {
           description: string | null
           divergence_applied: number
           duration_seconds: number | null
+          duration_target: number
           hook: string | null
           id: string
           render_error: string | null
+          render_jobs: Json
           render_status: string
           script: string | null
           status: string
@@ -392,9 +394,11 @@ export type Database = {
           description?: string | null
           divergence_applied?: number
           duration_seconds?: number | null
+          duration_target?: number
           hook?: string | null
           id?: string
           render_error?: string | null
+          render_jobs?: Json
           render_status?: string
           script?: string | null
           status?: string
@@ -415,9 +419,11 @@ export type Database = {
           description?: string | null
           divergence_applied?: number
           duration_seconds?: number | null
+          duration_target?: number
           hook?: string | null
           id?: string
           render_error?: string | null
+          render_jobs?: Json
           render_status?: string
           script?: string | null
           status?: string

@@ -6,6 +6,8 @@
 - [ ] Full channel page: videos, views and earnings per channel
 
 ## Done
+- [x] 30+ second video render pipeline: base 8s + 7s Veo extensions, target selector (30/45/60s), persisted render_jobs
+- [x] Second evergreen video rendered (36s) and published to YouTube: https://youtube.com/watch?v=8m_dZD2lKLg
 - [x] YouTube OAuth connected (channel "Dee"), finance scan, blueprint extraction, first evergreen video published: https://youtube.com/watch?v=CRs5Kd8airA
 - [x] Deploy gate lowered 95% → 85% (public metadata can't supply private retention/CTR)
 - [x] Google Search Console connected, verified, sitemap submitted
