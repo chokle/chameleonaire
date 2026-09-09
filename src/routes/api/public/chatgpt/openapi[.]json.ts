@@ -5,7 +5,7 @@ const OPENAPI_SCHEMA = {
   info: {
     title: "Chameleonaire ChatGPT Actions",
     description:
-      "API for surfacing YouTube creator scans, blueprints, channels, and earnings estimates inside a ChatGPT Custom GPT.",
+      "Full control of Chameleonaire from a ChatGPT Custom GPT: scan niches for earning channels, extract blueprints, spawn channels, generate evergreen videos, render, schedule and publish to YouTube.",
     version: "1.0.0",
     contact: { name: "Chameleonaire", url: "https://chameleonaire.me" },
   },
@@ -359,8 +359,227 @@ const OPENAPI_SCHEMA = {
         },
       },
     },
+    "/api/public/chatgpt/next-actions": {
+      get: {
+        operationId: "getNextActions",
+        summary: "Get the ranked next actions for this account",
+        description:
+          "ALWAYS call this first. It returns ranked action cards (kind, title, why, impact, params) describing exactly what to do next: run a scan, extract a blueprint, spawn a channel, generate, render, approve or publish. Use the params on a card as the body for the matching action.",
+        responses: {
+          "200": { description: "Ranked action cards", content: { "application/json": { schema: { type: "object" } } } },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/scan": {
+      post: {
+        operationId: "runScan",
+        summary: "Scan YouTube for high-earning creators in a niche",
+        description:
+          "Runs a live scan and stores the creators it finds with modelled profit per video. Use min/max to target a profit bracket (for example 2000 to 10000 per video).",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["niche"],
+                properties: {
+                  niche: { type: "string", description: "e.g. finance, ai, real estate" },
+                  min: { type: "number", default: 2000 },
+                  max: { type: "number", nullable: true, default: 10000 },
+                  count: { type: "integer", minimum: 3, maximum: 24, default: 12 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Scan result with scanId and number found" },
+          "400": { description: "Scan failed" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/blueprint": {
+      post: {
+        operationId: "extractBlueprint",
+        summary: "Extract a strategy blueprint from scanned creators",
+        description:
+          "Pulls the repeatable structure out of one to eight creators and returns confidence plus whether it clears the deploy gate. Structure only — never a creator's words, likeness or thumbnails.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["creator_ids"],
+                properties: {
+                  creator_ids: { type: "array", items: { type: "string", format: "uuid" }, minItems: 1, maxItems: 8 },
+                  name: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Blueprint with confidence and deployable flag" },
+          "400": { description: "Extraction failed" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/spawn-channel": {
+      post: {
+        operationId: "spawnChannel",
+        summary: "Spawn a channel that runs a blueprint",
+        description:
+          "Creates a channel bound to a blueprint and brand. Only pass a blueprint that is deployable; otherwise generation is blocked.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name"],
+                properties: {
+                  name: { type: "string" },
+                  blueprint_id: { type: "string", format: "uuid", nullable: true },
+                  brand_id: { type: "string", format: "uuid", nullable: true },
+                  divergence: { type: "integer", minimum: 0, maximum: 100, default: 35 },
+                  uploads_per_week: { type: "integer", minimum: 1, maximum: 21, default: 3 },
+                  auto_publish: { type: "boolean", default: false },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "The new channel" },
+          "400": { description: "Could not spawn channel" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/generate": {
+      post: {
+        operationId: "generateVideos",
+        summary: "Generate evergreen video concepts and scripts for a channel",
+        description:
+          "Writes 1-6 evergreen concepts, titles, hooks, scripts, descriptions and thumbnail prompts using the channel's blueprint and brand. Evergreen only: no news, trends or dated topics.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["channel_id"],
+                properties: {
+                  channel_id: { type: "string", format: "uuid" },
+                  count: { type: "integer", minimum: 1, maximum: 6, default: 3 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Created videos" },
+          "400": { description: "Generation failed" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/render": {
+      post: {
+        operationId: "renderVideo",
+        summary: "Render a generated video to a real video file",
+        description:
+          "Renders the video at the requested length in seconds (30, 45 or 60 are typical). This is slow; if it times out, poll listVideos for render_status.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["video_id"],
+                properties: {
+                  video_id: { type: "string", format: "uuid" },
+                  duration_target: { type: "integer", minimum: 8, maximum: 120, default: 30 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Render result with duration" },
+          "400": { description: "Render failed" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/schedule": {
+      post: {
+        operationId: "scheduleVideo",
+        summary: "Approve a video and put it in the publish queue",
+        description: "Approves the video and schedules it. Omit scheduled_for to schedule it an hour from now.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["video_id"],
+                properties: {
+                  video_id: { type: "string", format: "uuid" },
+                  scheduled_for: { type: "string", format: "date-time" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Queue entry" },
+          "400": { description: "Scheduling failed" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
+    "/api/public/chatgpt/autopilot": {
+      post: {
+        operationId: "runAutopilot",
+        summary: "Run the whole earning loop for a niche in one call",
+        description:
+          "Scans the niche, extracts a blueprint from the top earners, reuses the connected channel (or spawns one), and generates evergreen videos. With mode 'full' it also renders and publishes the first video privately to YouTube. Returns a step-by-step report you should narrate to the user. Use mode 'plan' by default; use 'full' only when the user asked to publish.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["niche"],
+                properties: {
+                  niche: { type: "string" },
+                  min: { type: "number", default: 2000 },
+                  max: { type: "number", nullable: true, default: 10000 },
+                  channel_name: { type: "string" },
+                  video_count: { type: "integer", minimum: 1, maximum: 6, default: 3 },
+                  duration_target: { type: "integer", minimum: 8, maximum: 120, default: 30 },
+                  mode: { type: "string", enum: ["plan", "full"], default: "plan" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Step-by-step autopilot report" },
+          "400": { description: "Autopilot failed" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
   },
 };
+
 
 export const Route = createFileRoute("/api/public/chatgpt/openapi.json")({
   server: {

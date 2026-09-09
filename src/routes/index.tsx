@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { blueprintsQuery, channelsQuery, creatorsQuery, queueQuery } from "@/lib/queries";
 import { DEPLOY_THRESHOLD, money, compact } from "@/lib/domain";
+import { StartEarning } from "@/components/StartEarning";
+import { NextSteps } from "@/components/NextSteps";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -69,16 +72,22 @@ function Command() {
   return (
     <AppShell
       title="Command deck"
-      subtitle="Scan the earners. Decode what wins. Spawn channels that run the formula as your own — and keep adapting."
+      subtitle="Pick a niche, press start. It finds the earners, decodes the formula and loads evergreen videos in your own voice."
       action={
-        <Button asChild>
-          <Link to="/scanner">
-            Run a profit scan <ArrowRight className="ml-1 size-4" />
+        <Button asChild variant="secondary">
+          <Link to="/studio">
+            Open studio <ArrowRight className="ml-1 size-4" />
           </Link>
         </Button>
       }
     >
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        <StartEarning />
+        <NextSteps />
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
         <Stat
           label="Creators surfaced"
           value={compact(rows.length)}

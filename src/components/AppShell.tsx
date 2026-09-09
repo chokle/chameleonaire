@@ -8,6 +8,8 @@ import {
   CalendarClock,
   Fingerprint,
   Gauge,
+  LayoutGrid,
+
   Palette,
   Plug,
   Radar,
@@ -17,7 +19,8 @@ import {
 import type { ReactNode } from "react";
 
 const NAV = [
-  { to: "/", label: "Command", icon: Gauge },
+  { to: "/", label: "Start", icon: Gauge },
+  { to: "/studio", label: "Studio", icon: LayoutGrid },
   { to: "/scanner", label: "Profit scanner", icon: Radar },
   { to: "/calculator", label: "Money calculator", icon: Calculator },
   { to: "/blueprints", label: "Blueprints", icon: Fingerprint },
@@ -27,6 +30,7 @@ const NAV = [
   { to: "/integrations/chatgpt", label: "ChatGPT", icon: Plug },
   { to: "/profile", label: "Profile", icon: UserRound },
 ] as const;
+
 
 export function AppShell({
   children,
