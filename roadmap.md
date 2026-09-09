@@ -17,3 +17,10 @@
 - [x] Stale-chunk auto-recovery for deploys
 - [x] SEO fixes: sitemap, unique metadata/social previews on detail pages, headings & labels
 - [x] Security findings locked down
+
+## Autopilot + Custom GPT (done 2026-09-09)
+- [x] OpenAPI actions: next-actions, scan, blueprint, spawn-channel, generate, render, schedule, autopilot
+- [x] Studio board with drag-and-drop recommendations and Draft/Approved/Scheduled/Published columns
+- [x] Start earning one-button flow + persistent next steps on home
+- [x] Paste-ready Custom GPT name/description/instructions/starters on /integrations/chatgpt
+- [ ] Publish the site so ChatGPT can load the updated schema
