@@ -176,6 +176,408 @@
           ]
         },
         "outputSchema": null
+      },
+      {
+        "name": "next_actions",
+        "title": "Get recommended next actions",
+        "description": "Return the ranked next actions for the signed-in account (what to scan, generate, render, schedule or publish next).",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_videos",
+        "title": "List generated videos",
+        "description": "List generated videos for the signed-in account, optionally filtered to one channel.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "channel_id": {
+              "description": "Only videos for this channel.",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "limit": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_queue",
+        "title": "List publish queue",
+        "description": "List publish queue entries (awaiting approval, scheduled, published) for the signed-in account.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "channel_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "limit": {
+              "default": 20,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "generate_videos",
+        "title": "Generate evergreen video concepts",
+        "description": "Generate 1-6 evergreen video concepts (title, hook, script, thumbnail brief) for one of your channels using its blueprint.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "channel_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Channel to generate for."
+            },
+            "count": {
+              "default": 3,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
+            }
+          },
+          "required": [
+            "channel_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "render_video",
+        "title": "Render a generated video",
+        "description": "Render the actual video file for a generated concept. Duration is in seconds (8-120).",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "video_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "duration_target": {
+              "default": 30,
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 120
+            }
+          },
+          "required": [
+            "video_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "approve_video",
+        "title": "Approve or unapprove a video",
+        "description": "Mark a generated video approved (or remove approval). Approval alone does not schedule or publish.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "video_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "approved": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "video_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "schedule_video",
+        "title": "Schedule a video for publishing",
+        "description": "Approve and schedule a rendered video for upload. Provide an ISO timestamp, or omit to schedule one hour from now.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "video_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "scheduled_for": {
+              "description": "ISO 8601 UTC timestamp.",
+              "type": "string",
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+            }
+          },
+          "required": [
+            "video_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "publish_now",
+        "title": "Publish a queued video now",
+        "description": "Immediately upload a queued video to its connected YouTube channel. Uploads are private by default.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "queue_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Publish queue entry id from list_queue."
+            }
+          },
+          "required": [
+            "queue_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "run_scan",
+        "title": "Run a profit scan",
+        "description": "Scan YouTube for creators in a niche within a modeled profit-per-video bracket.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "niche": {
+              "type": "string",
+              "minLength": 1
+            },
+            "min": {
+              "default": 2000,
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "niche"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "extract_blueprint",
+        "title": "Extract a blueprint",
+        "description": "Extract a structure-only strategy blueprint from one or more surfaced creators.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "creator_ids": {
+              "minItems": 1,
+              "maxItems": 10,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "creator_ids"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "spawn_channel",
+        "title": "Spawn a channel",
+        "description": "Create a channel from a blueprint and brand profile.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "blueprint_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "brand_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "auto_publish": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "autopilot",
+        "title": "Run autopilot",
+        "description": "Run the end-to-end flow for a niche: scan, blueprint, channel, evergreen concepts. Use mode 'plan' to stop before rendering, 'full' to also render.",
+        "annotations": {
+          "readOnlyHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "niche": {
+              "type": "string",
+              "minLength": 1
+            },
+            "min": {
+              "type": "number",
+              "minimum": 0
+            },
+            "max": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "channel_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "video_count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 6
+            },
+            "duration_target": {
+              "type": "integer",
+              "minimum": 8,
+              "maximum": 120
+            },
+            "mode": {
+              "default": "plan",
+              "type": "string",
+              "enum": [
+                "plan",
+                "full"
+              ]
+            }
+          },
+          "required": [
+            "niche"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_performance",
+        "title": "Get video performance",
+        "description": "Per-video views, watch time and modeled revenue, plus blueprint rankings. Set refresh to pull fresh YouTube stats.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "refresh": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        },
+        "outputSchema": null
       }
     ]
   }

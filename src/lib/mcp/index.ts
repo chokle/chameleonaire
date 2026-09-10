@@ -6,6 +6,7 @@ import listCreators from "./tools/list-creators";
 import listBlueprints from "./tools/list-blueprints";
 import listChannels from "./tools/list-channels";
 import estimateEarnings from "./tools/estimate-earnings";
+import { actionTools } from "./tools/actions";
 
 // The OAuth issuer must be the direct Supabase host; the project ref is the
 // only value that survives publish unchanged.
@@ -16,7 +17,7 @@ export default defineMcp({
   title: "Chameleonaire",
   version: "0.1.0",
   instructions:
-    "Tools for Chameleonaire, a YouTube profit-intelligence app. Use `list_scans` to see profit scans, `list_creators` to inspect surfaced creators and their estimated earnings, `list_blueprints` for extracted strategy blueprints, `list_channels` for spawned channels, and `estimate_earnings` to model earnings for any views/cadence/niche combination.",
+    "Tools for Chameleonaire, a YouTube profit-intelligence app. Read: `list_scans`, `list_creators`, `list_blueprints`, `list_channels`, `list_videos`, `list_queue`, `get_performance`, `estimate_earnings`, `next_actions`. Write: `run_scan`, `extract_blueprint`, `spawn_channel`, `generate_videos` (evergreen only — no news, trends or dated topics), `render_video`, `approve_video`, `schedule_video`, `publish_now`, and `autopilot` for the whole flow. Typical order: next_actions -> generate_videos -> render_video -> schedule_video (or publish_now). YouTube uploads are private by default.",
   auth: auth.oauth.issuer({
     issuer: `https://${projectRef}.supabase.co/auth/v1`,
     acceptedAudiences: "authenticated",
@@ -29,5 +30,6 @@ export default defineMcp({
     listBlueprints,
     listChannels,
     estimateEarnings,
+    ...actionTools,
   ] as unknown as McpTools,
 });
