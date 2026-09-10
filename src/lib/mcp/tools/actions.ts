@@ -96,10 +96,22 @@ const renderVideoTool = defineTool({
     withUser(ctx, async (userId) => (await actions()).renderVideoForUser(userId, video_id, duration_target)),
 });
 
+const reviewVideoTool = defineTool({
+  name: "review_video",
+  title: "Review a rendered video",
+  description:
+    "Fetch the full details of a generated video for review before approval: title, hook, script, thumbnail brief, render status, duration and a temporary preview link. Call this before approve_video.",
+  inputSchema: { video_id: z.string().uuid() },
+  annotations: { readOnlyHint: true, openWorldHint: false },
+  handler: ({ video_id }, ctx) =>
+    withUser(ctx, async (userId) => (await actions()).reviewVideoForUser(userId, video_id)),
+});
+
 const approveVideoTool = defineTool({
   name: "approve_video",
   title: "Approve or unapprove a video",
-  description: "Mark a generated video approved (or remove approval). Approval alone does not schedule or publish.",
+  description:
+    "Green-light a reviewed video (or remove approval). Review it with review_video first. Scheduling and publishing are blocked until a video is approved; approval alone does not schedule or publish.",
   inputSchema: { video_id: z.string().uuid(), approved: z.boolean().default(true) },
   annotations: { readOnlyHint: false, openWorldHint: false },
   handler: ({ video_id, approved }, ctx) =>
@@ -110,7 +122,7 @@ const scheduleVideoTool = defineTool({
   name: "schedule_video",
   title: "Schedule a video for publishing",
   description:
-    "Approve and schedule a rendered video for upload. Provide an ISO timestamp, or omit to schedule one hour from now.",
+    "Schedule an already-approved rendered video for upload. Provide an ISO timestamp, or omit to schedule one hour from now.",
   inputSchema: {
     video_id: z.string().uuid(),
     scheduled_for: z.string().datetime().optional().describe("ISO 8601 UTC timestamp."),
@@ -244,6 +256,7 @@ export const actionTools = [
   listQueueTool,
   generateVideosTool,
   renderVideoTool,
+  reviewVideoTool,
   approveVideoTool,
   scheduleVideoTool,
   publishNowTool,

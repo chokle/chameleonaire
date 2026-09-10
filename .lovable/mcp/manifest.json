@@ -309,9 +309,33 @@
         "outputSchema": null
       },
       {
+        "name": "review_video",
+        "title": "Review a rendered video",
+        "description": "Fetch the full details of a generated video for review before approval: title, hook, script, thumbnail brief, render status, duration and a temporary preview link. Call this before approve_video.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "video_id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "required": [
+            "video_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "approve_video",
         "title": "Approve or unapprove a video",
-        "description": "Mark a generated video approved (or remove approval). Approval alone does not schedule or publish.",
+        "description": "Green-light a reviewed video (or remove approval). Review it with review_video first. Scheduling and publishing are blocked until a video is approved; approval alone does not schedule or publish.",
         "annotations": {
           "readOnlyHint": false,
           "openWorldHint": false
@@ -339,7 +363,7 @@
       {
         "name": "schedule_video",
         "title": "Schedule a video for publishing",
-        "description": "Approve and schedule a rendered video for upload. Provide an ISO timestamp, or omit to schedule one hour from now.",
+        "description": "Schedule an already-approved rendered video for upload. Provide an ISO timestamp, or omit to schedule one hour from now.",
         "annotations": {
           "readOnlyHint": false,
           "openWorldHint": false
