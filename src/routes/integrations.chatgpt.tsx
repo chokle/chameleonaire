@@ -138,7 +138,7 @@ function ChatGptIntegrationPage() {
 
   return (
     <AppShell
-      title="ChatGPT Integration"
+      title="Chamele-on-air - Adapt. Transform. Go viral"
       subtitle="Give a Custom GPT full control: it can scan, decode, write, render, schedule and publish for you."
     >
       <div className="grid max-w-3xl gap-6">
