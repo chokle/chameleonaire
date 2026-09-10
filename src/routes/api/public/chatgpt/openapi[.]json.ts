@@ -89,11 +89,37 @@ const OPENAPI_SCHEMA = {
         },
       },
     },
+    "/api/public/chatgpt/review": {
+      post: {
+        operationId: "reviewVideo",
+        summary: "Review a rendered video before approving it",
+        description:
+          "Returns the full video for review (title, hook, script, thumbnail brief, render status, duration and a temporary preview link) plus whether it is ready to schedule.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["video_id"],
+                properties: { video_id: { type: "string", format: "uuid" } },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Video review detail", content: { "application/json": { schema: { type: "object" } } } },
+          "400": { description: "Invalid request" },
+          "401": { description: "Missing or invalid API key" },
+        },
+      },
+    },
     "/api/public/chatgpt/approve": {
       post: {
         operationId: "setVideoApproval",
         summary: "Approve or unapprove a generated video",
-        description: "Approving a video marks it scheduled so the publish worker can upload it.",
+        description:
+          "Green-lights a reviewed video. Call reviewVideo first. Scheduling and publishing are rejected until a video is approved; approval alone does not schedule or publish.",
         requestBody: {
           required: true,
           content: {
@@ -570,8 +596,8 @@ const OPENAPI_SCHEMA = {
     "/api/public/chatgpt/schedule": {
       post: {
         operationId: "scheduleVideo",
-        summary: "Approve a video and put it in the publish queue",
-        description: "Approves the video and schedules it. Omit scheduled_for to schedule it an hour from now.",
+        summary: "Schedule an approved video for publishing",
+        description: "Schedules an already-approved video. Omit scheduled_for to schedule it an hour from now.",
         requestBody: {
           required: true,
           content: {

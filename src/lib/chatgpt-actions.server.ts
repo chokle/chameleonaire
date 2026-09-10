@@ -246,14 +246,80 @@ export async function setVideoApprovalForUser(userId: string, videoId: string, a
 
   const { data, error } = await supabase
     .from("generated_videos")
-    .update({ approved, status: approved ? "scheduled" : "awaiting_approval" })
+    .update({ approved, status: approved ? "approved" : "awaiting_approval" })
     .eq("id", videoId)
     .select("id, title, approved, status")
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) throw new Error("Video not found.");
-  return { video: data };
+  if (!approved) {
+    // Pull it back out of the schedule if it was queued.
+    await supabase
+      .from("publish_queue")
+      .update({ status: "awaiting_approval" })
+      .eq("generated_video_id", videoId)
+      .eq("status", "scheduled");
+  }
+  return { video: data, next: approved ? "Now call schedule_video or publish_now." : "Approval removed." };
 }
+
+/** Full detail for a human/AI review pass before approving a rendered video. */
+export async function reviewVideoForUser(userId: string, videoId: string) {
+  const supabase = await adminClient();
+  const { data: video } = await supabase
+    .from("generated_videos")
+    .select(
+      "id, channel_id, title, concept, hook, script, thumbnail_url, thumbnail_prompt, status, approved, render_status, render_error, duration_seconds, duration_target, video_url, youtube_video_id, created_at",
+    )
+    .eq("id", videoId)
+    .maybeSingle();
+  if (!video?.channel_id) throw new Error("Video not found.");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id, name, connected")
+    .eq("id", video.channel_id)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Video not found or not owned by you.");
+
+  let previewUrl: string | null = null;
+  if (video.video_url) {
+    const { previewUrl: sign } = await import("./render.server");
+    previewUrl = await sign(video.video_url);
+  }
+
+  const rendered = video.render_status === "rendered" && Boolean(video.video_url);
+  const { video_url: _path, ...rest } = video;
+  return {
+    video: rest,
+    channel: { id: channel.id, name: channel.name, connected: channel.connected },
+    rendered,
+    approved: Boolean(video.approved),
+    preview_url: previewUrl,
+    ready_to_schedule: rendered && Boolean(video.approved),
+    next: !rendered
+      ? "Render this video first (render_video)."
+      : video.approved
+        ? "Approved — call schedule_video or publish_now."
+        : "Review the script and preview, then call approve_video to green-light it.",
+  };
+}
+
+/** Scheduling and publishing both require an explicit approval pass. */
+async function assertApproved(
+  supabase: Awaited<ReturnType<typeof adminClient>>,
+  videoId: string,
+) {
+  const { data } = await supabase
+    .from("generated_videos")
+    .select("approved, render_status")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (!data) throw new Error("Video not found.");
+  if (!data.approved)
+    throw new Error("This video has not been approved yet. Call review_video, then approve_video first.");
+}
+
 
 export type Privacy = "private" | "unlisted" | "public";
 
@@ -298,6 +364,13 @@ export async function publishQueueItemForUser(userId: string, queueId: string, p
     .eq("owner_id", userId)
     .maybeSingle();
   if (!channel) throw new Error("Queue item not found or not owned by you.");
+
+  const { data: qrow } = await supabase
+    .from("publish_queue")
+    .select("generated_video_id")
+    .eq("id", queueId)
+    .maybeSingle();
+  if (qrow?.generated_video_id) await assertApproved(supabase, qrow.generated_video_id);
 
   const { publishQueueItem } = await import("./publish.server");
   return publishQueueItem(queueId, privacy);
@@ -392,6 +465,7 @@ export async function renderVideoForUser(userId: string, videoId: string, durati
 }
 
 export async function scheduleVideoForUser(userId: string, videoId: string, scheduledFor: string | null) {
+  await assertApproved(await adminClient(), videoId);
   const { scheduleGeneratedVideo } = await import("./autopilot-actions.server");
   return scheduleGeneratedVideo(videoId, scheduledFor, userId);
 }
