@@ -14,10 +14,12 @@ const JOB_ID = "publish";
 const BATCH = 3;
 const LEASE_MINUTES = 10;
 
+export type Privacy = "private" | "unlisted" | "public";
+
 async function uploadToYouTube(
   token: string,
   bytes: ArrayBuffer,
-  meta: { title: string; description: string; tags: string[] },
+  meta: { title: string; description: string; tags: string[]; privacy: Privacy },
 ): Promise<string> {
   const boundary = `chameleon${crypto.randomUUID().replace(/-/g, "")}`;
   const snippet = {
