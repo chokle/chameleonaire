@@ -36,7 +36,7 @@ export const Route = createFileRoute("/channels/$id")({
   head: ({ params }) => {
     const title = "Chamele-on-air - adapt · transform · go viral";
     const description = "Workspace for this channel: generate chameleonized concepts, hooks, scripts and thumbnails, then queue them to publish.";
-    const url = `https://chameleonaire.lovable.app/channels/${params.id}`;
+    const url = `https://chameleonaire.me/channels/${params.id}`;
     return {
       meta: [
         { title },
