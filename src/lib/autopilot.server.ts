@@ -214,6 +214,7 @@ export async function runAutopilot(
       data: { channelId: reuse.id },
     });
   } else {
+    if (!userId) throw new Error("Autopilot requires a signed-in user to spawn a channel.");
     const { data: brand } = await db.from("brands").select("id").limit(1).maybeSingle();
     const { data: created, error } = await db
       .from("channels")
@@ -225,7 +226,7 @@ export async function runAutopilot(
         uploads_per_week: 3,
         auto_publish: false,
         status: "draft",
-        owner_id: userId ?? null,
+        owner_id: userId,
       })
       .select("id, name")
       .single();
