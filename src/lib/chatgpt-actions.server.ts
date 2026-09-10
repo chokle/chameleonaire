@@ -269,7 +269,7 @@ export async function reviewVideoForUser(userId: string, videoId: string) {
   const { data: video } = await supabase
     .from("generated_videos")
     .select(
-      "id, channel_id, title, concept, hook, script, thumbnail_url, thumbnail_brief, status, approved, render_status, render_error, duration_seconds, duration_target, video_url, youtube_video_id, created_at",
+      "id, channel_id, title, concept, hook, script, thumbnail_url, thumbnail_prompt, status, approved, render_status, render_error, duration_seconds, duration_target, video_url, youtube_video_id, created_at",
     )
     .eq("id", videoId)
     .maybeSingle();
@@ -365,6 +365,13 @@ export async function publishQueueItemForUser(userId: string, queueId: string, p
     .maybeSingle();
   if (!channel) throw new Error("Queue item not found or not owned by you.");
 
+  const { data: qrow } = await supabase
+    .from("publish_queue")
+    .select("generated_video_id")
+    .eq("id", queueId)
+    .maybeSingle();
+  if (qrow?.generated_video_id) await assertApproved(supabase, qrow.generated_video_id);
+
   const { publishQueueItem } = await import("./publish.server");
   return publishQueueItem(queueId, privacy);
 }
@@ -458,6 +465,7 @@ export async function renderVideoForUser(userId: string, videoId: string, durati
 }
 
 export async function scheduleVideoForUser(userId: string, videoId: string, scheduledFor: string | null) {
+  await assertApproved(await adminClient(), videoId);
   const { scheduleGeneratedVideo } = await import("./autopilot-actions.server");
   return scheduleGeneratedVideo(videoId, scheduledFor, userId);
 }
