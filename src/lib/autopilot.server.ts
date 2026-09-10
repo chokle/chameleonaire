@@ -225,6 +225,7 @@ export async function runAutopilot(
         uploads_per_week: 3,
         auto_publish: false,
         status: "draft",
+        owner_id: userId ?? null,
       })
       .select("id, name")
       .single();
