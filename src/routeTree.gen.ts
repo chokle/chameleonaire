@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -74,6 +75,11 @@ const BrandsRoute = BrandsRouteImport.update({
 const CalculatorRoute = CalculatorRouteImport.update({
   id: '/calculator',
   path: '/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -310,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
@@ -358,6 +365,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
@@ -457,6 +466,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/library'
     | '/mcp'
     | '/performance'
     | '/privacy'
@@ -505,6 +515,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/library'
     | '/mcp'
     | '/performance'
     | '/privacy'
@@ -553,6 +564,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/library'
     | '/mcp'
     | '/performance'
     | '/privacy'
@@ -602,6 +614,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
+  LibraryRoute: typeof LibraryRoute
   McpRoute: typeof McpRoute
   PerformanceRoute: typeof PerformanceRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -673,6 +686,13 @@ declare module '@tanstack/react-router' {
       path: '/calculator'
       fullPath: '/calculator'
       preLoaderRoute: typeof CalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -991,6 +1011,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
+  LibraryRoute: LibraryRoute,
   McpRoute: McpRoute,
   PerformanceRoute: PerformanceRoute,
   PrivacyRoute: PrivacyRoute,
