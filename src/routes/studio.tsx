@@ -327,6 +327,10 @@ function StudioPage() {
           </DropZone>
         </div>
 
+        <div className="mt-6">
+          <AutoScheduleCard />
+        </div>
+
         <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {COLUMNS.map((col) => {
             const items = rows.filter((v) => columnOf(v) === col.id);
