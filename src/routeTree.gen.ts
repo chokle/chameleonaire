@@ -44,6 +44,7 @@ import { Route as ApiPublicChatgptPerformanceRouteImport } from './routes/api/pu
 import { Route as ApiPublicChatgptPublishRouteImport } from './routes/api/public/chatgpt/publish'
 import { Route as ApiPublicChatgptQueueRouteImport } from './routes/api/public/chatgpt/queue'
 import { Route as ApiPublicChatgptRenderRouteImport } from './routes/api/public/chatgpt/render'
+import { Route as ApiPublicChatgptReviewRouteImport } from './routes/api/public/chatgpt/review'
 import { Route as ApiPublicChatgptScanRouteImport } from './routes/api/public/chatgpt/scan'
 import { Route as ApiPublicChatgptScansRouteImport } from './routes/api/public/chatgpt/scans'
 import { Route as ApiPublicChatgptScheduleRouteImport } from './routes/api/public/chatgpt/schedule'
@@ -241,6 +242,11 @@ const ApiPublicChatgptRenderRoute = ApiPublicChatgptRenderRouteImport.update({
   path: '/api/public/chatgpt/render',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicChatgptReviewRoute = ApiPublicChatgptReviewRouteImport.update({
+  id: '/api/public/chatgpt/review',
+  path: '/api/public/chatgpt/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicChatgptScanRoute = ApiPublicChatgptScanRouteImport.update({
   id: '/api/public/chatgpt/scan',
   path: '/api/public/chatgpt/scan',
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
+  '/api/public/chatgpt/review': typeof ApiPublicChatgptReviewRoute
   '/api/public/chatgpt/scan': typeof ApiPublicChatgptScanRoute
   '/api/public/chatgpt/scans': typeof ApiPublicChatgptScansRoute
   '/api/public/chatgpt/schedule': typeof ApiPublicChatgptScheduleRoute
@@ -382,6 +389,7 @@ export interface FileRoutesByTo {
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
+  '/api/public/chatgpt/review': typeof ApiPublicChatgptReviewRoute
   '/api/public/chatgpt/scan': typeof ApiPublicChatgptScanRoute
   '/api/public/chatgpt/scans': typeof ApiPublicChatgptScansRoute
   '/api/public/chatgpt/schedule': typeof ApiPublicChatgptScheduleRoute
@@ -430,6 +438,7 @@ export interface FileRoutesById {
   '/api/public/chatgpt/publish': typeof ApiPublicChatgptPublishRoute
   '/api/public/chatgpt/queue': typeof ApiPublicChatgptQueueRoute
   '/api/public/chatgpt/render': typeof ApiPublicChatgptRenderRoute
+  '/api/public/chatgpt/review': typeof ApiPublicChatgptReviewRoute
   '/api/public/chatgpt/scan': typeof ApiPublicChatgptScanRoute
   '/api/public/chatgpt/scans': typeof ApiPublicChatgptScansRoute
   '/api/public/chatgpt/schedule': typeof ApiPublicChatgptScheduleRoute
@@ -479,6 +488,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
+    | '/api/public/chatgpt/review'
     | '/api/public/chatgpt/scan'
     | '/api/public/chatgpt/scans'
     | '/api/public/chatgpt/schedule'
@@ -526,6 +536,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
+    | '/api/public/chatgpt/review'
     | '/api/public/chatgpt/scan'
     | '/api/public/chatgpt/scans'
     | '/api/public/chatgpt/schedule'
@@ -573,6 +584,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/publish'
     | '/api/public/chatgpt/queue'
     | '/api/public/chatgpt/render'
+    | '/api/public/chatgpt/review'
     | '/api/public/chatgpt/scan'
     | '/api/public/chatgpt/scans'
     | '/api/public/chatgpt/schedule'
@@ -621,6 +633,7 @@ export interface RootRouteChildren {
   ApiPublicChatgptPublishRoute: typeof ApiPublicChatgptPublishRoute
   ApiPublicChatgptQueueRoute: typeof ApiPublicChatgptQueueRoute
   ApiPublicChatgptRenderRoute: typeof ApiPublicChatgptRenderRoute
+  ApiPublicChatgptReviewRoute: typeof ApiPublicChatgptReviewRoute
   ApiPublicChatgptScanRoute: typeof ApiPublicChatgptScanRoute
   ApiPublicChatgptScansRoute: typeof ApiPublicChatgptScansRoute
   ApiPublicChatgptScheduleRoute: typeof ApiPublicChatgptScheduleRoute
@@ -879,6 +892,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatgptRenderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/review': {
+      id: '/api/public/chatgpt/review'
+      path: '/api/public/chatgpt/review'
+      fullPath: '/api/public/chatgpt/review'
+      preLoaderRoute: typeof ApiPublicChatgptReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/chatgpt/scan': {
       id: '/api/public/chatgpt/scan'
       path: '/api/public/chatgpt/scan'
@@ -1003,6 +1023,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicChatgptPublishRoute: ApiPublicChatgptPublishRoute,
   ApiPublicChatgptQueueRoute: ApiPublicChatgptQueueRoute,
   ApiPublicChatgptRenderRoute: ApiPublicChatgptRenderRoute,
+  ApiPublicChatgptReviewRoute: ApiPublicChatgptReviewRoute,
   ApiPublicChatgptScanRoute: ApiPublicChatgptScanRoute,
   ApiPublicChatgptScansRoute: ApiPublicChatgptScansRoute,
   ApiPublicChatgptScheduleRoute: ApiPublicChatgptScheduleRoute,
