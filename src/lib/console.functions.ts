@@ -103,10 +103,15 @@ export const setVideoApproval = createServerFn({ method: "POST" })
       .update({ approved: data.approved })
       .eq("id", data.videoId);
     if (error) throw new Error(error.message);
-    await db
-      .from("publish_queue")
-      .update({ status: data.approved ? "scheduled" : "awaiting_approval" })
-      .eq("generated_video_id", data.videoId)
-      .in("status", ["awaiting_approval", "scheduled"]);
+    // Approving only green-lights the video; the queue row stays at
+    // awaiting_approval until the user explicitly schedules it. Unapproving
+    // pulls it back out of the schedule.
+    if (!data.approved) {
+      await db
+        .from("publish_queue")
+        .update({ status: "awaiting_approval" })
+        .eq("generated_video_id", data.videoId)
+        .eq("status", "scheduled");
+    }
     return { ok: true };
   });
