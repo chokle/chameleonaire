@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
+import { useState } from "react";
+import { Check, Eye, Loader2, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { setQueueStatus } from "@/lib/console.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact } from "@/lib/domain";
+import { VideoReviewDialog } from "@/components/VideoReviewDialog";
 
 export const Route = createFileRoute("/queue")({
   head: () => ({
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/queue")({
 
 function Queue() {
   const qc = useQueryClient();
+  const [reviewId, setReviewId] = useState<string | null>(null);
   const { data: queue } = useQuery(queueQuery);
   const { data: snaps } = useQuery(snapshotsQuery);
   const loop = useServerFn(runFeedbackLoop);
@@ -234,6 +237,11 @@ function Queue() {
           </CardContent>
         </Card>
       </div>
+      <VideoReviewDialog
+        videoId={reviewId}
+        open={Boolean(reviewId)}
+        onOpenChange={(o) => !o && setReviewId(null)}
+      />
     </AppShell>
   );
 }
