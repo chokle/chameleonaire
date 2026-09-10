@@ -34,9 +34,8 @@ import { setVideoApproval } from "@/lib/console.functions";
 
 export const Route = createFileRoute("/channels/$id")({
   head: ({ params }) => {
-    const ref = params.id.slice(0, 8);
-    const title = `Channel ${ref} — chamele-on-air`;
-    const description = `Workspace for channel ${ref}: generate chameleonized concepts, hooks, scripts and thumbnails, then queue them to publish.`;
+    const title = "Chamele-on-air - adapt · transform · go viral";
+    const description = "Workspace for this channel: generate chameleonized concepts, hooks, scripts and thumbnails, then queue them to publish.";
     const url = `https://chameleonaire.lovable.app/channels/${params.id}`;
     return {
       meta: [
