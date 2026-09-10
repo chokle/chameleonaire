@@ -60,9 +60,10 @@ export const createChannel = createServerFn({ method: "POST" })
       })
       .parse(data),
   )
-  .handler(async ({ data }) => {
-    const db = await admin();
-    const { error } = await db.from("channels").insert(data);
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("channels")
+      .insert({ ...data, owner_id: context.userId });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -78,12 +79,14 @@ export const setQueueStatus = createServerFn({ method: "POST" })
       })
       .parse(data),
   )
-  .handler(async ({ data }) => {
-    const db = await admin();
-    const { error } = await db.from("publish_queue").update({ status: data.status }).eq("id", data.id);
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("publish_queue")
+      .update({ status: data.status })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     if (data.videoId) {
-      await db
+      await context.supabase
         .from("generated_videos")
         .update({ approved: data.status === "scheduled" })
         .eq("id", data.videoId);
@@ -96,9 +99,8 @@ export const setVideoApproval = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) =>
     z.object({ videoId: uuid, approved: z.boolean() }).parse(data),
   )
-  .handler(async ({ data }) => {
-    const db = await admin();
-    const { error } = await db
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
       .from("generated_videos")
       .update({ approved: data.approved })
       .eq("id", data.videoId);
@@ -107,7 +109,7 @@ export const setVideoApproval = createServerFn({ method: "POST" })
     // awaiting_approval until the user explicitly schedules it. Unapproving
     // pulls it back out of the schedule.
     if (!data.approved) {
-      await db
+      await context.supabase
         .from("publish_queue")
         .update({ status: "awaiting_approval" })
         .eq("generated_video_id", data.videoId)
