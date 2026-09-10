@@ -130,12 +130,13 @@ export type ListQueueInput = {
   limit?: number;
 };
 
-export async function getChannelForUser(_userId: string, channelId: string) {
+export async function getChannelForUser(userId: string, channelId: string) {
   const supabase = await adminClient();
   const { data: channel, error } = await supabase
     .from("channels")
     .select("*, brands(name, voice, palette), blueprints(id, name, niche, confidence, deployable)")
     .eq("id", channelId)
+    .eq("owner_id", userId)
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!channel) return null;
