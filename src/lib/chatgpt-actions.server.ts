@@ -353,19 +353,19 @@ export async function generateVideosForUser(userId: string, channelId: string, c
   return { created: result.created, videos: data ?? [] };
 }
 
-export async function renderVideoForUser(_userId: string, videoId: string, durationTarget: number) {
+export async function renderVideoForUser(userId: string, videoId: string, durationTarget: number) {
   const { renderVideoFile } = await import("./render.server");
-  return renderVideoFile(videoId, durationTarget);
+  return renderVideoFile(videoId, durationTarget, userId);
 }
 
-export async function scheduleVideoForUser(_userId: string, videoId: string, scheduledFor: string | null) {
+export async function scheduleVideoForUser(userId: string, videoId: string, scheduledFor: string | null) {
   const { scheduleGeneratedVideo } = await import("./autopilot-actions.server");
-  return scheduleGeneratedVideo(videoId, scheduledFor);
+  return scheduleGeneratedVideo(videoId, scheduledFor, userId);
 }
 
-export async function nextActionsForUser(_userId: string) {
+export async function nextActionsForUser(userId: string) {
   const { nextActions } = await import("./autopilot.server");
-  const { actions } = await nextActions();
+  const { actions } = await nextActions(userId);
   return { actions };
 }
 
