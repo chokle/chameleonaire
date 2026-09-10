@@ -16,7 +16,7 @@ type Concept = {
   thumbnail_prompt: string;
 };
 
-export async function generateForChannel(channelId: string, count: number) {
+export async function generateForChannel(channelId: string, count: number, userId?: string) {
   const db = await admin();
 
   const { data: channel } = await db
@@ -25,6 +25,9 @@ export async function generateForChannel(channelId: string, count: number) {
     .eq("id", channelId)
     .maybeSingle();
   if (!channel) throw new Error("Channel not found.");
+  if (userId && channel.owner_id !== userId) {
+    throw new Error("Channel not found or not owned by you.");
+  }
 
   const blueprint = channel.blueprints as { strategy?: unknown; confidence?: number; name?: string } | null;
   const brand = channel.brands as Record<string, unknown> | null;
