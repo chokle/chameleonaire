@@ -155,7 +155,7 @@ export async function publishQueueItem(
       outcome: "pending",
     });
 
-    return { youtubeVideoId: ytId, url: `https://youtube.com/watch?v=${ytId}` };
+    return { youtubeVideoId: ytId, url: `https://youtube.com/watch?v=${ytId}`, privacy };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Publish failed.";
     await db
