@@ -214,7 +214,9 @@ async function learnFromSnapshotRows(
   }
 
   // Channels riding a losing blueprint drift further from it; winners tighten up.
-  const { data: channels } = await db.from("channels").select("id, blueprint_id, divergence");
+  let channelsQ = db.from("channels").select("id, blueprint_id, divergence");
+  if (userId) channelsQ = channelsQ.eq("owner_id", userId);
+  const { data: channels } = await channelsQ;
   for (const c of channels ?? []) {
     if (!c.blueprint_id) continue;
     const stat = byBlueprint.get(c.blueprint_id);
