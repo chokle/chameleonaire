@@ -83,8 +83,8 @@ export async function buildAccountSnapshot(userId?: string): Promise<AccountSnap
   };
 }
 
-export async function nextActions(): Promise<{ actions: ActionCard[]; snapshot: AccountSnapshot }> {
-  const snapshot = await buildAccountSnapshot();
+export async function nextActions(userId?: string): Promise<{ actions: ActionCard[]; snapshot: AccountSnapshot }> {
+  const snapshot = await buildAccountSnapshot(userId);
   return { actions: recommend(snapshot), snapshot };
 }
 
