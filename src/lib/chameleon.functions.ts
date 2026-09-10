@@ -20,9 +20,9 @@ const ThumbInput = z.object({ videoId: z.string().uuid() });
 export const renderThumbnail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ThumbInput.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { makeThumbnail } = await import("./chameleon.server");
-    return makeThumbnail(data.videoId);
+    return makeThumbnail(data.videoId, context.userId);
   });
 
 const LoopInput = z.object({ channelId: z.string().uuid().nullable().default(null) });
