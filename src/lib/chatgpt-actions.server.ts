@@ -394,8 +394,8 @@ export async function autopilotForUser(
 }
 
 export async function performanceForUser(userId: string, refresh: boolean) {
-  const { syncPerformance, readPerformanceForUser } = await import("./performance.server");
+  const { syncPerformance, readPerformance } = await import("./performance.server");
   const sync = refresh ? await syncPerformance(userId) : null;
-  const data = await readPerformanceForUser(userId);
+  const data = await readPerformance(userId);
   return { ...data, sync };
 }
