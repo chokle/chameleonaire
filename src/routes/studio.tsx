@@ -96,6 +96,107 @@ function DropZone({
   );
 }
 
+function AutoScheduleCard() {
+  const qc = useQueryClient();
+  const readFn = useServerFn(getAutoSchedule);
+  const saveFn = useServerFn(saveAutoSchedule);
+  const [saving, setSaving] = useState(false);
+
+  const settings = useQuery({
+    queryKey: ["auto-schedule"],
+    queryFn: () => readFn({ data: undefined }),
+  });
+
+  const current = settings.data ?? { enabled: false, perWeek: 3, hourUtc: 15 };
+
+  const save = async (next: { enabled: boolean; perWeek: number; hourUtc: number }) => {
+    setSaving(true);
+    try {
+      const res = await saveFn({ data: next });
+      if (!next.enabled) toast.success("Auto-schedule off — you schedule videos yourself.");
+      else if (res.scheduled > 0)
+        toast.success(
+          `Auto-schedule on — queued ${res.scheduled} video${res.scheduled === 1 ? "" : "s"}, first on ${new Date(res.nextSlot!).toLocaleString()}.`,
+        );
+      else toast.success("Auto-schedule on — approved videos will be queued automatically.");
+      await qc.invalidateQueries();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save that.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card className="spectrum-border">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <CalendarClock className="size-4 text-primary" /> Auto-schedule
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <Label htmlFor="auto-schedule" className="text-sm">
+              Publish on a regular rhythm
+            </Label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Every approved, finished video is queued on the next free slot and uploaded automatically (private).
+            </p>
+          </div>
+          <Switch
+            id="auto-schedule"
+            checked={current.enabled}
+            disabled={settings.isLoading || saving}
+            onCheckedChange={(enabled) => save({ ...current, enabled })}
+          />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">How often</Label>
+            <Select
+              value={String(current.perWeek)}
+              disabled={saving}
+              onValueChange={(v) => save({ ...current, perWeek: Number(v) })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">Once a week</SelectItem>
+                <SelectItem value="2">Twice a week</SelectItem>
+                <SelectItem value="3">3 a week</SelectItem>
+                <SelectItem value="5">5 a week</SelectItem>
+                <SelectItem value="7">Every day</SelectItem>
+                <SelectItem value="14">Twice a day</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Time of day (UTC)</Label>
+            <Select
+              value={String(current.hourUtc)}
+              disabled={saving || current.perWeek > 7}
+              onValueChange={(v) => save({ ...current, hourUtc: Number(v) })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 24 }, (_, h) => (
+                  <SelectItem key={h} value={String(h)}>
+                    {String(h).padStart(2, "0")}:00
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function StudioPage() {
   const qc = useQueryClient();
   const nextActionsFn = useServerFn(getNextActions);
