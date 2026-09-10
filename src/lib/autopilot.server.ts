@@ -241,7 +241,7 @@ export async function runAutopilot(
 
   // 4. Generate evergreen concepts
   const { generateForChannel } = await import("./chameleon.server");
-  const gen = await generateForChannel(channelId, videoCount);
+  const gen = await generateForChannel(channelId, videoCount, userId);
   const { data: fresh } = await db
     .from("generated_videos")
     .select("id, title")
