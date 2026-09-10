@@ -300,7 +300,7 @@ export async function publishQueueItemForUser(userId: string, queueId: string, p
   if (!channel) throw new Error("Queue item not found or not owned by you.");
 
   const { publishQueueItem } = await import("./publish.server");
-  return publishQueueItem(queueId);
+  return publishQueueItem(queueId, privacy);
 }
 
 /* ---------- write actions: plan, generate, render, schedule, autopilot ---------- */
