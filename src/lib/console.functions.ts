@@ -68,6 +68,40 @@ export const createChannel = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteChannel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ id: uuid }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: channel, error: readError } = await context.supabase
+      .from("channels")
+      .select("id, owner_id")
+      .eq("id", data.id)
+      .single();
+    if (readError || !channel) throw new Error("Channel not found.");
+    if (channel.owner_id !== context.userId) throw new Error("You do not own this channel.");
+
+    const db = await admin();
+    // Remove dependent rows first; FK constraints block the channel delete otherwise.
+    const { data: videos } = await db
+      .from("generated_videos")
+      .select("id")
+      .eq("channel_id", data.id);
+    const videoIds = (videos ?? []).map((v) => v.id);
+    if (videoIds.length > 0) {
+      await db.from("publish_queue").delete().in("generated_video_id", videoIds);
+      await db.from("performance_snapshots").delete().in("generated_video_id", videoIds);
+    }
+    await db.from("publish_queue").delete().eq("channel_id", data.id);
+    await db.from("performance_snapshots").delete().eq("channel_id", data.id);
+    await db.from("generated_videos").delete().eq("channel_id", data.id);
+    await db.from("youtube_accounts").delete().eq("channel_id", data.id);
+    await db.from("oauth_states").delete().eq("channel_id", data.id);
+
+    const { error } = await db.from("channels").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 export const setQueueStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>
