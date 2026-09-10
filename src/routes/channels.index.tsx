@@ -82,6 +82,18 @@ function Channels() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const removeChannel = useServerFn(deleteChannel);
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      await removeChannel({ data: { id } });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["channels"] });
+      toast.success("Channel deleted.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <AppShell
       title="Channels"
