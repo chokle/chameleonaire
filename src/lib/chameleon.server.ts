@@ -180,15 +180,17 @@ export async function learnFromPerformance(channelId: string | null, userId?: st
   if (channelId) q = q.eq("channel_id", channelId);
   const { data: snaps } = await q;
 
-  if (userId && snaps) {
+  const rows = (snaps ?? []).filter((s): s is typeof s & { channel_id: string } => Boolean(s.channel_id));
+
+  if (userId) {
     const ownedChannelIds = new Set(
       (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [],
     );
-    const filtered = snaps.filter((s) => ownedChannelIds.has(s.channel_id));
+    const filtered = rows.filter((s) => ownedChannelIds.has(s.channel_id));
     return learnFromSnapshotRows(filtered, db, userId);
   }
 
-  return learnFromSnapshotRows(snaps ?? [], db);
+  return learnFromSnapshotRows(rows, db);
 }
 
 async function learnFromSnapshotRows(
