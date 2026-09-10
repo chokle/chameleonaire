@@ -198,14 +198,22 @@ export async function listVideosForUser(userId: string, input: ListVideosInput =
   return { videos: data ?? [] };
 }
 
-export async function listQueueForUser(_userId: string, input: ListQueueInput = {}) {
+export async function listQueueForUser(userId: string, input: ListQueueInput = {}) {
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
   const supabase = await adminClient();
+
+  let channelQ = supabase.from("channels").select("id").eq("owner_id", userId);
+  if (input.channel_id) channelQ = channelQ.eq("id", input.channel_id);
+  const { data: ownedChannels } = await channelQ;
+  const ownedIds = (ownedChannels ?? []).map((c) => c.id);
+  if (!ownedIds.length) return { queue: [] };
+
   let query = supabase
     .from("publish_queue")
     .select(
       "id, channel_id, generated_video_id, status, scheduled_for, published_at, attempts, last_error, generated_videos(id, title, approved, render_status, youtube_video_id), channels(name)",
     )
+    .in("channel_id", ownedIds)
     .order("scheduled_for", { ascending: true })
     .limit(limit);
   if (input.channel_id) query = query.eq("channel_id", input.channel_id);
