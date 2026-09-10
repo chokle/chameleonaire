@@ -49,6 +49,7 @@ import { Route as ApiPublicChatgptScansRouteImport } from './routes/api/public/c
 import { Route as ApiPublicChatgptScheduleRouteImport } from './routes/api/public/chatgpt/schedule'
 import { Route as ApiPublicChatgptSpawnChannelRouteImport } from './routes/api/public/chatgpt/spawn-channel'
 import { Route as ApiPublicChatgptVideosRouteImport } from './routes/api/public/chatgpt/videos'
+import { Route as ApiPublicChatgptVisibilityRouteImport } from './routes/api/public/chatgpt/visibility'
 import { Route as ApiPublicHooksPublishTickRouteImport } from './routes/api/public/hooks/publish-tick'
 import { Route as ApiPublicHooksSyncCronSecretRouteImport } from './routes/api/public/hooks/sync-cron-secret'
 import { Route as ApiPublicYoutubeCallbackRouteImport } from './routes/api/public/youtube.callback'
@@ -267,6 +268,12 @@ const ApiPublicChatgptVideosRoute = ApiPublicChatgptVideosRouteImport.update({
   path: '/api/public/chatgpt/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicChatgptVisibilityRoute =
+  ApiPublicChatgptVisibilityRouteImport.update({
+    id: '/api/public/chatgpt/visibility',
+    path: '/api/public/chatgpt/visibility',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPublishTickRoute =
   ApiPublicHooksPublishTickRouteImport.update({
     id: '/api/public/hooks/publish-tick',
@@ -333,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/api/public/chatgpt/schedule': typeof ApiPublicChatgptScheduleRoute
   '/api/public/chatgpt/spawn-channel': typeof ApiPublicChatgptSpawnChannelRoute
   '/api/public/chatgpt/videos': typeof ApiPublicChatgptVideosRoute
+  '/api/public/chatgpt/visibility': typeof ApiPublicChatgptVisibilityRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -379,6 +387,7 @@ export interface FileRoutesByTo {
   '/api/public/chatgpt/schedule': typeof ApiPublicChatgptScheduleRoute
   '/api/public/chatgpt/spawn-channel': typeof ApiPublicChatgptSpawnChannelRoute
   '/api/public/chatgpt/videos': typeof ApiPublicChatgptVideosRoute
+  '/api/public/chatgpt/visibility': typeof ApiPublicChatgptVisibilityRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -426,6 +435,7 @@ export interface FileRoutesById {
   '/api/public/chatgpt/schedule': typeof ApiPublicChatgptScheduleRoute
   '/api/public/chatgpt/spawn-channel': typeof ApiPublicChatgptSpawnChannelRoute
   '/api/public/chatgpt/videos': typeof ApiPublicChatgptVideosRoute
+  '/api/public/chatgpt/visibility': typeof ApiPublicChatgptVisibilityRoute
   '/api/public/hooks/publish-tick': typeof ApiPublicHooksPublishTickRoute
   '/api/public/hooks/sync-cron-secret': typeof ApiPublicHooksSyncCronSecretRoute
   '/api/public/youtube/callback': typeof ApiPublicYoutubeCallbackRoute
@@ -474,6 +484,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/schedule'
     | '/api/public/chatgpt/spawn-channel'
     | '/api/public/chatgpt/videos'
+    | '/api/public/chatgpt/visibility'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/schedule'
     | '/api/public/chatgpt/spawn-channel'
     | '/api/public/chatgpt/videos'
+    | '/api/public/chatgpt/visibility'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -566,6 +578,7 @@ export interface FileRouteTypes {
     | '/api/public/chatgpt/schedule'
     | '/api/public/chatgpt/spawn-channel'
     | '/api/public/chatgpt/videos'
+    | '/api/public/chatgpt/visibility'
     | '/api/public/hooks/publish-tick'
     | '/api/public/hooks/sync-cron-secret'
     | '/api/public/youtube/callback'
@@ -613,6 +626,7 @@ export interface RootRouteChildren {
   ApiPublicChatgptScheduleRoute: typeof ApiPublicChatgptScheduleRoute
   ApiPublicChatgptSpawnChannelRoute: typeof ApiPublicChatgptSpawnChannelRoute
   ApiPublicChatgptVideosRoute: typeof ApiPublicChatgptVideosRoute
+  ApiPublicChatgptVisibilityRoute: typeof ApiPublicChatgptVisibilityRoute
   ApiPublicHooksPublishTickRoute: typeof ApiPublicHooksPublishTickRoute
   ApiPublicHooksSyncCronSecretRoute: typeof ApiPublicHooksSyncCronSecretRoute
   ApiPublicYoutubeCallbackRoute: typeof ApiPublicYoutubeCallbackRoute
@@ -900,6 +914,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatgptVideosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chatgpt/visibility': {
+      id: '/api/public/chatgpt/visibility'
+      path: '/api/public/chatgpt/visibility'
+      fullPath: '/api/public/chatgpt/visibility'
+      preLoaderRoute: typeof ApiPublicChatgptVisibilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/publish-tick': {
       id: '/api/public/hooks/publish-tick'
       path: '/api/public/hooks/publish-tick'
@@ -987,6 +1008,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicChatgptScheduleRoute: ApiPublicChatgptScheduleRoute,
   ApiPublicChatgptSpawnChannelRoute: ApiPublicChatgptSpawnChannelRoute,
   ApiPublicChatgptVideosRoute: ApiPublicChatgptVideosRoute,
+  ApiPublicChatgptVisibilityRoute: ApiPublicChatgptVisibilityRoute,
   ApiPublicHooksPublishTickRoute: ApiPublicHooksPublishTickRoute,
   ApiPublicHooksSyncCronSecretRoute: ApiPublicHooksSyncCronSecretRoute,
   ApiPublicYoutubeCallbackRoute: ApiPublicYoutubeCallbackRoute,
