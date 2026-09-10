@@ -15,13 +15,13 @@ import { NextSteps } from "@/components/NextSteps";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Command — chamele-on-air" },
+      { title: "Chamele-on-air - adapt · transform · go viral" },
       {
         name: "description",
         content:
           "One console for profit scanning, blueprint extraction and the channels spawning off the winning formula.",
       },
-      { property: "og:title", content: "chamele-on-air command deck" },
+      { property: "og:title", content: "Chamele-on-air - adapt · transform · go viral" },
       {
         property: "og:description",
         content: "Scan the earners, decode the formula, spawn the channels. Forever adapting.",
@@ -71,7 +71,7 @@ function Command() {
 
   return (
     <AppShell
-      title="Command deck"
+      title="Chamele-on-air - adapt · transform · go viral"
       subtitle="Pick a niche, press start. It finds the earners, decodes the formula and loads evergreen videos in your own voice."
       action={
         <Button asChild variant="secondary">
