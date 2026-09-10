@@ -332,10 +332,18 @@ export async function spawnChannelForUser(userId: string, input: SpawnChannelInp
   return { channel: data };
 }
 
-export async function generateVideosForUser(_userId: string, channelId: string, count: number) {
-  const { generateForChannel } = await import("./chameleon.server");
-  const result = await generateForChannel(channelId, Math.min(Math.max(count, 1), 6));
+export async function generateVideosForUser(userId: string, channelId: string, count: number) {
   const supabase = await adminClient();
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", channelId)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Channel not found or not owned by you.");
+
+  const { generateForChannel } = await import("./chameleon.server");
+  const result = await generateForChannel(channelId, Math.min(Math.max(count, 1), 6), userId);
   const { data } = await supabase
     .from("generated_videos")
     .select("id, title, hook, status, approved")
