@@ -136,6 +136,7 @@ export async function publishQueueItem(
       title: video.title,
       description: video.description ?? "",
       tags: video.tags ?? [],
+      privacy,
     });
     if (video.thumbnail_url) await setThumbnail(token, ytId, video.thumbnail_url);
 
