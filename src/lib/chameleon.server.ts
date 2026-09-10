@@ -185,13 +185,17 @@ export async function learnFromPerformance(channelId: string | null, userId?: st
       (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [],
     );
     const filtered = snaps.filter((s) => ownedChannelIds.has(s.channel_id));
-    return learnFromSnapshotRows(filtered, db);
+    return learnFromSnapshotRows(filtered, db, userId);
   }
 
   return learnFromSnapshotRows(snaps ?? [], db);
 }
 
-async function learnFromSnapshotRows(snaps: { blueprint_id: string | null; outcome: string | null; channel_id: string }[], db: Awaited<ReturnType<typeof admin>>) {
+async function learnFromSnapshotRows(
+  snaps: { blueprint_id: string | null; outcome: string | null; channel_id: string }[],
+  db: Awaited<ReturnType<typeof admin>>,
+  userId?: string,
+) {
 
   const byBlueprint = new Map<string, { wins: number; total: number }>();
   for (const s of snaps ?? []) {
