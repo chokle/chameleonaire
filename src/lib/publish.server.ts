@@ -73,8 +73,32 @@ async function setThumbnail(token: string, videoId: string, url: string): Promis
   }
 }
 
+/** Changes the visibility of a video already live on YouTube. */
+export async function setYouTubePrivacy(
+  channelId: string,
+  youtubeVideoId: string,
+  privacy: Privacy,
+): Promise<void> {
+  const token = await accessTokenFor(channelId);
+  const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=status", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id: youtubeVideoId,
+      status: { privacyStatus: privacy, selfDeclaredMadeForKids: false },
+    }),
+  });
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+    throw new Error(json.error?.message ?? `YouTube rejected the visibility change (${res.status}).`);
+  }
+}
+
 /** Publishes one queue row end to end: render if needed, upload, record. */
-export async function publishQueueItem(queueId: string): Promise<{ youtubeVideoId: string; url: string }> {
+export async function publishQueueItem(
+  queueId: string,
+  privacy: Privacy = "private",
+): Promise<{ youtubeVideoId: string; url: string; privacy: Privacy }> {
   const db = await admin();
 
   const { data: item } = await db
