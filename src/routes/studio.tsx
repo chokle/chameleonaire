@@ -5,6 +5,7 @@ import { useState } from "react";
 import { DndContext, useDraggable, useDroppable, type DragEndEvent } from "@dnd-kit/core";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
+import { VideoReviewDialog } from "@/components/VideoReviewDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -204,6 +205,7 @@ function StudioPage() {
   const scheduleFn = useServerFn(scheduleVideo);
   const publishFn = useServerFn(publishNow);
   const [busy, setBusy] = useState<string | null>(null);
+  const [reviewId, setReviewId] = useState<string | null>(null);
 
   const actions = useQuery({
     queryKey: ["next-actions"],
@@ -355,6 +357,14 @@ function StudioPage() {
                           {v.video_url ? `${v.duration_seconds ?? 0}s rendered` : "not rendered"}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 px-2 text-[11px]"
+                            onClick={() => setReviewId(v.id)}
+                          >
+                            Review
+                          </Button>
                           {COLUMNS.filter((c) => c.id !== col.id).map((c) => (
                             <Button
                               key={c.id}
@@ -377,6 +387,11 @@ function StudioPage() {
           })}
         </div>
       </DndContext>
+      <VideoReviewDialog
+        videoId={reviewId}
+        open={Boolean(reviewId)}
+        onOpenChange={(o) => !o && setReviewId(null)}
+      />
     </AppShell>
   );
 }
