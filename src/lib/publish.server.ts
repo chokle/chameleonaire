@@ -29,7 +29,7 @@ async function uploadToYouTube(
       tags: meta.tags.slice(0, 15),
       categoryId: "22",
     },
-    status: { privacyStatus: "private", selfDeclaredMadeForKids: false },
+    status: { privacyStatus: meta.privacy, selfDeclaredMadeForKids: false },
   };
 
   const enc = new TextEncoder();
