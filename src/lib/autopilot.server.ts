@@ -110,7 +110,10 @@ export type AutopilotInput = {
  * One call, whole loop. Each step records its own outcome so ChatGPT (or the UI)
  * can narrate progress and pick up where a run stopped.
  */
-export async function runAutopilot(input: AutopilotInput): Promise<{
+export async function runAutopilot(
+  input: AutopilotInput,
+  userId?: string,
+): Promise<{
   steps: AutopilotStep[];
   scanId: string | null;
   blueprintId: string | null;
