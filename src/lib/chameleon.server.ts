@@ -115,14 +115,24 @@ export async function generateForChannel(channelId: string, count: number, userI
   return { created: inserted?.length ?? 0 };
 }
 
-export async function makeThumbnail(videoId: string) {
+export async function makeThumbnail(videoId: string, userId?: string) {
   const db = await admin();
   const { data: video } = await db
     .from("generated_videos")
-    .select("id, thumbnail_prompt, title")
+    .select("id, thumbnail_prompt, title, channel_id")
     .eq("id", videoId)
     .maybeSingle();
   if (!video) throw new Error("Video not found.");
+  if (userId) {
+    const { data: channel } = await db
+      .from("channels")
+      .select("owner_id")
+      .eq("id", video.channel_id)
+      .maybeSingle();
+    if (!channel || channel.owner_id !== userId) {
+      throw new Error("Video not found or not owned by you.");
+    }
+  }
 
   const key = process.env["LOVABLE_API_KEY"];
   if (!key) throw new Error("AI is not configured.");
