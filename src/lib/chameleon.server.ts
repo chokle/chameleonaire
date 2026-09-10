@@ -173,12 +173,25 @@ export async function makeThumbnail(videoId: string, userId?: string) {
  * The forever loop: reads back performance, scores each blueprint's win rate,
  * and nudges channel divergence toward whatever is currently working.
  */
-export async function learnFromPerformance(channelId: string | null) {
+export async function learnFromPerformance(channelId: string | null, userId?: string) {
   const db = await admin();
 
   let q = db.from("performance_snapshots").select("*").order("captured_at", { ascending: false }).limit(500);
   if (channelId) q = q.eq("channel_id", channelId);
   const { data: snaps } = await q;
+
+  if (userId && snaps) {
+    const ownedChannelIds = new Set(
+      (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [],
+    );
+    const filtered = snaps.filter((s) => ownedChannelIds.has(s.channel_id));
+    return learnFromSnapshotRows(filtered, db);
+  }
+
+  return learnFromSnapshotRows(snaps ?? [], db);
+}
+
+async function learnFromSnapshotRows(snaps: { blueprint_id: string | null; outcome: string | null; channel_id: string }[], db: Awaited<ReturnType<typeof admin>>) {
 
   const byBlueprint = new Map<string, { wins: number; total: number }>();
   for (const s of snaps ?? []) {
