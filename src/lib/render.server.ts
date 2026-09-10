@@ -149,15 +149,20 @@ function extensionPrompt(
 export async function renderVideoFile(
   videoId: string,
   durationTarget = 30,
+  userId?: string,
 ): Promise<{ videoUrl: string; durationSeconds: number }> {
   const db = await admin();
 
   const { data: video } = await db
     .from("generated_videos")
-    .select("*, channels(id, name, brands(palette))")
+    .select("*, channels(id, name, owner_id, brands(palette))")
     .eq("id", videoId)
     .maybeSingle();
   if (!video) throw new Error("Video not found.");
+  const channel = video.channels as { owner_id?: string } | null;
+  if (userId && channel?.owner_id !== userId) {
+    throw new Error("Video not found or not owned by you.");
+  }
   if (video.video_url) return { videoUrl: video.video_url, durationSeconds: video.duration_seconds ?? 0 };
 
   const target = Math.max(8, Math.min(120, durationTarget));

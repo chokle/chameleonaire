@@ -1,6 +1,9 @@
 # Roadmap
 
 ## Open
+- [ ] Per-channel ownership: only the owner sees/manages their channels and downstream data
+- [ ] Video template page: write script + choose visuals before scheduling
+- [ ] Update /integrations/chatgpt heading to "Chamele-on-air - Adapt. Transform. Go viral"
 - [ ] Channel funnel page: views/likes/subscribers needed to earn money, links to /calculator
 - [ ] Full channel page: videos, views and earnings per channel
 - [ ] ChatGPT OAuth plugin flow (if user wants OAuth instead of API-key Actions)

@@ -8,22 +8,39 @@ async function admin() {
   return supabaseAdmin;
 }
 
-export async function buildAccountSnapshot(): Promise<AccountSnapshot> {
+export async function buildAccountSnapshot(userId?: string): Promise<AccountSnapshot> {
   const db = await admin();
 
-  const [brands, creators, blueprints, channels, videos, queue, accounts] = await Promise.all([
+  const channelsQ = db
+    .from("channels")
+    .select("id, name, blueprint_id, status")
+    .order("created_at", { ascending: false })
+    .limit(30);
+  if (userId) channelsQ.eq("owner_id", userId);
+
+  const [brands, creators, blueprints, channels, accounts] = await Promise.all([
     db.from("brands").select("id"),
     db.from("creators").select("id, channel_name, niche, est_profit_per_video").order("est_profit_per_video", { ascending: false }).limit(30),
     db.from("blueprints").select("id, name, confidence, niche").order("confidence", { ascending: false }).limit(30),
-    db.from("channels").select("id, name, blueprint_id, status").order("created_at", { ascending: false }).limit(30),
-    db
-      .from("generated_videos")
-      .select("id, title, channel_id, approved, render_status, video_url, youtube_video_id")
-      .order("created_at", { ascending: false })
-      .limit(60),
-    db.from("publish_queue").select("id, status, generated_video_id, scheduled_for").order("scheduled_for").limit(60),
+    channelsQ,
     db.from("youtube_accounts").select("channel_id"),
   ]);
+
+  const ownedChannelIds = userId
+    ? new Set((channels.data ?? []).map((c) => c.id))
+    : new Set<string>();
+
+  let videosQ = db
+    .from("generated_videos")
+    .select("id, title, channel_id, approved, render_status, video_url, youtube_video_id")
+    .order("created_at", { ascending: false })
+    .limit(60);
+  let queueQ = db.from("publish_queue").select("id, status, generated_video_id, scheduled_for").order("scheduled_for").limit(60);
+  if (userId) {
+    videosQ = videosQ.in("channel_id", Array.from(ownedChannelIds));
+    queueQ = queueQ.in("channel_id", Array.from(ownedChannelIds));
+  }
+  const [videos, queue] = await Promise.all([videosQ, queueQ]);
 
   const connected = new Set((accounts.data ?? []).map((a) => a.channel_id));
 
@@ -66,8 +83,8 @@ export async function buildAccountSnapshot(): Promise<AccountSnapshot> {
   };
 }
 
-export async function nextActions(): Promise<{ actions: ActionCard[]; snapshot: AccountSnapshot }> {
-  const snapshot = await buildAccountSnapshot();
+export async function nextActions(userId?: string): Promise<{ actions: ActionCard[]; snapshot: AccountSnapshot }> {
+  const snapshot = await buildAccountSnapshot(userId);
   return { actions: recommend(snapshot), snapshot };
 }
 
@@ -93,7 +110,10 @@ export type AutopilotInput = {
  * One call, whole loop. Each step records its own outcome so ChatGPT (or the UI)
  * can narrate progress and pick up where a run stopped.
  */
-export async function runAutopilot(input: AutopilotInput): Promise<{
+export async function runAutopilot(
+  input: AutopilotInput,
+  userId?: string,
+): Promise<{
   steps: AutopilotStep[];
   scanId: string | null;
   blueprintId: string | null;
@@ -166,12 +186,19 @@ export async function runAutopilot(input: AutopilotInput): Promise<{
   }
 
   // 3. Channel — reuse a connected one when we have it
-  const { data: existing } = await db
+  const existingQ = db
     .from("channels")
     .select("id, name, blueprint_id")
     .order("created_at", { ascending: true })
     .limit(5);
-  const { data: connected } = await db.from("youtube_accounts").select("channel_id");
+  if (userId) existingQ.eq("owner_id", userId);
+  const { data: existing } = await existingQ;
+  const connectedQ = db.from("youtube_accounts").select("channel_id");
+  if (userId) {
+    const ownedIds = (existing ?? []).map((c) => c.id);
+    connectedQ.in("channel_id", ownedIds.length ? ownedIds : ["00000000-0000-0000-0000-000000000000"]);
+  }
+  const { data: connected } = await connectedQ;
   const connectedIds = new Set((connected ?? []).map((c) => c.channel_id));
   const reuse = (existing ?? []).find((c) => connectedIds.has(c.id)) ?? null;
 
@@ -187,6 +214,7 @@ export async function runAutopilot(input: AutopilotInput): Promise<{
       data: { channelId: reuse.id },
     });
   } else {
+    if (!userId) throw new Error("Autopilot requires a signed-in user to spawn a channel.");
     const { data: brand } = await db.from("brands").select("id").limit(1).maybeSingle();
     const { data: created, error } = await db
       .from("channels")
@@ -198,6 +226,7 @@ export async function runAutopilot(input: AutopilotInput): Promise<{
         uploads_per_week: 3,
         auto_publish: false,
         status: "draft",
+        owner_id: userId,
       })
       .select("id, name")
       .single();
@@ -213,7 +242,7 @@ export async function runAutopilot(input: AutopilotInput): Promise<{
 
   // 4. Generate evergreen concepts
   const { generateForChannel } = await import("./chameleon.server");
-  const gen = await generateForChannel(channelId, videoCount);
+  const gen = await generateForChannel(channelId, videoCount, userId);
   const { data: fresh } = await db
     .from("generated_videos")
     .select("id, title")
@@ -242,7 +271,7 @@ export async function runAutopilot(input: AutopilotInput): Promise<{
   if (!first) return { steps, scanId, blueprintId, channelId, videoIds, publishedUrl };
 
   const { renderVideoFile } = await import("./render.server");
-  const rendered = await renderVideoFile(first, durationTarget);
+  const rendered = await renderVideoFile(first, durationTarget, userId);
   steps.push({
     step: "render",
     status: "done",

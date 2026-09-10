@@ -84,13 +84,19 @@ async function fetchStats(channelId: string, youtubeIds: string[]): Promise<Map<
 }
 
 /** Pulls fresh stats from YouTube for every published video and stores a snapshot. */
-export async function syncPerformance(): Promise<{ updated: number; skipped: number; errors: string[] }> {
+export async function syncPerformance(userId?: string): Promise<{ updated: number; skipped: number; errors: string[] }> {
   const db = await admin();
-  const { data: videos } = await db
+  let q = db
     .from("generated_videos")
     .select("id, title, channel_id, blueprint_id, youtube_video_id, duration_seconds")
     .not("youtube_video_id", "is", null)
     .limit(200);
+  if (userId) {
+    const owned = (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [];
+    if (!owned.length) return { updated: 0, skipped: 0, errors: [] };
+    q = q.in("channel_id", owned);
+  }
+  const { data: videos } = await q;
 
   const rows = videos ?? [];
   if (!rows.length) return { updated: 0, skipped: 0, errors: [] };
@@ -161,25 +167,39 @@ export async function syncPerformance(): Promise<{ updated: number; skipped: num
 }
 
 /** Latest snapshot per video plus a blueprint leaderboard. */
-export async function readPerformance(): Promise<{
+export async function readPerformance(userId?: string): Promise<{
   videos: VideoPerformance[];
   blueprints: BlueprintRanking[];
   totals: { views: number; watchTimeMinutes: number; estRevenue: number; published: number };
 }> {
   const db = await admin();
 
+  let ownedChannelIds: string[] | undefined;
+  if (userId) {
+    ownedChannelIds = (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [];
+    if (!ownedChannelIds.length) {
+      return { videos: [], blueprints: [], totals: { views: 0, watchTimeMinutes: 0, estRevenue: 0, published: 0 } };
+    }
+  }
+
+  const videosQ = db
+    .from("generated_videos")
+    .select("id, title, channel_id, blueprint_id, youtube_video_id, duration_seconds, channels(name)")
+    .not("youtube_video_id", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (ownedChannelIds) videosQ.in("channel_id", ownedChannelIds);
+
+  const snapsQ = db
+    .from("performance_snapshots")
+    .select("*")
+    .order("captured_at", { ascending: false })
+    .limit(1000);
+  if (ownedChannelIds) snapsQ.in("channel_id", ownedChannelIds);
+
   const [{ data: videos }, { data: snaps }, { data: blueprintRows }] = await Promise.all([
-    db
-      .from("generated_videos")
-      .select("id, title, channel_id, blueprint_id, youtube_video_id, duration_seconds, channels(name)")
-      .not("youtube_video_id", "is", null)
-      .order("created_at", { ascending: false })
-      .limit(200),
-    db
-      .from("performance_snapshots")
-      .select("*")
-      .order("captured_at", { ascending: false })
-      .limit(1000),
+    videosQ,
+    snapsQ,
     db.from("blueprints").select("id, name, niche, confidence"),
   ]);
 

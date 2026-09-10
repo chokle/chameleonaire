@@ -26,7 +26,12 @@ async function adminClient() {
 
 export async function assertIsMember(userId: string): Promise<boolean> {
   const supabase = await adminClient();
-  const { data, error } = await supabase.rpc("is_member", { _user_id: userId });
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
   if (error) throw new Error(error.message);
   return Boolean(data);
 }
@@ -82,12 +87,13 @@ export async function listBlueprintsForUser(_userId: string, input: ListBlueprin
   return { blueprints: data ?? [] };
 }
 
-export async function listChannelsForUser(_userId: string, input: ListChannelsInput = {}) {
+export async function listChannelsForUser(userId: string, input: ListChannelsInput = {}) {
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
   const supabase = await adminClient();
   const { data, error } = await supabase
     .from("channels")
     .select("*")
+    .eq("owner_id", userId)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw new Error(error.message);
@@ -129,12 +135,13 @@ export type ListQueueInput = {
   limit?: number;
 };
 
-export async function getChannelForUser(_userId: string, channelId: string) {
+export async function getChannelForUser(userId: string, channelId: string) {
   const supabase = await adminClient();
   const { data: channel, error } = await supabase
     .from("channels")
     .select("*, brands(name, voice, palette), blueprints(id, name, niche, confidence, deployable)")
     .eq("id", channelId)
+    .eq("owner_id", userId)
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!channel) return null;
@@ -169,14 +176,23 @@ export async function getChannelForUser(_userId: string, channelId: string) {
   };
 }
 
-export async function listVideosForUser(_userId: string, input: ListVideosInput = {}) {
+export async function listVideosForUser(userId: string, input: ListVideosInput = {}) {
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
   const supabase = await adminClient();
+
+  // videos are owned through their channel
+  let channelQ = supabase.from("channels").select("id").eq("owner_id", userId);
+  if (input.channel_id) channelQ = channelQ.eq("id", input.channel_id);
+  const { data: ownedChannels } = await channelQ;
+  const ownedIds = (ownedChannels ?? []).map((c) => c.id);
+  if (!ownedIds.length) return { videos: [] };
+
   let query = supabase
     .from("generated_videos")
     .select(
       "id, channel_id, title, concept, hook, status, approved, render_status, render_error, duration_seconds, duration_target, thumbnail_url, youtube_video_id, created_at",
     )
+    .in("channel_id", ownedIds)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (input.channel_id) query = query.eq("channel_id", input.channel_id);
@@ -187,14 +203,22 @@ export async function listVideosForUser(_userId: string, input: ListVideosInput 
   return { videos: data ?? [] };
 }
 
-export async function listQueueForUser(_userId: string, input: ListQueueInput = {}) {
+export async function listQueueForUser(userId: string, input: ListQueueInput = {}) {
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
   const supabase = await adminClient();
+
+  let channelQ = supabase.from("channels").select("id").eq("owner_id", userId);
+  if (input.channel_id) channelQ = channelQ.eq("id", input.channel_id);
+  const { data: ownedChannels } = await channelQ;
+  const ownedIds = (ownedChannels ?? []).map((c) => c.id);
+  if (!ownedIds.length) return { queue: [] };
+
   let query = supabase
     .from("publish_queue")
     .select(
       "id, channel_id, generated_video_id, status, scheduled_for, published_at, attempts, last_error, generated_videos(id, title, approved, render_status, youtube_video_id), channels(name)",
     )
+    .in("channel_id", ownedIds)
     .order("scheduled_for", { ascending: true })
     .limit(limit);
   if (input.channel_id) query = query.eq("channel_id", input.channel_id);
@@ -204,8 +228,22 @@ export async function listQueueForUser(_userId: string, input: ListQueueInput = 
   return { queue: data ?? [] };
 }
 
-export async function setVideoApprovalForUser(_userId: string, videoId: string, approved: boolean) {
+export async function setVideoApprovalForUser(userId: string, videoId: string, approved: boolean) {
   const supabase = await adminClient();
+  const { data: video } = await supabase
+    .from("generated_videos")
+    .select("id, channel_id")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (!video) throw new Error("Video not found.");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", video.channel_id)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Video not found or not owned by you.");
+
   const { data, error } = await supabase
     .from("generated_videos")
     .update({ approved, status: approved ? "scheduled" : "awaiting_approval" })
@@ -217,7 +255,22 @@ export async function setVideoApprovalForUser(_userId: string, videoId: string, 
   return { video: data };
 }
 
-export async function publishQueueItemForUser(_userId: string, queueId: string) {
+export async function publishQueueItemForUser(userId: string, queueId: string) {
+  const supabase = await adminClient();
+  const { data: item } = await supabase
+    .from("publish_queue")
+    .select("id, channel_id")
+    .eq("id", queueId)
+    .maybeSingle();
+  if (!item) throw new Error("Queue item not found.");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", item.channel_id)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Queue item not found or not owned by you.");
+
   const { publishQueueItem } = await import("./publish.server");
   return publishQueueItem(queueId);
 }
@@ -264,7 +317,7 @@ export type SpawnChannelInput = {
   auto_publish?: boolean | undefined;
 };
 
-export async function spawnChannelForUser(_userId: string, input: SpawnChannelInput) {
+export async function spawnChannelForUser(userId: string, input: SpawnChannelInput) {
   const supabase = await adminClient();
   const { data, error } = await supabase
     .from("channels")
@@ -276,6 +329,7 @@ export async function spawnChannelForUser(_userId: string, input: SpawnChannelIn
       uploads_per_week: Math.min(Math.max(input.uploads_per_week ?? 3, 1), 21),
       auto_publish: input.auto_publish ?? false,
       status: "draft",
+      owner_id: userId,
     })
     .select("id, name, blueprint_id, status")
     .single();
@@ -283,10 +337,18 @@ export async function spawnChannelForUser(_userId: string, input: SpawnChannelIn
   return { channel: data };
 }
 
-export async function generateVideosForUser(_userId: string, channelId: string, count: number) {
-  const { generateForChannel } = await import("./chameleon.server");
-  const result = await generateForChannel(channelId, Math.min(Math.max(count, 1), 6));
+export async function generateVideosForUser(userId: string, channelId: string, count: number) {
   const supabase = await adminClient();
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", channelId)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Channel not found or not owned by you.");
+
+  const { generateForChannel } = await import("./chameleon.server");
+  const result = await generateForChannel(channelId, Math.min(Math.max(count, 1), 6), userId);
   const { data } = await supabase
     .from("generated_videos")
     .select("id, title, hook, status, approved")
@@ -296,24 +358,24 @@ export async function generateVideosForUser(_userId: string, channelId: string, 
   return { created: result.created, videos: data ?? [] };
 }
 
-export async function renderVideoForUser(_userId: string, videoId: string, durationTarget: number) {
+export async function renderVideoForUser(userId: string, videoId: string, durationTarget: number) {
   const { renderVideoFile } = await import("./render.server");
-  return renderVideoFile(videoId, durationTarget);
+  return renderVideoFile(videoId, durationTarget, userId);
 }
 
-export async function scheduleVideoForUser(_userId: string, videoId: string, scheduledFor: string | null) {
+export async function scheduleVideoForUser(userId: string, videoId: string, scheduledFor: string | null) {
   const { scheduleGeneratedVideo } = await import("./autopilot-actions.server");
-  return scheduleGeneratedVideo(videoId, scheduledFor);
+  return scheduleGeneratedVideo(videoId, scheduledFor, userId);
 }
 
-export async function nextActionsForUser(_userId: string) {
+export async function nextActionsForUser(userId: string) {
   const { nextActions } = await import("./autopilot.server");
-  const { actions } = await nextActions();
+  const { actions } = await nextActions(userId);
   return { actions };
 }
 
 export async function autopilotForUser(
-  _userId: string,
+  userId: string,
   input: {
     niche: string;
     min?: number | undefined;
@@ -333,12 +395,12 @@ export async function autopilotForUser(
     videoCount: input.video_count ?? 3,
     durationTarget: input.duration_target ?? 30,
     mode: input.mode ?? "plan",
-  });
+  }, userId);
 }
 
-export async function performanceForUser(_userId: string, refresh: boolean) {
+export async function performanceForUser(userId: string, refresh: boolean) {
   const { syncPerformance, readPerformance } = await import("./performance.server");
-  const sync = refresh ? await syncPerformance() : null;
-  const data = await readPerformance();
+  const sync = refresh ? await syncPerformance(userId) : null;
+  const data = await readPerformance(userId);
   return { ...data, sync };
 }

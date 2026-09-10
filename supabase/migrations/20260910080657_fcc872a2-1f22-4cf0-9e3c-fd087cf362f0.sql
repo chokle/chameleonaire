@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.owns_channel(uuid) FROM PUBLIC, anon;

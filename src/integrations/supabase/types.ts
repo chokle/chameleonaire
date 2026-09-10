@@ -126,6 +126,7 @@ export type Database = {
           est_monthly: number
           id: string
           name: string
+          owner_id: string
           status: string
           updated_at: string
           uploads_per_week: number
@@ -142,6 +143,7 @@ export type Database = {
           est_monthly?: number
           id?: string
           name: string
+          owner_id: string
           status?: string
           updated_at?: string
           uploads_per_week?: number
@@ -158,6 +160,7 @@ export type Database = {
           est_monthly?: number
           id?: string
           name?: string
+          owner_id?: string
           status?: string
           updated_at?: string
           uploads_per_week?: number
@@ -770,6 +773,84 @@ export type Database = {
         }
         Relationships: []
       }
+      video_templates: {
+        Row: {
+          blueprint_id: string | null
+          brand_id: string | null
+          created_at: string
+          description: string
+          duration_target: number
+          hook: string
+          id: string
+          name: string
+          owner_id: string
+          pacing: string
+          palette: string
+          script: string
+          shot_notes: string
+          tags: string[]
+          thumbnail_prompt: string
+          title: string
+          updated_at: string
+          visual_style: string
+        }
+        Insert: {
+          blueprint_id?: string | null
+          brand_id?: string | null
+          created_at?: string
+          description?: string
+          duration_target?: number
+          hook?: string
+          id?: string
+          name: string
+          owner_id: string
+          pacing?: string
+          palette?: string
+          script?: string
+          shot_notes?: string
+          tags?: string[]
+          thumbnail_prompt?: string
+          title?: string
+          updated_at?: string
+          visual_style?: string
+        }
+        Update: {
+          blueprint_id?: string | null
+          brand_id?: string | null
+          created_at?: string
+          description?: string
+          duration_target?: number
+          hook?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          pacing?: string
+          palette?: string
+          script?: string
+          shot_notes?: string
+          tags?: string[]
+          thumbnail_prompt?: string
+          title?: string
+          updated_at?: string
+          visual_style?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_templates_blueprint_id_fkey"
+            columns: ["blueprint_id"]
+            isOneToOne: false
+            referencedRelation: "blueprints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_templates_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       youtube_accounts: {
         Row: {
           access_token: string | null
@@ -822,14 +903,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      is_member: { Args: { _user_id: string }; Returns: boolean }
       run_publish_tick: { Args: never; Returns: undefined }
     }
     Enums: {

@@ -172,8 +172,17 @@ export async function accessTokenFor(channelId: string): Promise<string> {
   return tokens.access_token;
 }
 
-export async function disconnect(channelId: string): Promise<void> {
+export async function disconnect(channelId: string, userId?: string): Promise<void> {
   const db = await admin();
+  if (userId) {
+    const { data: owned } = await db
+      .from("channels")
+      .select("id")
+      .eq("id", channelId)
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!owned) throw new Error("Channel not found or not owned by you.");
+  }
   await db.from("youtube_accounts").delete().eq("channel_id", channelId);
   // A channel without a YouTube link cannot publish, so it stops being "active".
   await db

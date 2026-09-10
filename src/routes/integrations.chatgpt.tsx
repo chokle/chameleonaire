@@ -11,10 +11,10 @@ import { createChatGptApiKey, listChatGptApiKeys, revokeChatGptApiKey } from "@/
 export const Route = createFileRoute("/integrations/chatgpt")({
   head: () => ({
     meta: [
-      { title: "ChatGPT Integration — chamele-on-air" },
-      { name: "description", content: "Connect Chameleonaire to a ChatGPT Custom GPT via API key." },
-      { property: "og:title", content: "ChatGPT Integration — chamele-on-air" },
-      { property: "og:description", content: "Connect Chameleonaire to a ChatGPT Custom GPT via API key." },
+      { title: "Chamele-on-air - Adapt. Transform. Go viral" },
+      { name: "description", content: "Connect Chamele-on-air to a ChatGPT Custom GPT and publish evergreen videos on autopilot." },
+      { property: "og:title", content: "Chamele-on-air - Adapt. Transform. Go viral" },
+      { property: "og:description", content: "Connect Chamele-on-air to a ChatGPT Custom GPT and publish evergreen videos on autopilot." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -138,7 +138,7 @@ function ChatGptIntegrationPage() {
 
   return (
     <AppShell
-      title="ChatGPT Integration"
+      title="Chamele-on-air - Adapt. Transform. Go viral"
       subtitle="Give a Custom GPT full control: it can scan, decode, write, render, schedule and publish for you."
     >
       <div className="grid max-w-3xl gap-6">

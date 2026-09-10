@@ -16,7 +16,7 @@ type Concept = {
   thumbnail_prompt: string;
 };
 
-export async function generateForChannel(channelId: string, count: number) {
+export async function generateForChannel(channelId: string, count: number, userId?: string) {
   const db = await admin();
 
   const { data: channel } = await db
@@ -25,6 +25,9 @@ export async function generateForChannel(channelId: string, count: number) {
     .eq("id", channelId)
     .maybeSingle();
   if (!channel) throw new Error("Channel not found.");
+  if (userId && channel.owner_id !== userId) {
+    throw new Error("Channel not found or not owned by you.");
+  }
 
   const blueprint = channel.blueprints as { strategy?: unknown; confidence?: number; name?: string } | null;
   const brand = channel.brands as Record<string, unknown> | null;
@@ -112,14 +115,24 @@ export async function generateForChannel(channelId: string, count: number) {
   return { created: inserted?.length ?? 0 };
 }
 
-export async function makeThumbnail(videoId: string) {
+export async function makeThumbnail(videoId: string, userId?: string) {
   const db = await admin();
   const { data: video } = await db
     .from("generated_videos")
-    .select("id, thumbnail_prompt, title")
+    .select("id, thumbnail_prompt, title, channel_id")
     .eq("id", videoId)
     .maybeSingle();
   if (!video) throw new Error("Video not found.");
+  if (userId) {
+    const { data: channel } = await db
+      .from("channels")
+      .select("owner_id")
+      .eq("id", video.channel_id)
+      .maybeSingle();
+    if (!channel || channel.owner_id !== userId) {
+      throw new Error("Video not found or not owned by you.");
+    }
+  }
 
   const key = process.env["LOVABLE_API_KEY"];
   if (!key) throw new Error("AI is not configured.");
@@ -160,12 +173,31 @@ export async function makeThumbnail(videoId: string) {
  * The forever loop: reads back performance, scores each blueprint's win rate,
  * and nudges channel divergence toward whatever is currently working.
  */
-export async function learnFromPerformance(channelId: string | null) {
+export async function learnFromPerformance(channelId: string | null, userId?: string) {
   const db = await admin();
 
   let q = db.from("performance_snapshots").select("*").order("captured_at", { ascending: false }).limit(500);
   if (channelId) q = q.eq("channel_id", channelId);
   const { data: snaps } = await q;
+
+  const rows = (snaps ?? []).filter((s): s is typeof s & { channel_id: string } => Boolean(s.channel_id));
+
+  if (userId) {
+    const ownedChannelIds = new Set(
+      (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [],
+    );
+    const filtered = rows.filter((s) => ownedChannelIds.has(s.channel_id));
+    return learnFromSnapshotRows(filtered, db, userId);
+  }
+
+  return learnFromSnapshotRows(rows, db);
+}
+
+async function learnFromSnapshotRows(
+  snaps: { blueprint_id: string | null; outcome: string | null; channel_id: string }[],
+  db: Awaited<ReturnType<typeof admin>>,
+  userId?: string,
+) {
 
   const byBlueprint = new Map<string, { wins: number; total: number }>();
   for (const s of snaps ?? []) {
@@ -184,7 +216,9 @@ export async function learnFromPerformance(channelId: string | null) {
   }
 
   // Channels riding a losing blueprint drift further from it; winners tighten up.
-  const { data: channels } = await db.from("channels").select("id, blueprint_id, divergence");
+  let channelsQ = db.from("channels").select("id, blueprint_id, divergence");
+  if (userId) channelsQ = channelsQ.eq("owner_id", userId);
+  const { data: channels } = await channelsQ;
   for (const c of channels ?? []) {
     if (!c.blueprint_id) continue;
     const stat = byBlueprint.get(c.blueprint_id);
