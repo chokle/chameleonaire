@@ -186,6 +186,14 @@ export async function publishTick(): Promise<{
     })
     .eq("id", JOB_ID);
 
+  // Auto-schedule (when enabled) tops the queue up before we drain it.
+  try {
+    const { autoScheduleApproved } = await import("./auto-schedule.server");
+    await autoScheduleApproved();
+  } catch {
+    // Never let scheduling failures block publishing.
+  }
+
   const { data: due } = await db
     .from("publish_queue")
     .select("id")
