@@ -312,7 +312,7 @@ export type SpawnChannelInput = {
   auto_publish?: boolean | undefined;
 };
 
-export async function spawnChannelForUser(_userId: string, input: SpawnChannelInput) {
+export async function spawnChannelForUser(userId: string, input: SpawnChannelInput) {
   const supabase = await adminClient();
   const { data, error } = await supabase
     .from("channels")
@@ -324,6 +324,7 @@ export async function spawnChannelForUser(_userId: string, input: SpawnChannelIn
       uploads_per_week: Math.min(Math.max(input.uploads_per_week ?? 3, 1), 21),
       auto_publish: input.auto_publish ?? false,
       status: "draft",
+      owner_id: userId,
     })
     .select("id, name, blueprint_id, status")
     .single();
