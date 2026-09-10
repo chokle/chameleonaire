@@ -270,7 +270,7 @@ export async function runAutopilot(
   if (!first) return { steps, scanId, blueprintId, channelId, videoIds, publishedUrl };
 
   const { renderVideoFile } = await import("./render.server");
-  const rendered = await renderVideoFile(first, durationTarget);
+  const rendered = await renderVideoFile(first, durationTarget, userId);
   steps.push({
     step: "render",
     status: "done",
