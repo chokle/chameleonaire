@@ -370,7 +370,7 @@ export async function nextActionsForUser(userId: string) {
 }
 
 export async function autopilotForUser(
-  _userId: string,
+  userId: string,
   input: {
     niche: string;
     min?: number | undefined;
@@ -390,12 +390,12 @@ export async function autopilotForUser(
     videoCount: input.video_count ?? 3,
     durationTarget: input.duration_target ?? 30,
     mode: input.mode ?? "plan",
-  });
+  }, userId);
 }
 
-export async function performanceForUser(_userId: string, refresh: boolean) {
-  const { syncPerformance, readPerformance } = await import("./performance.server");
-  const sync = refresh ? await syncPerformance() : null;
-  const data = await readPerformance();
+export async function performanceForUser(userId: string, refresh: boolean) {
+  const { syncPerformance, readPerformanceForUser } = await import("./performance.server");
+  const sync = refresh ? await syncPerformance(userId) : null;
+  const data = await readPerformanceForUser(userId);
   return { ...data, sync };
 }
