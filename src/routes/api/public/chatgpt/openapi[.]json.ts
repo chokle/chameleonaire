@@ -122,7 +122,7 @@ const OPENAPI_SCHEMA = {
         operationId: "publishQueueItem",
         summary: "Publish a queued video to YouTube now",
         description:
-          "Renders if needed and uploads the queued video to the connected YouTube channel. Returns the YouTube video id and URL.",
+          "Renders if needed and uploads the queued video to the connected YouTube channel. Set privacy to 'public' to publish it live for everyone, 'unlisted' for link-only, or 'private' (default). Returns the YouTube video id and URL.",
         requestBody: {
           required: true,
           content: {
@@ -130,7 +130,14 @@ const OPENAPI_SCHEMA = {
               schema: {
                 type: "object",
                 required: ["queue_id"],
-                properties: { queue_id: { type: "string", format: "uuid" } },
+                properties: {
+                  queue_id: { type: "string", format: "uuid" },
+                  privacy: {
+                    type: "string",
+                    enum: ["private", "unlisted", "public"],
+                    default: "private",
+                  },
+                },
               },
             },
           },
@@ -138,6 +145,35 @@ const OPENAPI_SCHEMA = {
         responses: {
           "200": { description: "Published", content: { "application/json": { schema: { type: "object" } } } },
           "400": { description: "Publish failed" },
+          "401": { description: "Missing or invalid API key" },
+          "403": { description: "Account is not an approved member" },
+        },
+      },
+    },
+    "/api/public/chatgpt/visibility": {
+      post: {
+        operationId: "setVideoVisibility",
+        summary: "Change a published video's YouTube visibility",
+        description:
+          "Changes the visibility of a video already uploaded to YouTube, for example flipping a private upload to public.",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["video_id", "privacy"],
+                properties: {
+                  video_id: { type: "string", format: "uuid" },
+                  privacy: { type: "string", enum: ["private", "unlisted", "public"] },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "Visibility updated", content: { "application/json": { schema: { type: "object" } } } },
+          "400": { description: "Update failed" },
           "401": { description: "Missing or invalid API key" },
           "403": { description: "Account is not an approved member" },
         },
