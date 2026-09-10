@@ -139,10 +139,15 @@ export const setVideoApproval = createServerFn({ method: "POST" })
       .update({ approved: data.approved })
       .eq("id", data.videoId);
     if (error) throw new Error(error.message);
-    // Approving only green-lights the video; the queue row stays at
-    // awaiting_approval until the user explicitly schedules it. Unapproving
-    // pulls it back out of the schedule.
-    if (!data.approved) {
+    // Approving also schedules the video so the publish worker picks it up.
+    // Unapproving pulls it back out of the schedule.
+    if (data.approved) {
+      await context.supabase
+        .from("publish_queue")
+        .update({ status: "scheduled" })
+        .eq("generated_video_id", data.videoId)
+        .eq("status", "awaiting_approval");
+    } else {
       await context.supabase
         .from("publish_queue")
         .update({ status: "awaiting_approval" })
