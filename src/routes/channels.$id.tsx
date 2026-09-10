@@ -157,7 +157,7 @@ function ChannelDetail() {
 
   if (!channel) {
     return (
-      <AppShell title="Channel">
+      <AppShell title="Chamele-on-air - adapt · transform · go viral">
         <p className="text-sm text-muted-foreground">Loading…</p>
       </AppShell>
     );
@@ -168,8 +168,8 @@ function ChannelDetail() {
 
   return (
     <AppShell
-      title={channel.name}
-      subtitle={`${bp?.name ?? "no blueprint"} · ${brand?.name ?? "no brand"} · divergence ${Number(channel.divergence)}% · ${Number(channel.uploads_per_week)} uploads/week`}
+      title="Chamele-on-air - adapt · transform · go viral"
+      subtitle={`${channel.name} · ${bp?.name ?? "no blueprint"} · ${brand?.name ?? "no brand"} · divergence ${Number(channel.divergence)}% · ${Number(channel.uploads_per_week)} uploads/week`}
       action={
         <Button onClick={() => generating.mutate()} disabled={generating.isPending}>
           {generating.isPending ? (
