@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { z } from "zod";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { blueprintsQuery, brandsQuery, channelsQuery } from "@/lib/queries";
 import { DEPLOY_THRESHOLD } from "@/lib/domain";
-import { createChannel } from "@/lib/console.functions";
+import { createChannel, deleteChannel } from "@/lib/console.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/channels/")({
