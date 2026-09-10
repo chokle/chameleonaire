@@ -223,8 +223,22 @@ export async function listQueueForUser(userId: string, input: ListQueueInput = {
   return { queue: data ?? [] };
 }
 
-export async function setVideoApprovalForUser(_userId: string, videoId: string, approved: boolean) {
+export async function setVideoApprovalForUser(userId: string, videoId: string, approved: boolean) {
   const supabase = await adminClient();
+  const { data: video } = await supabase
+    .from("generated_videos")
+    .select("id, channel_id")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (!video) throw new Error("Video not found.");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", video.channel_id)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Video not found or not owned by you.");
+
   const { data, error } = await supabase
     .from("generated_videos")
     .update({ approved, status: approved ? "scheduled" : "awaiting_approval" })
