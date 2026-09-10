@@ -26,7 +26,12 @@ async function adminClient() {
 
 export async function assertIsMember(userId: string): Promise<boolean> {
   const supabase = await adminClient();
-  const { data, error } = await supabase.rpc("is_member", { _user_id: userId });
+  const { data, error } = await supabase
+    .from("user_roles")
+    .select("id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
   if (error) throw new Error(error.message);
   return Boolean(data);
 }
