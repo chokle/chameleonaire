@@ -247,6 +247,7 @@ export const actionTools = [
   approveVideoTool,
   scheduleVideoTool,
   publishNowTool,
+  setVisibilityTool,
   runScanTool,
   extractBlueprintTool,
   spawnChannelTool,
