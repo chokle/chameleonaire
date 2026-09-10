@@ -186,12 +186,19 @@ export async function runAutopilot(
   }
 
   // 3. Channel — reuse a connected one when we have it
-  const { data: existing } = await db
+  const existingQ = db
     .from("channels")
     .select("id, name, blueprint_id")
     .order("created_at", { ascending: true })
     .limit(5);
-  const { data: connected } = await db.from("youtube_accounts").select("channel_id");
+  if (userId) existingQ.eq("owner_id", userId);
+  const { data: existing } = await existingQ;
+  const connectedQ = db.from("youtube_accounts").select("channel_id");
+  if (userId) {
+    const ownedIds = (existing ?? []).map((c) => c.id);
+    connectedQ.in("channel_id", ownedIds.length ? ownedIds : ["00000000-0000-0000-0000-000000000000"]);
+  }
+  const { data: connected } = await connectedQ;
   const connectedIds = new Set((connected ?? []).map((c) => c.channel_id));
   const reuse = (existing ?? []).find((c) => connectedIds.has(c.id)) ?? null;
 
