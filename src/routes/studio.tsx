@@ -15,7 +15,17 @@ import { setVideoApproval } from "@/lib/console.functions";
 import { publishNow } from "@/lib/publish.functions";
 import { scheduleVideo } from "@/lib/autopilot.functions";
 import type { ActionCard } from "@/lib/recommendations";
-import { GripVertical, Play, Sparkles } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getAutoSchedule, saveAutoSchedule } from "@/lib/auto-schedule.functions";
+import { CalendarClock, GripVertical, Play, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
