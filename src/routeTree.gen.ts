@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -21,6 +22,7 @@ import { Route as QueueRouteImport } from './routes/queue'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StudioRouteImport } from './routes/studio'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
@@ -76,6 +78,11 @@ const CalculatorRoute = CalculatorRouteImport.update({
   path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
@@ -114,6 +121,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const StudioRoute = StudioRouteImport.update({
   id: '/studio',
   path: '/studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -310,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
@@ -318,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
+  '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
@@ -358,6 +372,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
@@ -366,6 +381,7 @@ export interface FileRoutesByTo {
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
+  '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
@@ -407,6 +423,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
   '/privacy': typeof PrivacyRoute
@@ -415,6 +432,7 @@ export interface FileRoutesById {
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
+  '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
@@ -457,6 +475,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/library'
     | '/mcp'
     | '/performance'
     | '/privacy'
@@ -465,6 +484,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/sitemap.xml'
     | '/studio'
+    | '/templates'
     | '/terms'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
@@ -505,6 +525,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/library'
     | '/mcp'
     | '/performance'
     | '/privacy'
@@ -513,6 +534,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/sitemap.xml'
     | '/studio'
+    | '/templates'
     | '/terms'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
@@ -553,6 +575,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/library'
     | '/mcp'
     | '/performance'
     | '/privacy'
@@ -561,6 +584,7 @@ export interface FileRouteTypes {
     | '/scanner'
     | '/sitemap.xml'
     | '/studio'
+    | '/templates'
     | '/terms'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
@@ -602,6 +626,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
+  LibraryRoute: typeof LibraryRoute
   McpRoute: typeof McpRoute
   PerformanceRoute: typeof PerformanceRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -610,6 +635,7 @@ export interface RootRouteChildren {
   ScannerRoute: typeof ScannerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StudioRoute: typeof StudioRoute
+  TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
@@ -675,6 +701,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
@@ -729,6 +762,13 @@ declare module '@tanstack/react-router' {
       path: '/studio'
       fullPath: '/studio'
       preLoaderRoute: typeof StudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -991,6 +1031,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
+  LibraryRoute: LibraryRoute,
   McpRoute: McpRoute,
   PerformanceRoute: PerformanceRoute,
   PrivacyRoute: PrivacyRoute,
@@ -999,6 +1040,7 @@ const rootRouteChildren: RootRouteChildren = {
   ScannerRoute: ScannerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StudioRoute: StudioRoute,
+  TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,

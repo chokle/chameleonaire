@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Check, Loader2, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
+import { useState } from "react";
+import { Check, Eye, Loader2, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { setQueueStatus } from "@/lib/console.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact } from "@/lib/domain";
+import { VideoReviewDialog } from "@/components/VideoReviewDialog";
 
 export const Route = createFileRoute("/queue")({
   head: () => ({
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/queue")({
 
 function Queue() {
   const qc = useQueryClient();
+  const [reviewId, setReviewId] = useState<string | null>(null);
   const { data: queue } = useQuery(queueQuery);
   const { data: snaps } = useQuery(snapshotsQuery);
   const loop = useServerFn(runFeedbackLoop);
@@ -115,11 +118,18 @@ function Queue() {
               <ul className="divide-y divide-border/70">
                 {rows.map((q) => {
                   const v = q.generated_videos as
-                    | { id?: string; title?: string; approved?: boolean; video_url?: string | null; youtube_video_id?: string | null }
+                    | {
+                        id?: string;
+                        title?: string;
+                        approved?: boolean;
+                        video_url?: string | null;
+                        youtube_video_id?: string | null;
+                      }
                     | null;
                   const c = q.channels as { name?: string } | null;
+                  const live = Boolean(v?.youtube_video_id);
                   return (
-                    <li key={q.id} className="flex items-center gap-3 py-3">
+                    <li key={q.id} className="flex flex-wrap items-center gap-3 py-3">
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{v?.title ?? "untitled"}</p>
                         <p className="text-xs text-muted-foreground">
@@ -129,12 +139,27 @@ function Queue() {
                       <Badge variant={q.status === "scheduled" ? "default" : "secondary"}>
                         {q.status.replace(/_/g, " ")}
                       </Badge>
+                      <Badge variant={live ? "default" : "secondary"}>
+                        {live ? "on YouTube" : "not on YouTube"}
+                      </Badge>
+                      {v?.id ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setReviewId(v.id ?? null)}
+                        >
+                          <Eye className="mr-1 size-4" />
+                          Review
+                        </Button>
+                      ) : null}
                       {q.status === "awaiting_approval" ? (
                         <div className="flex gap-1">
                           <Button
                             size="icon"
                             variant="ghost"
-                            aria-label="Approve"
+                            aria-label="Schedule"
+                            disabled={!v?.approved}
+                            title={v?.approved ? "Schedule" : "Review and approve this video first"}
                             onClick={() =>
                               setStatus.mutate({ id: q.id, status: "scheduled", ...(v?.id ? { videoId: v.id } : {}) })
                             }
@@ -166,14 +191,14 @@ function Queue() {
                           Publish now
                         </Button>
                       ) : null}
-                      {v?.youtube_video_id ? (
+                      {live ? (
                         <a
                           className="text-xs text-primary underline"
-                          href={`https://youtube.com/watch?v=${v.youtube_video_id}`}
+                          href={`https://youtube.com/watch?v=${v?.youtube_video_id}`}
                           target="_blank"
                           rel="noreferrer"
                         >
-                          view
+                          watch on YouTube
                         </a>
                       ) : null}
                     </li>
@@ -212,6 +237,11 @@ function Queue() {
           </CardContent>
         </Card>
       </div>
+      <VideoReviewDialog
+        videoId={reviewId}
+        open={Boolean(reviewId)}
+        onOpenChange={(o) => !o && setReviewId(null)}
+      />
     </AppShell>
   );
 }
