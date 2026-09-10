@@ -6,7 +6,7 @@ async function admin() {
 }
 
 /** Approves a video and makes sure it has a scheduled queue row. */
-export async function scheduleGeneratedVideo(videoId: string, scheduledFor: string | null) {
+export async function scheduleGeneratedVideo(videoId: string, scheduledFor: string | null, userId?: string) {
   const db = await admin();
   const { data: video, error } = await db
     .from("generated_videos")
@@ -15,6 +15,16 @@ export async function scheduleGeneratedVideo(videoId: string, scheduledFor: stri
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!video) throw new Error("Video not found.");
+
+  if (userId) {
+    const { data: channel } = await db
+      .from("channels")
+      .select("id")
+      .eq("id", video.channel_id)
+      .eq("owner_id", userId)
+      .maybeSingle();
+    if (!channel) throw new Error("Video not found or not owned by you.");
+  }
 
   await db.from("generated_videos").update({ approved: true, status: "scheduled" }).eq("id", videoId);
 
