@@ -30,7 +30,7 @@ const LoopInput = z.object({ channelId: z.string().uuid().nullable().default(nul
 export const runFeedbackLoop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => LoopInput.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { learnFromPerformance } = await import("./chameleon.server");
-    return learnFromPerformance(data.channelId);
+    return learnFromPerformance(data.channelId, context.userId);
   });
