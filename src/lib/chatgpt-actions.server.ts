@@ -255,7 +255,35 @@ export async function setVideoApprovalForUser(userId: string, videoId: string, a
   return { video: data };
 }
 
-export async function publishQueueItemForUser(userId: string, queueId: string) {
+export type Privacy = "private" | "unlisted" | "public";
+
+/** Change visibility of a video already uploaded to YouTube. */
+export async function setVideoVisibilityForUser(userId: string, videoId: string, privacy: Privacy) {
+  const supabase = await adminClient();
+  const { data: video } = await supabase
+    .from("generated_videos")
+    .select("id, title, channel_id, youtube_video_id")
+    .eq("id", videoId)
+    .maybeSingle();
+  if (!video?.channel_id) throw new Error("Video not found.");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", video.channel_id)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Video not found or not owned by you.");
+  if (!video.youtube_video_id) throw new Error("This video has not been uploaded to YouTube yet.");
+
+  const { setYouTubePrivacy } = await import("./publish.server");
+  await setYouTubePrivacy(video.channel_id, video.youtube_video_id, privacy);
+  return {
+    video: { id: video.id, title: video.title, privacy },
+    url: `https://youtube.com/watch?v=${video.youtube_video_id}`,
+  };
+}
+
+export async function publishQueueItemForUser(userId: string, queueId: string, privacy: Privacy = "private") {
   const supabase = await adminClient();
   const { data: item } = await supabase
     .from("publish_queue")
@@ -272,7 +300,7 @@ export async function publishQueueItemForUser(userId: string, queueId: string) {
   if (!channel) throw new Error("Queue item not found or not owned by you.");
 
   const { publishQueueItem } = await import("./publish.server");
-  return publishQueueItem(queueId);
+  return publishQueueItem(queueId, privacy);
 }
 
 /* ---------- write actions: plan, generate, render, schedule, autopilot ---------- */

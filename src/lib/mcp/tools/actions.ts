@@ -124,11 +124,28 @@ const publishNowTool = defineTool({
   name: "publish_now",
   title: "Publish a queued video now",
   description:
-    "Immediately upload a queued video to its connected YouTube channel. Uploads are private by default.",
-  inputSchema: { queue_id: z.string().uuid().describe("Publish queue entry id from list_queue.") },
+    "Immediately upload a queued video to its connected YouTube channel. Set privacy to 'public' to make it live for everyone, 'unlisted' for link-only, or 'private' (default).",
+  inputSchema: {
+    queue_id: z.string().uuid().describe("Publish queue entry id from list_queue."),
+    privacy: z.enum(["private", "unlisted", "public"]).default("private"),
+  },
   annotations: { readOnlyHint: false, openWorldHint: true },
-  handler: ({ queue_id }, ctx) =>
-    withUser(ctx, async (userId) => (await actions()).publishQueueItemForUser(userId, queue_id)),
+  handler: ({ queue_id, privacy }, ctx) =>
+    withUser(ctx, async (userId) => (await actions()).publishQueueItemForUser(userId, queue_id, privacy)),
+});
+
+const setVisibilityTool = defineTool({
+  name: "set_video_visibility",
+  title: "Change a published video's visibility",
+  description:
+    "Change the YouTube visibility of a video that is already uploaded (for example flip a private upload to public).",
+  inputSchema: {
+    video_id: z.string().uuid().describe("Generated video id from list_videos."),
+    privacy: z.enum(["private", "unlisted", "public"]),
+  },
+  annotations: { readOnlyHint: false, openWorldHint: true },
+  handler: ({ video_id, privacy }, ctx) =>
+    withUser(ctx, async (userId) => (await actions()).setVideoVisibilityForUser(userId, video_id, privacy)),
 });
 
 const runScanTool = defineTool({
@@ -230,6 +247,7 @@ export const actionTools = [
   approveVideoTool,
   scheduleVideoTool,
   publishNowTool,
+  setVisibilityTool,
   runScanTool,
   extractBlueprintTool,
   spawnChannelTool,

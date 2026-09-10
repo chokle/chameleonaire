@@ -14,10 +14,12 @@ const JOB_ID = "publish";
 const BATCH = 3;
 const LEASE_MINUTES = 10;
 
+export type Privacy = "private" | "unlisted" | "public";
+
 async function uploadToYouTube(
   token: string,
   bytes: ArrayBuffer,
-  meta: { title: string; description: string; tags: string[] },
+  meta: { title: string; description: string; tags: string[]; privacy: Privacy },
 ): Promise<string> {
   const boundary = `chameleon${crypto.randomUUID().replace(/-/g, "")}`;
   const snippet = {
@@ -27,7 +29,7 @@ async function uploadToYouTube(
       tags: meta.tags.slice(0, 15),
       categoryId: "22",
     },
-    status: { privacyStatus: "private", selfDeclaredMadeForKids: false },
+    status: { privacyStatus: meta.privacy, selfDeclaredMadeForKids: false },
   };
 
   const enc = new TextEncoder();
@@ -71,8 +73,32 @@ async function setThumbnail(token: string, videoId: string, url: string): Promis
   }
 }
 
+/** Changes the visibility of a video already live on YouTube. */
+export async function setYouTubePrivacy(
+  channelId: string,
+  youtubeVideoId: string,
+  privacy: Privacy,
+): Promise<void> {
+  const token = await accessTokenFor(channelId);
+  const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=status", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      id: youtubeVideoId,
+      status: { privacyStatus: privacy, selfDeclaredMadeForKids: false },
+    }),
+  });
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+    throw new Error(json.error?.message ?? `YouTube rejected the visibility change (${res.status}).`);
+  }
+}
+
 /** Publishes one queue row end to end: render if needed, upload, record. */
-export async function publishQueueItem(queueId: string): Promise<{ youtubeVideoId: string; url: string }> {
+export async function publishQueueItem(
+  queueId: string,
+  privacy: Privacy = "private",
+): Promise<{ youtubeVideoId: string; url: string; privacy: Privacy }> {
   const db = await admin();
 
   const { data: item } = await db
@@ -110,6 +136,7 @@ export async function publishQueueItem(queueId: string): Promise<{ youtubeVideoI
       title: video.title,
       description: video.description ?? "",
       tags: video.tags ?? [],
+      privacy,
     });
     if (video.thumbnail_url) await setThumbnail(token, ytId, video.thumbnail_url);
 
@@ -128,7 +155,7 @@ export async function publishQueueItem(queueId: string): Promise<{ youtubeVideoI
       outcome: "pending",
     });
 
-    return { youtubeVideoId: ytId, url: `https://youtube.com/watch?v=${ytId}` };
+    return { youtubeVideoId: ytId, url: `https://youtube.com/watch?v=${ytId}`, privacy };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Publish failed.";
     await db
