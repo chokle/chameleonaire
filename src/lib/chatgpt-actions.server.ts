@@ -250,7 +250,22 @@ export async function setVideoApprovalForUser(userId: string, videoId: string, a
   return { video: data };
 }
 
-export async function publishQueueItemForUser(_userId: string, queueId: string) {
+export async function publishQueueItemForUser(userId: string, queueId: string) {
+  const supabase = await adminClient();
+  const { data: item } = await supabase
+    .from("publish_queue")
+    .select("id, channel_id")
+    .eq("id", queueId)
+    .maybeSingle();
+  if (!item) throw new Error("Queue item not found.");
+  const { data: channel } = await supabase
+    .from("channels")
+    .select("id")
+    .eq("id", item.channel_id)
+    .eq("owner_id", userId)
+    .maybeSingle();
+  if (!channel) throw new Error("Queue item not found or not owned by you.");
+
   const { publishQueueItem } = await import("./publish.server");
   return publishQueueItem(queueId);
 }
