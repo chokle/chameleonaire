@@ -34,9 +34,8 @@ import { setVideoApproval } from "@/lib/console.functions";
 
 export const Route = createFileRoute("/channels/$id")({
   head: ({ params }) => {
-    const ref = params.id.slice(0, 8);
-    const title = `Channel ${ref} — chamele-on-air`;
-    const description = `Workspace for channel ${ref}: generate chameleonized concepts, hooks, scripts and thumbnails, then queue them to publish.`;
+    const title = "Chamele-on-air - adapt · transform · go viral";
+    const description = "Workspace for this channel: generate chameleonized concepts, hooks, scripts and thumbnails, then queue them to publish.";
     const url = `https://chameleonaire.lovable.app/channels/${params.id}`;
     return {
       meta: [
@@ -158,7 +157,7 @@ function ChannelDetail() {
 
   if (!channel) {
     return (
-      <AppShell title="Channel">
+      <AppShell title="Chamele-on-air - adapt · transform · go viral">
         <p className="text-sm text-muted-foreground">Loading…</p>
       </AppShell>
     );
@@ -169,8 +168,8 @@ function ChannelDetail() {
 
   return (
     <AppShell
-      title={channel.name}
-      subtitle={`${bp?.name ?? "no blueprint"} · ${brand?.name ?? "no brand"} · divergence ${Number(channel.divergence)}% · ${Number(channel.uploads_per_week)} uploads/week`}
+      title="Chamele-on-air - adapt · transform · go viral"
+      subtitle={`${channel.name} · ${bp?.name ?? "no blueprint"} · ${brand?.name ?? "no brand"} · divergence ${Number(channel.divergence)}% · ${Number(channel.uploads_per_week)} uploads/week`}
       action={
         <Button onClick={() => generating.mutate()} disabled={generating.isPending}>
           {generating.isPending ? (
