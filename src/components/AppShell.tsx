@@ -6,6 +6,8 @@ import {
   Boxes,
   Calculator,
   CalendarClock,
+  FileText,
+  Film,
   Fingerprint,
   Gauge,
   LayoutGrid,
