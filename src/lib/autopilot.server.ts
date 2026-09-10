@@ -16,28 +16,31 @@ export async function buildAccountSnapshot(userId?: string): Promise<AccountSnap
     .select("id, name, blueprint_id, status")
     .order("created_at", { ascending: false })
     .limit(30);
-  const videosQ = db
-    .from("generated_videos")
-    .select("id, title, channel_id, approved, render_status, video_url, youtube_video_id")
-    .order("created_at", { ascending: false })
-    .limit(60);
-  const queueQ = db.from("publish_queue").select("id, status, generated_video_id, scheduled_for").order("scheduled_for").limit(60);
-  const accountsQ = db.from("youtube_accounts").select("channel_id");
+  if (userId) channelsQ.eq("owner_id", userId);
 
-  if (userId) {
-    channelsQ.eq("owner_id", userId);
-    // videos and queue are owner-scoped via RLS, but we also filter here for safety.
-  }
-
-  const [brands, creators, blueprints, channels, videos, queue, accounts] = await Promise.all([
+  const [brands, creators, blueprints, channels, accounts] = await Promise.all([
     db.from("brands").select("id"),
     db.from("creators").select("id, channel_name, niche, est_profit_per_video").order("est_profit_per_video", { ascending: false }).limit(30),
     db.from("blueprints").select("id, name, confidence, niche").order("confidence", { ascending: false }).limit(30),
     channelsQ,
-    videosQ,
-    queueQ,
-    accountsQ,
+    db.from("youtube_accounts").select("channel_id"),
   ]);
+
+  const ownedChannelIds = userId
+    ? new Set((channels.data ?? []).map((c) => c.id))
+    : new Set<string>();
+
+  let videosQ = db
+    .from("generated_videos")
+    .select("id, title, channel_id, approved, render_status, video_url, youtube_video_id")
+    .order("created_at", { ascending: false })
+    .limit(60);
+  let queueQ = db.from("publish_queue").select("id, status, generated_video_id, scheduled_for").order("scheduled_for").limit(60);
+  if (userId) {
+    videosQ = videosQ.in("channel_id", Array.from(ownedChannelIds));
+    queueQ = queueQ.in("channel_id", Array.from(ownedChannelIds));
+  }
+  const [videos, queue] = await Promise.all([videosQ, queueQ]);
 
   const connected = new Set((accounts.data ?? []).map((a) => a.channel_id));
 
