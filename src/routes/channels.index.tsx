@@ -216,8 +216,8 @@ function Channels() {
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-display text-lg font-semibold">{c.name}</p>
-                        <Badge variant={c.status === "active" ? "default" : "secondary"}>
-                          {c.status}
+                        <Badge variant={c.connected ? "default" : "secondary"}>
+                          {c.connected ? c.status : "not connected"}
                         </Badge>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">

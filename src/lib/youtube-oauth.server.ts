@@ -175,8 +175,14 @@ export async function accessTokenFor(channelId: string): Promise<string> {
 export async function disconnect(channelId: string): Promise<void> {
   const db = await admin();
   await db.from("youtube_accounts").delete().eq("channel_id", channelId);
+  // A channel without a YouTube link cannot publish, so it stops being "active".
   await db
     .from("channels")
-    .update({ connected: false, youtube_channel_id: null, youtube_title: null })
+    .update({
+      connected: false,
+      youtube_channel_id: null,
+      youtube_title: null,
+      status: "draft",
+    })
     .eq("id", channelId);
 }
