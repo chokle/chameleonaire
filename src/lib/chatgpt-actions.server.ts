@@ -82,12 +82,13 @@ export async function listBlueprintsForUser(_userId: string, input: ListBlueprin
   return { blueprints: data ?? [] };
 }
 
-export async function listChannelsForUser(_userId: string, input: ListChannelsInput = {}) {
+export async function listChannelsForUser(userId: string, input: ListChannelsInput = {}) {
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
   const supabase = await adminClient();
   const { data, error } = await supabase
     .from("channels")
     .select("*")
+    .eq("owner_id", userId)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw new Error(error.message);
