@@ -171,14 +171,23 @@ export async function getChannelForUser(userId: string, channelId: string) {
   };
 }
 
-export async function listVideosForUser(_userId: string, input: ListVideosInput = {}) {
+export async function listVideosForUser(userId: string, input: ListVideosInput = {}) {
   const limit = Math.min(Math.max(input.limit ?? 20, 1), 50);
   const supabase = await adminClient();
+
+  // videos are owned through their channel
+  let channelQ = supabase.from("channels").select("id").eq("owner_id", userId);
+  if (input.channel_id) channelQ = channelQ.eq("id", input.channel_id);
+  const { data: ownedChannels } = await channelQ;
+  const ownedIds = (ownedChannels ?? []).map((c) => c.id);
+  if (!ownedIds.length) return { videos: [] };
+
   let query = supabase
     .from("generated_videos")
     .select(
       "id, channel_id, title, concept, hook, status, approved, render_status, render_error, duration_seconds, duration_target, thumbnail_url, youtube_video_id, created_at",
     )
+    .in("channel_id", ownedIds)
     .order("created_at", { ascending: false })
     .limit(limit);
   if (input.channel_id) query = query.eq("channel_id", input.channel_id);
