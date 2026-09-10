@@ -84,13 +84,19 @@ async function fetchStats(channelId: string, youtubeIds: string[]): Promise<Map<
 }
 
 /** Pulls fresh stats from YouTube for every published video and stores a snapshot. */
-export async function syncPerformance(): Promise<{ updated: number; skipped: number; errors: string[] }> {
+export async function syncPerformance(userId?: string): Promise<{ updated: number; skipped: number; errors: string[] }> {
   const db = await admin();
-  const { data: videos } = await db
+  let q = db
     .from("generated_videos")
     .select("id, title, channel_id, blueprint_id, youtube_video_id, duration_seconds")
     .not("youtube_video_id", "is", null)
     .limit(200);
+  if (userId) {
+    const owned = (await db.from("channels").select("id").eq("owner_id", userId)).data?.map((c) => c.id) ?? [];
+    if (!owned.length) return { updated: 0, skipped: 0, errors: [] };
+    q = q.in("channel_id", owned);
+  }
+  const { data: videos } = await q;
 
   const rows = videos ?? [];
   if (!rows.length) return { updated: 0, skipped: 0, errors: [] };
