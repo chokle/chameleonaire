@@ -228,9 +228,31 @@ function Channels() {
                     <CardContent className="pt-6">
                       <div className="flex items-start justify-between gap-2">
                         <p className="font-display text-lg font-semibold">{c.name}</p>
-                        <Badge variant={c.connected ? "default" : "secondary"}>
-                          {c.connected ? c.status : "not connected"}
-                        </Badge>
+                        <div className="flex items-center gap-1">
+                          <Badge variant={c.connected ? "default" : "secondary"}>
+                            {c.connected ? c.status : "not connected"}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 text-muted-foreground hover:text-destructive"
+                            aria-label={`Delete channel ${c.name}`}
+                            disabled={remove.isPending}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (
+                                window.confirm(
+                                  `Delete "${c.name}" and all its videos, queue items and stats? This cannot be undone.`,
+                                )
+                              ) {
+                                remove.mutate(c.id);
+                              }
+                            }}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
                       </div>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {bp?.name ?? "no blueprint"} · {brand?.name ?? "no brand"}
