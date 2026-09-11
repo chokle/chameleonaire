@@ -213,7 +213,14 @@ export async function publishTick(): Promise<{
     })
     .eq("id", JOB_ID);
 
-  // Auto-schedule (when enabled) tops the queue up before we drain it.
+  // Confidence auto-approval (when enabled) green-lights high-scoring videos,
+  // then auto-schedule tops the queue up before we drain it.
+  try {
+    const { autoApproveQueue } = await import("./auto-approve.server");
+    await autoApproveQueue();
+  } catch {
+    // Never let approval failures block publishing.
+  }
   try {
     const { autoScheduleApproved } = await import("./auto-schedule.server");
     await autoScheduleApproved();
