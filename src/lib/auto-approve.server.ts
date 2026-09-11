@@ -74,7 +74,9 @@ export async function autoApproveQueue(): Promise<{
   const db = await admin();
   const { data: rows } = await db
     .from("publish_queue")
-    .select("id, generated_video_id, generated_videos(id, video_url, blueprint_id)")
+    .select(
+      "id, generated_video_id, generated_videos(id, video_url, blueprint_id, title, hook, script, thumbnail_prompt, tags, duration_target)",
+    )
     .eq("status", "awaiting_approval")
     .order("scheduled_for", { ascending: true })
     .limit(50);
@@ -102,8 +104,12 @@ export async function autoApproveQueue(): Promise<{
   let held = 0;
 
   for (const row of pending) {
-    const video = row.generated_videos as { id?: string; blueprint_id?: string | null } | null;
-    const score = video?.blueprint_id ? (confidence.get(video.blueprint_id) ?? 0) : 0;
+    const video = row.generated_videos as
+      | ({ id?: string; blueprint_id?: string | null } & Parameters<typeof scoreVideoConfidence>[0])
+      | null;
+    const evidence = video?.blueprint_id ? (confidence.get(video.blueprint_id) ?? 0) : 0;
+    // Score the video's own craft — hook, script, title, thumbnail direction — not just the blueprint.
+    const score = video ? scoreVideoConfidence(video, evidence).score : 0;
     if (score < settings.threshold || approved >= MAX_PER_RUN) {
       held += 1;
       continue;
