@@ -232,7 +232,11 @@ function Queue() {
                       </div>
                       <Badge
                         variant={score !== null && score >= threshold ? "default" : "secondary"}
-                        title="Blueprint confidence for this video"
+                        title={
+                          conf
+                            ? conf.factors.map((f) => `${f.label}: ${Math.round(f.score * 100)}% (${f.note})`).join("\n")
+                            : "No score yet"
+                        }
                       >
                         {score !== null ? `${score}% confidence` : "no score"}
                       </Badge>
