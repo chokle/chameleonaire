@@ -43,6 +43,39 @@ function Queue() {
   const publish = useServerFn(publishNow);
   const tick = useServerFn(runPublishTick);
 
+  const readAuto = useServerFn(getAutoApprove);
+  const writeAuto = useServerFn(saveAutoApprove);
+  const runAuto = useServerFn(runAutoApprove);
+  const { data: auto } = useQuery({
+    queryKey: ["auto-approve"],
+    queryFn: () => readAuto({}),
+  });
+  const [draftThreshold, setDraftThreshold] = useState<number | null>(null);
+  const threshold = draftThreshold ?? auto?.threshold ?? 85;
+
+  const savingAuto = useMutation({
+    mutationFn: (next: { enabled: boolean; threshold: number }) => writeAuto({ data: next }),
+    onSuccess: (r: { approved: number; held: number }) => {
+      setDraftThreshold(null);
+      qc.invalidateQueries();
+      toast.success(
+        r.approved > 0 ? `Auto-approved ${r.approved} video${r.approved === 1 ? "" : "s"}.` : "Auto-approval saved.",
+      );
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const runningAuto = useMutation({
+    mutationFn: () => runAuto({}),
+    onSuccess: (r: { approved: number; held: number; skipped?: string }) => {
+      qc.invalidateQueries();
+      if (r.skipped) toast.message(`Skipped — ${r.skipped}`);
+      else toast.success(`Auto-approved ${r.approved}, held ${r.held} below threshold.`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const publishing = useMutation({
     mutationFn: (queueId: string) => publish({ data: { queueId } }),
     onSuccess: (r: { url: string }) => {
