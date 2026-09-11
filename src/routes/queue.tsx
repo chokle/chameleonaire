@@ -225,6 +225,12 @@ function Queue() {
                           {c?.name} · {new Date(q.scheduled_for).toLocaleString()}
                         </p>
                       </div>
+                      <Badge
+                        variant={score !== null && score >= threshold ? "default" : "secondary"}
+                        title="Blueprint confidence for this video"
+                      >
+                        {score !== null ? `${score}% confidence` : "no score"}
+                      </Badge>
                       <Badge variant={q.status === "scheduled" ? "default" : "secondary"}>
                         {q.status.replace(/_/g, " ")}
                       </Badge>
