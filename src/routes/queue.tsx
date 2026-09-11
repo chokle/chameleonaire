@@ -141,6 +141,55 @@ function Queue() {
         </div>
       }
     >
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">Confidence auto-approval</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+          <div className="flex items-center gap-3">
+            <Switch
+              id="auto-approve"
+              checked={Boolean(auto?.enabled)}
+              onCheckedChange={(enabled) => savingAuto.mutate({ enabled, threshold })}
+              disabled={savingAuto.isPending}
+            />
+            <Label htmlFor="auto-approve" className="text-sm">
+              {auto?.enabled ? "On" : "Off"}
+            </Label>
+          </div>
+          <div>
+            <p className="mb-2 text-sm text-muted-foreground">
+              Auto-approve and schedule rendered videos scoring{" "}
+              <span className="font-mono text-foreground">{threshold}%</span> or higher. Anything below waits
+              for you — and your manual approve or cancel always overrides it.
+            </p>
+            <Slider
+              value={[threshold]}
+              min={50}
+              max={100}
+              step={1}
+              aria-label="Auto-approval threshold"
+              onValueChange={(v) => setDraftThreshold(v[0] ?? threshold)}
+              onValueCommit={(v) =>
+                savingAuto.mutate({ enabled: Boolean(auto?.enabled), threshold: v[0] ?? threshold })
+              }
+            />
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => runningAuto.mutate()}
+            disabled={runningAuto.isPending}
+          >
+            {runningAuto.isPending ? (
+              <Loader2 className="mr-1 size-4 animate-spin" />
+            ) : (
+              <Check className="mr-1 size-4" />
+            )}
+            Run now
+          </Button>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
