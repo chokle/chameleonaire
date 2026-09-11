@@ -8,8 +8,12 @@ import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 import { queueQuery, snapshotsQuery } from "@/lib/queries";
 import { setQueueStatus } from "@/lib/console.functions";
+import { getAutoApprove, runAutoApprove, saveAutoApprove } from "@/lib/auto-approve.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact } from "@/lib/domain";
@@ -38,6 +42,39 @@ function Queue() {
   const loop = useServerFn(runFeedbackLoop);
   const publish = useServerFn(publishNow);
   const tick = useServerFn(runPublishTick);
+
+  const readAuto = useServerFn(getAutoApprove);
+  const writeAuto = useServerFn(saveAutoApprove);
+  const runAuto = useServerFn(runAutoApprove);
+  const { data: auto } = useQuery({
+    queryKey: ["auto-approve"],
+    queryFn: () => readAuto({}),
+  });
+  const [draftThreshold, setDraftThreshold] = useState<number | null>(null);
+  const threshold = draftThreshold ?? auto?.threshold ?? 85;
+
+  const savingAuto = useMutation({
+    mutationFn: (next: { enabled: boolean; threshold: number }) => writeAuto({ data: next }),
+    onSuccess: (r: { approved: number; held: number }) => {
+      setDraftThreshold(null);
+      qc.invalidateQueries();
+      toast.success(
+        r.approved > 0 ? `Auto-approved ${r.approved} video${r.approved === 1 ? "" : "s"}.` : "Auto-approval saved.",
+      );
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const runningAuto = useMutation({
+    mutationFn: () => runAuto({}),
+    onSuccess: (r: { approved: number; held: number; skipped?: string }) => {
+      qc.invalidateQueries();
+      if (r.skipped) toast.message(`Skipped — ${r.skipped}`);
+      else toast.success(`Auto-approved ${r.approved}, held ${r.held} below threshold.`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const publishing = useMutation({
     mutationFn: (queueId: string) => publish({ data: { queueId } }),
@@ -104,6 +141,55 @@ function Queue() {
         </div>
       }
     >
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">Confidence auto-approval</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+          <div className="flex items-center gap-3">
+            <Switch
+              id="auto-approve"
+              checked={Boolean(auto?.enabled)}
+              onCheckedChange={(enabled) => savingAuto.mutate({ enabled, threshold })}
+              disabled={savingAuto.isPending}
+            />
+            <Label htmlFor="auto-approve" className="text-sm">
+              {auto?.enabled ? "On" : "Off"}
+            </Label>
+          </div>
+          <div>
+            <p className="mb-2 text-sm text-muted-foreground">
+              Auto-approve and schedule rendered videos scoring{" "}
+              <span className="font-mono text-foreground">{threshold}%</span> or higher. Anything below waits
+              for you — and your manual approve or cancel always overrides it.
+            </p>
+            <Slider
+              value={[threshold]}
+              min={50}
+              max={100}
+              step={1}
+              aria-label="Auto-approval threshold"
+              onValueChange={(v) => setDraftThreshold(v[0] ?? threshold)}
+              onValueCommit={(v) =>
+                savingAuto.mutate({ enabled: Boolean(auto?.enabled), threshold: v[0] ?? threshold })
+              }
+            />
+          </div>
+          <Button
+            variant="secondary"
+            onClick={() => runningAuto.mutate()}
+            disabled={runningAuto.isPending}
+          >
+            {runningAuto.isPending ? (
+              <Loader2 className="mr-1 size-4 animate-spin" />
+            ) : (
+              <Check className="mr-1 size-4" />
+            )}
+            Run now
+          </Button>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -124,10 +210,13 @@ function Queue() {
                         approved?: boolean;
                         video_url?: string | null;
                         youtube_video_id?: string | null;
+                        blueprints?: { confidence?: number | null } | null;
                       }
                     | null;
                   const c = q.channels as { name?: string } | null;
                   const live = Boolean(v?.youtube_video_id);
+                  const score =
+                    typeof v?.blueprints?.confidence === "number" ? Math.round(v.blueprints.confidence) : null;
                   return (
                     <li key={q.id} className="flex flex-wrap items-center gap-3 py-3">
                       <div className="min-w-0 flex-1">
@@ -136,6 +225,12 @@ function Queue() {
                           {c?.name} · {new Date(q.scheduled_for).toLocaleString()}
                         </p>
                       </div>
+                      <Badge
+                        variant={score !== null && score >= threshold ? "default" : "secondary"}
+                        title="Blueprint confidence for this video"
+                      >
+                        {score !== null ? `${score}% confidence` : "no score"}
+                      </Badge>
                       <Badge variant={q.status === "scheduled" ? "default" : "secondary"}>
                         {q.status.replace(/_/g, " ")}
                       </Badge>
