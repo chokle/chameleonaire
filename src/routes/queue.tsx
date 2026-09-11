@@ -16,7 +16,7 @@ import { setQueueStatus } from "@/lib/console.functions";
 import { getAutoApprove, runAutoApprove, saveAutoApprove } from "@/lib/auto-approve.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
-import { money, compact } from "@/lib/domain";
+import { money, compact, scoreVideoConfidence } from "@/lib/domain";
 import { VideoReviewDialog } from "@/components/VideoReviewDialog";
 
 export const Route = createFileRoute("/queue")({
@@ -207,6 +207,11 @@ function Queue() {
                     | {
                         id?: string;
                         title?: string;
+                        hook?: string | null;
+                        script?: string | null;
+                        thumbnail_prompt?: string | null;
+                        tags?: string[] | null;
+                        duration_target?: number | null;
                         approved?: boolean;
                         video_url?: string | null;
                         youtube_video_id?: string | null;
@@ -215,8 +220,8 @@ function Queue() {
                     | null;
                   const c = q.channels as { name?: string } | null;
                   const live = Boolean(v?.youtube_video_id);
-                  const score =
-                    typeof v?.blueprints?.confidence === "number" ? Math.round(v.blueprints.confidence) : null;
+                  const conf = v ? scoreVideoConfidence(v, v.blueprints?.confidence ?? null) : null;
+                  const score = conf?.score ?? null;
                   return (
                     <li key={q.id} className="flex flex-wrap items-center gap-3 py-3">
                       <div className="min-w-0 flex-1">
@@ -227,7 +232,11 @@ function Queue() {
                       </div>
                       <Badge
                         variant={score !== null && score >= threshold ? "default" : "secondary"}
-                        title="Blueprint confidence for this video"
+                        title={
+                          conf
+                            ? conf.factors.map((f) => `${f.label}: ${Math.round(f.score * 100)}% (${f.note})`).join("\n")
+                            : "No score yet"
+                        }
                       >
                         {score !== null ? `${score}% confidence` : "no score"}
                       </Badge>

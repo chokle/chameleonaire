@@ -206,3 +206,102 @@ export function confidenceCeiling(coverage: number): number {
   if (coverage >= 40) return 88;
   return 82;
 }
+
+/* ------------------------------------------------------------------ *
+ * Per-video confidence
+ * ------------------------------------------------------------------ */
+
+export type VideoCraftInput = {
+  title?: string | null;
+  hook?: string | null;
+  script?: string | null;
+  thumbnail_prompt?: string | null;
+  tags?: string[] | null;
+  duration_target?: number | null;
+};
+
+export type VideoConfidence = {
+  score: number; // 0-100
+  factors: { label: string; score: number; weight: number; note: string }[];
+};
+
+const CURIOSITY = /\b(why|how|what|never|stop|mistake|secret|nobody|actually|before|until|most|truth|lose|lost|costs?)\b/i;
+const NUMBERS = /\d/;
+const SECOND_PERSON = /\b(you|your|you're|yours)\b/i;
+const THUMB_CRAFT = /\b(contrast|close-?up|bold|text|arrow|split|colou?r|face|expression|red|yellow|background|frame|overlay)\b/i;
+
+function band(value: number, floor: number, ideal: number): number {
+  if (value <= 0) return 0;
+  if (value >= ideal) return 1;
+  if (value <= floor) return Math.max(0, value / Math.max(1, floor)) * 0.5;
+  return 0.5 + ((value - floor) / (ideal - floor)) * 0.5;
+}
+
+/**
+ * Scores how well a single video's own craft — hook, script, title, tags and
+ * thumbnail direction — matches what actually performs, then blends it with the
+ * blueprint's evidence confidence. This is what the auto-approval gate reads,
+ * so the number moves with the work rather than sitting on the blueprint's.
+ */
+export function scoreVideoConfidence(
+  video: VideoCraftInput,
+  blueprintConfidence?: number | null,
+): VideoConfidence {
+  const title = (video.title ?? "").trim();
+  const hook = (video.hook ?? "").trim();
+  const script = (video.script ?? "").trim();
+  const thumb = (video.thumbnail_prompt ?? "").trim();
+  const tags = (video.tags ?? []).filter(Boolean);
+  const target = Math.max(8, Number(video.duration_target) || 30);
+
+  // Hook: short, spoken, curious, aimed at the viewer.
+  const hookWords = hook.split(/\s+/).filter(Boolean).length;
+  let hookScore = band(hookWords, 6, 24) * 0.55;
+  if (CURIOSITY.test(hook)) hookScore += 0.2;
+  if (SECOND_PERSON.test(hook)) hookScore += 0.15;
+  if (NUMBERS.test(hook)) hookScore += 0.1;
+  hookScore = Math.min(1, hookScore);
+
+  // Script: enough words for the target runtime (~2.6 words/sec spoken).
+  const scriptWords = script.split(/\s+/).filter(Boolean).length;
+  const needed = Math.round(target * 2.6);
+  const ratio = needed ? scriptWords / needed : 0;
+  let scriptScore = ratio >= 0.9 ? Math.min(1, 1.05 - Math.max(0, ratio - 1.6) * 0.5) : band(ratio, 0.4, 0.9) * 0.9;
+  if (script.split(/[.!?]/).filter((s) => s.trim().length > 3).length >= 4) scriptScore += 0.05;
+  scriptScore = Math.max(0, Math.min(1, scriptScore));
+
+  // Title: scannable length, a concrete number or a curiosity gap.
+  const titleLen = title.length;
+  let titleScore = titleLen === 0 ? 0 : titleLen <= 70 ? band(titleLen, 20, 45) : 0.6;
+  if (NUMBERS.test(title)) titleScore += 0.15;
+  if (CURIOSITY.test(title)) titleScore += 0.15;
+  titleScore = Math.min(1, titleScore);
+
+  // Thumbnail direction: specific enough for an image model to execute.
+  const thumbWords = thumb.split(/\s+/).filter(Boolean).length;
+  let thumbScore = band(thumbWords, 5, 22) * 0.7;
+  if (THUMB_CRAFT.test(thumb)) thumbScore += 0.3;
+  thumbScore = Math.min(1, thumbScore);
+
+  // Tags: 8-12 is the working range.
+  const tagScore = Math.min(1, band(tags.length, 4, 8));
+
+  const evidence = Math.max(0, Math.min(100, Number(blueprintConfidence) || 0)) / 100;
+
+  const factors = [
+    { label: "Hook", score: hookScore, weight: 0.2, note: hookWords ? `${hookWords} words` : "missing" },
+    {
+      label: "Script",
+      score: scriptScore,
+      weight: 0.25,
+      note: scriptWords ? `${scriptWords} words for ~${target}s` : "missing",
+    },
+    { label: "Title", score: titleScore, weight: 0.13, note: titleLen ? `${titleLen} chars` : "missing" },
+    { label: "Thumbnail direction", score: thumbScore, weight: 0.12, note: thumbWords ? `${thumbWords} words` : "missing" },
+    { label: "Tags", score: tagScore, weight: 0.05, note: `${tags.length} tags` },
+    { label: "Blueprint evidence", score: evidence, weight: 0.25, note: `${Math.round(evidence * 100)}%` },
+  ];
+
+  const score = Math.round(factors.reduce((sum, f) => sum + f.score * f.weight, 0) * 100);
+  return { score: Math.max(0, Math.min(100, score)), factors };
+}

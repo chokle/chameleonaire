@@ -1,0 +1,1 @@
+DELETE FROM public.chatgpt_api_keys WHERE id = 'cf3ca341-873d-47a2-9f6b-84716153af70';
