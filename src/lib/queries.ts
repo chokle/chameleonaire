@@ -1,10 +1,22 @@
 import { queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * Every table below is readable only by signed-in accounts. Firing these reads
+ * while signed out produced a stream of Postgres "permission denied" errors and
+ * an error state in the UI, so we short-circuit to an empty result instead and
+ * let the app shell show its sign-in prompt.
+ */
+async function signedIn() {
+  const { data } = await supabase.auth.getSession();
+  return Boolean(data.session);
+}
+
 export const creatorsQuery = (scanId?: string | null) =>
   queryOptions({
     queryKey: ["creators", scanId ?? "all"],
     queryFn: async () => {
+      if (!(await signedIn())) return [];
       let q = supabase
         .from("creators")
         .select("*")
@@ -21,6 +33,7 @@ export const creatorQuery = (id: string) =>
   queryOptions({
     queryKey: ["creator", id],
     queryFn: async () => {
+      if (!(await signedIn())) return null;
       const { data, error } = await supabase
         .from("creators")
         .select("*, creator_videos(*)")
@@ -34,6 +47,7 @@ export const creatorQuery = (id: string) =>
 export const scansQuery = queryOptions({
   queryKey: ["scans"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("scans")
       .select("*")
@@ -47,6 +61,7 @@ export const scansQuery = queryOptions({
 export const blueprintsQuery = queryOptions({
   queryKey: ["blueprints"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("blueprints")
       .select("*")
@@ -61,6 +76,7 @@ export const blueprintQuery = (id: string) =>
   queryOptions({
     queryKey: ["blueprint", id],
     queryFn: async () => {
+      if (!(await signedIn())) return null;
       const { data, error } = await supabase.from("blueprints").select("*").eq("id", id).single();
       if (error) throw new Error(error.message);
       return data;
@@ -70,6 +86,7 @@ export const blueprintQuery = (id: string) =>
 export const brandsQuery = queryOptions({
   queryKey: ["brands"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("brands")
       .select("*")
@@ -82,6 +99,7 @@ export const brandsQuery = queryOptions({
 export const channelsQuery = queryOptions({
   queryKey: ["channels"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("channels")
       .select("*, blueprints(name, confidence, win_rate), brands(name)")
@@ -95,6 +113,7 @@ export const channelQuery = (id: string) =>
   queryOptions({
     queryKey: ["channel", id],
     queryFn: async () => {
+      if (!(await signedIn())) return null;
       const { data, error } = await supabase
         .from("channels")
         .select("*, blueprints(*), brands(*)")
@@ -109,6 +128,7 @@ export const channelVideosQuery = (id: string) =>
   queryOptions({
     queryKey: ["channel-videos", id],
     queryFn: async () => {
+      if (!(await signedIn())) return [];
       const { data, error } = await supabase
         .from("generated_videos")
         .select("*")
@@ -122,6 +142,7 @@ export const channelVideosQuery = (id: string) =>
 export const queueQuery = queryOptions({
   queryKey: ["queue"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("publish_queue")
       .select("*, generated_videos(id, title, thumbnail_url, approved, status, video_url, youtube_video_id), channels(name)")
@@ -135,6 +156,7 @@ export const queueQuery = queryOptions({
 export const snapshotsQuery = queryOptions({
   queryKey: ["snapshots"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("performance_snapshots")
       .select("*")
@@ -148,6 +170,7 @@ export const snapshotsQuery = queryOptions({
 export const allVideosQuery = queryOptions({
   queryKey: ["all-videos"],
   queryFn: async () => {
+    if (!(await signedIn())) return [];
     const { data, error } = await supabase
       .from("generated_videos")
       .select("*, channels(name)")
