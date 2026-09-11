@@ -16,7 +16,7 @@ import { setQueueStatus } from "@/lib/console.functions";
 import { getAutoApprove, runAutoApprove, saveAutoApprove } from "@/lib/auto-approve.functions";
 import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
-import { money, compact } from "@/lib/domain";
+import { money, compact, scoreVideoConfidence } from "@/lib/domain";
 import { VideoReviewDialog } from "@/components/VideoReviewDialog";
 
 export const Route = createFileRoute("/queue")({
