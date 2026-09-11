@@ -8,7 +8,7 @@
  * there. Settings live in the service-role-only `cron_config` table.
  */
 
-import { DEPLOY_THRESHOLD } from "./domain";
+import { DEPLOY_THRESHOLD, scoreVideoConfidence } from "./domain";
 
 const KEY_ENABLED = "auto_approve_enabled";
 const KEY_THRESHOLD = "auto_approve_threshold";
