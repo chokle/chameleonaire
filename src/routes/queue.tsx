@@ -210,10 +210,13 @@ function Queue() {
                         approved?: boolean;
                         video_url?: string | null;
                         youtube_video_id?: string | null;
+                        blueprints?: { confidence?: number | null } | null;
                       }
                     | null;
                   const c = q.channels as { name?: string } | null;
                   const live = Boolean(v?.youtube_video_id);
+                  const score =
+                    typeof v?.blueprints?.confidence === "number" ? Math.round(v.blueprints.confidence) : null;
                   return (
                     <li key={q.id} className="flex flex-wrap items-center gap-3 py-3">
                       <div className="min-w-0 flex-1">
