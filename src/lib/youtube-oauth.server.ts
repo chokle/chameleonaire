@@ -13,7 +13,7 @@ export const YT_SCOPES = [
 export type YouTubeChannelOption = {
   id: string;
   title: string;
-  thumbnail?: string;
+  thumbnail: string | undefined;
 };
 
 export function oauthCreds(): { clientId: string; clientSecret: string } | null {
