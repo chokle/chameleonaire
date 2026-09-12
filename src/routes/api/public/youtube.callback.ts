@@ -39,6 +39,10 @@ export const Route = createFileRoute("/api/public/youtube/callback")({
         try {
           const { completeConsent } = await import("@/lib/youtube-oauth.server");
           const result = await completeConsent(code, state);
+          if ("picker" in result) {
+            // Multiple YouTube channels under this Google account: redirect to the picker.
+            return Response.redirect(`${url.origin}/youtube-picker?state=${encodeURIComponent(result.state)}`, 302);
+          }
           return page("YouTube connected", `Uploads will go to “${result.title}”.`, true);
         } catch (e) {
           const message = e instanceof Error ? e.message : "Unknown error";
