@@ -67,6 +67,22 @@ function ChannelDetail() {
   const setTargetFn = useServerFn(setVideoDurationTarget);
   const youtubePopup = useRef<Window | null>(null);
 
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type === "youtube-connected") {
+        qc.invalidateQueries({ queryKey: ["channel", id] });
+        qc.invalidateQueries({ queryKey: ["channels"] });
+        toast.success("YouTube channel connected.");
+        if (youtubePopup.current && !youtubePopup.current.closed) {
+          youtubePopup.current.close();
+          youtubePopup.current = null;
+        }
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [qc, id]);
+
   const { data: ready } = useQuery({
     queryKey: ["youtube-ready"],
     queryFn: () => readyFn({}),
