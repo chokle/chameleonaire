@@ -37,12 +37,37 @@ export const youtubeDisconnect = createServerFn({ method: "POST" })
 
 export const youtubeReady = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth]).handler(async () => {
-  const { oauthCreds } = await import("./youtube-oauth.server");
-  return {
-    oauth: oauthCreds() !== null,
-    dataApi: Boolean(process.env["YOUTUBE_API_KEY"]),
-  };
-});
+    const { oauthCreds } = await import("./youtube-oauth.server");
+    return {
+      oauth: oauthCreds() !== null,
+      dataApi: Boolean(process.env["YOUTUBE_API_KEY"]),
+    };
+  });
+
+const PendingInput = z.object({ state: z.string().min(1) });
+
+export const youtubePendingChannels = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => PendingInput.parse(input))
+  .handler(async ({ data }) => {
+    const { getPendingOAuthState } = await import("./youtube-oauth.server");
+    const pending = await getPendingOAuthState(data.state);
+    if (!pending) throw new Error("This pick link has expired. Start the connection again.");
+    return {
+      channelId: pending.channelId,
+      channels: pending.channels,
+    };
+  });
+
+const PickInput = z.object({ state: z.string().min(1), youtubeChannelId: z.string().min(1) });
+
+export const youtubePickChannel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => PickInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { finalizeChannelPick } = await import("./youtube-oauth.server");
+    return finalizeChannelPick(data.state, data.youtubeChannelId, context.userId);
+  });
 
 const VideoInput = z.object({
   videoId: z.string().uuid(),
@@ -98,13 +123,13 @@ export const publishNow = createServerFn({ method: "POST" })
 
 export const runPublishTick = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth]).handler(async () => {
-  const { publishTick } = await import("./publish.server");
-  return publishTick();
-});
+    const { publishTick } = await import("./publish.server");
+    return publishTick();
+  });
 
 export const resumePublishQueue = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth]).handler(async () => {
-  const { resumePublishing } = await import("./publish.server");
-  await resumePublishing();
-  return { ok: true };
-});
+    const { resumePublishing } = await import("./publish.server");
+    await resumePublishing();
+    return { ok: true };
+  });
