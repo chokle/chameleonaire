@@ -11,7 +11,7 @@ import { youtubePendingChannels, youtubePickChannel } from "@/lib/publish.functi
 
 export const Route = createFileRoute("/youtube-picker")({
   validateSearch: (search: Record<string, unknown>) => ({
-    state: String(search.state ?? ""),
+    state: String(search["state"] ?? ""),
   }),
   head: () => ({
     meta: [
