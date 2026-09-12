@@ -248,7 +248,13 @@ export async function completeConsent(
 
   // Multiple channels: store tokens and options, ask the user to pick.
   const expiresAt = new Date(Date.now() + (tokens.expires_in ?? 3500) * 1000).toISOString();
-  const payload = {
+  const payload: {
+    channels: YouTubeChannelOption[];
+    access_token: string;
+    refresh_token: string | undefined;
+    expires_at: string;
+    scopes: string;
+  } = {
     channels: options,
     access_token: tokens.access_token,
     refresh_token: tokens.refresh_token,
