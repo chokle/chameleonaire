@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Film, Image as ImageIcon, Link2, Loader2, Sparkles, Unlink } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
