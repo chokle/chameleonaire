@@ -24,6 +24,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StudioRouteImport } from './routes/studio'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as YoutubePickerRouteImport } from './routes/youtube-picker'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as BlueprintsIndexRouteImport } from './routes/blueprints.index'
 import { Route as BlueprintsIdRouteImport } from './routes/blueprints.$id'
@@ -131,6 +132,11 @@ const TemplatesRoute = TemplatesRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YoutubePickerRoute = YoutubePickerRouteImport.update({
+  id: '/youtube-picker',
+  path: '/youtube-picker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
@@ -333,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/studio': typeof StudioRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
+  '/youtube-picker': typeof YoutubePickerRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/studio': typeof StudioRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
+  '/youtube-picker': typeof YoutubePickerRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
@@ -434,6 +442,7 @@ export interface FileRoutesById {
   '/studio': typeof StudioRoute
   '/templates': typeof TemplatesRoute
   '/terms': typeof TermsRoute
+  '/youtube-picker': typeof YoutubePickerRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/blueprints/$id': typeof BlueprintsIdRoute
   '/channels/$id': typeof ChannelsIdRoute
@@ -486,6 +495,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/templates'
     | '/terms'
+    | '/youtube-picker'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
@@ -536,6 +546,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/templates'
     | '/terms'
+    | '/youtube-picker'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/studio'
     | '/templates'
     | '/terms'
+    | '/youtube-picker'
     | '/.well-known/oauth-protected-resource'
     | '/blueprints/$id'
     | '/channels/$id'
@@ -637,6 +649,7 @@ export interface RootRouteChildren {
   StudioRoute: typeof StudioRoute
   TemplatesRoute: typeof TemplatesRoute
   TermsRoute: typeof TermsRoute
+  YoutubePickerRoute: typeof YoutubePickerRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlueprintsIdRoute: typeof BlueprintsIdRoute
   ChannelsIdRoute: typeof ChannelsIdRoute
@@ -776,6 +789,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/youtube-picker': {
+      id: '/youtube-picker'
+      path: '/youtube-picker'
+      fullPath: '/youtube-picker'
+      preLoaderRoute: typeof YoutubePickerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/oauth-protected-resource': {
@@ -1042,6 +1062,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudioRoute: StudioRoute,
   TemplatesRoute: TemplatesRoute,
   TermsRoute: TermsRoute,
+  YoutubePickerRoute: YoutubePickerRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlueprintsIdRoute: BlueprintsIdRoute,
