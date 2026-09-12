@@ -1,33 +1,34 @@
-# Per-channel ownership + video template page
+# Support multiple YouTube channels under one Google account
 
-Two changes: channels become private to the person who created them, and a new page lets you write a script and pick visuals before a video is scheduled.
+## Goal
+Let you connect a second (or third) YouTube channel to a different spawned app channel, even when all YouTube channels live under the same Google account (`ex.itliquidity87@gmail.com`).
 
-## 1. Private channels
+## Current gap
+The OAuth callback calls `channels?part=snippet&mine=true` and blindly stores `items[0]`. If your Google account has more than one YouTube channel, the app always picks the first one and never lets you choose another.
 
-Today every signed-in member sees every channel, every generated video, every queue item. After this change:
+## What we'll build
 
-- Each channel has an owner. Loop Funds and your other channels get assigned to you.
-- A signed-in person only sees, edits, connects, generates for, schedules and publishes channels they own.
-- Everything hanging off a channel — generated videos, the publish queue, performance stats, the YouTube connection — follows the same rule.
-- Shared research data (scans, creators, blueprints, brands) stays visible to all members, since that is the discovery layer and nothing there is channel-specific.
-- The Studio board, channel list, queue, performance page, ChatGPT actions and the agent connection all return only your channels.
+1. **OAuth callback discovers every available YouTube channel**
+   - Change `completeConsent` in `src/lib/youtube-oauth.server.ts` to fetch all `mine=true` items, not just the first.
+   - If exactly one channel is returned, keep today's auto-connect behavior.
+   - If multiple channels are returned, store the list temporarily and redirect the popup to a picker page instead of completing immediately.
 
-## 2. Video template page
+2. **Channel picker page**
+   - New route `/channels/$id/connect-youtube` (or reuse the existing channel detail page with a picker modal).
+   - Reads the temporary OAuth result, shows each YouTube channel's title and thumbnail, and lets the user pick which one to link to the spawned app channel.
+   - On selection, stores the chosen `youtube_channel_id` + `youtube_title` in `youtube_accounts` and `channels`, then closes the popup and refreshes the parent.
 
-A new **Templates** page (`/templates`) where you build a video before it goes anywhere near the schedule:
+3. **Reconnect to a different YouTube channel**
+   - Update the channel detail page so "Disconnect" clears the current link and "Connect YouTube" starts a fresh OAuth flow, which will again show the picker if multiple channels exist.
 
-- Name the template, write the title, hook and full script (with a live word/estimated-length readout so the script matches the target duration).
-- Choose visuals: visual style, colour palette, pacing, shot direction notes, and a thumbnail prompt.
-- Pick target duration (30 / 45 / 60 / 90 seconds).
-- Optionally start from a blueprint or brand so the tone and structure match a proven pattern.
-- Save, edit, duplicate and delete templates. They are private to you.
-- "Create video" turns a template into a draft video on a channel you own — it lands in the Studio board's Draft column, ready to render, approve and schedule with the flow that already exists.
-- Evergreen-only rule still applies: templates warn if the script mentions dated or trending topics.
+4. **Guard against duplicate YouTube links**
+   - Before saving a selected YouTube channel, check whether another app channel already uses the same `youtube_channel_id` under the same owner.
+   - If it does, warn the user and ask them to pick a different YouTube channel or disconnect the other app channel first.
 
-## Technical notes
+5. **Verify and publish**
+   - Run typecheck and production build.
+   - Publish so the new picker flow is live.
+   - Walk through connecting your second YouTube channel end to end.
 
-- Migration: `channels.owner_id uuid` (defaults to the creating user, backfilled to your account), plus a `owns_channel(uuid)` security-definer helper. RLS on `channels`, `generated_videos`, `publish_queue`, `performance_snapshots` switches from `is_member()` to owner-scoped checks; `youtube_accounts` / `oauth_states` stay service-role only.
-- New table `video_templates` (owner_id, name, title, hook, script, visual_style, palette, pacing, shot_notes, thumbnail_prompt, duration_target, blueprint_id, brand_id) with owner-scoped RLS and GRANTs.
-- Every service-role server path that touches channels is filtered by owner: `console.functions.ts`, `chameleon.server.ts`, `publish.server.ts`, `auto-schedule.server.ts`, `autopilot.server.ts`, `chatgpt-actions.server.ts`, `mcp/tools/list-channels.ts`, `youtube-oauth.server.ts`.
-- The publish worker and cron tick keep running service-role wide (they act for all owners); only user-facing reads and writes are scoped.
-- New route `src/routes/templates.tsx` plus `src/lib/templates.functions.ts` (authenticated create/update/delete/instantiate) and query options in `src/lib/queries.ts`.
+## Outcome
+You can spawn "Outsourced Empire 2" (or any new channel), connect it to a different YouTube channel under the same Google account, and publish videos to it independently of the first one.
