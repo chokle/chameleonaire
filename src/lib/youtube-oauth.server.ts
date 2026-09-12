@@ -234,8 +234,8 @@ export async function completeConsent(
   // Single channel: complete immediately, preserving old behavior.
   if (ytChannels.length === 1) {
     await db.from("oauth_states").delete().eq("state", state);
-    const ytId = options[0].id;
-    const ytTitle = options[0].title;
+    const ytId = options[0]!.id;
+    const ytTitle = options[0]!.title;
     const expiresAt = new Date(Date.now() + (tokens.expires_in ?? 3500) * 1000).toISOString();
     await saveChannelToApp(row.channel_id, ytId, ytTitle, {
       access_token: tokens.access_token,
