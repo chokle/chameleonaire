@@ -276,7 +276,7 @@ export async function finalizeChannelPick(
   const payload = row.payload as {
     channels?: YouTubeChannelOption[];
     access_token?: string;
-    refresh_token?: string;
+    refresh_token?: string | undefined;
     expires_at?: string;
     scopes?: string;
   };
