@@ -148,7 +148,7 @@ async function saveChannelToApp(
   ytTitle: string,
   tokens: {
     access_token: string;
-    refresh_token?: string;
+    refresh_token: string | undefined;
     expires_at: string;
     scopes: string;
   },
