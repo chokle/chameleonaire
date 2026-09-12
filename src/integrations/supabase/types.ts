@@ -555,18 +555,21 @@ export type Database = {
         Row: {
           channel_id: string
           created_at: string
+          payload: Json | null
           redirect_uri: string
           state: string
         }
         Insert: {
           channel_id: string
           created_at?: string
+          payload?: Json | null
           redirect_uri: string
           state: string
         }
         Update: {
           channel_id?: string
           created_at?: string
+          payload?: Json | null
           redirect_uri?: string
           state?: string
         }
