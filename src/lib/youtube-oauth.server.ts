@@ -105,17 +105,19 @@ async function fetchYouTubeChannels(
   return data.items ?? [];
 }
 
-/** Returns the temporary payload stored during a multi-channel OAuth flow. */
-export async function getPendingOAuthState(
-  state: string,
-): Promise<{
+export type PendingOAuthState = {
   channelId: string;
   channels: YouTubeChannelOption[];
   accessToken: string;
-  refreshToken?: string;
+  refreshToken: string | undefined;
   expiresAt: string;
   scopes: string;
-} | null> {
+};
+
+/** Returns the temporary payload stored during a multi-channel OAuth flow. */
+export async function getPendingOAuthState(
+  state: string,
+): Promise<PendingOAuthState | null> {
   const db = await admin();
   const { data: row } = await db
     .from("oauth_states")
@@ -126,7 +128,7 @@ export async function getPendingOAuthState(
   const payload = row.payload as {
     channels?: YouTubeChannelOption[];
     access_token?: string;
-    refresh_token?: string;
+    refresh_token?: string | undefined;
     expires_at?: string;
     scopes?: string;
   };
@@ -134,7 +136,7 @@ export async function getPendingOAuthState(
     channelId: row.channel_id,
     channels: payload.channels ?? [],
     accessToken: payload.access_token ?? "",
-    refreshToken: payload.refresh_token ?? undefined,
+    refreshToken: payload.refresh_token,
     expiresAt: payload.expires_at ?? new Date(Date.now() + 3500 * 1000).toISOString(),
     scopes: payload.scopes ?? YT_SCOPES,
   };
