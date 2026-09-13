@@ -190,16 +190,6 @@ function Templates() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="tpl-hook">Hook (first 8 seconds)</Label>
-              <Textarea
-                id="tpl-hook"
-                rows={2}
-                value={draft.hook}
-                onChange={(e) => set({ hook: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-1.5">
               <Label htmlFor="tpl-script">Script</Label>
               <Textarea
                 id="tpl-script"
@@ -208,6 +198,52 @@ function Templates() {
                 onChange={(e) => set({ script: e.target.value })}
                 placeholder="Full spoken script — keep it evergreen: no dates, news or trends."
               />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label htmlFor="tpl-hook">Cold open (first 8 seconds)</Label>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => writingHook.mutate()}
+                  disabled={writingHook.isPending || draft.script.trim().length < 30}
+                  title={
+                    draft.script.trim().length < 30
+                      ? "Write the script first"
+                      : "Write the cold open from this script"
+                  }
+                >
+                  {writingHook.isPending ? (
+                    <Loader2 className="mr-1 size-4 animate-spin" />
+                  ) : (
+                    <Wand2 className="mr-1 size-4" />
+                  )}
+                  Generate cold open
+                </Button>
+              </div>
+              <Textarea
+                id="tpl-hook"
+                rows={2}
+                value={draft.hook}
+                onChange={(e) => set({ hook: e.target.value })}
+                placeholder="The first line viewers hear — write it, or generate it from the script."
+              />
+              {alternates.length > 0 ? (
+                <div className="space-y-1 pt-1">
+                  <p className="text-xs text-muted-foreground">Other options — tap to use:</p>
+                  {alternates.map((alt) => (
+                    <button
+                      key={alt}
+                      type="button"
+                      className="block w-full rounded-md border border-border/70 px-2 py-1.5 text-left text-xs hover:bg-muted"
+                      onClick={() => set({ hook: alt })}
+                    >
+                      {alt}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
