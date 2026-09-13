@@ -239,8 +239,14 @@ function StudioPage() {
         await approveFn({ data: { videoId, approved: false } });
         toast.success("Moved back to draft.");
       } else if (to === "approved") {
-        await approveFn({ data: { videoId, approved: true } });
-        toast.success("Approved.");
+        const res = (await approveFn({ data: { videoId, approved: true } })) as {
+          published?: boolean;
+          url?: string;
+          error?: string;
+        };
+        if (res?.published && res.url) toast.success(`Published publicly: ${res.url}`);
+        else if (res?.error) toast.error(`Approved, but publishing failed: ${res.error}`);
+        else toast.success("Approved.");
       } else if (to === "scheduled") {
         const res = await scheduleFn({ data: { videoId } });
         toast.success(`Scheduled for ${new Date(res.scheduledFor).toLocaleString()}.`);
@@ -251,7 +257,7 @@ function StudioPage() {
         }
         const res = await scheduleFn({ data: { videoId } });
         const published = await publishFn({ data: { queueId: res.queueId } });
-        toast.success(`Live (private): ${published.url}`);
+        toast.success(`Live: ${published.url}`);
       }
       await qc.invalidateQueries();
     } catch (e) {

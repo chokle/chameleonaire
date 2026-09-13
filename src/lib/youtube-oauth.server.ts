@@ -8,6 +8,8 @@ const YOUTUBE_CALLBACK_URL =
 export const YT_SCOPES = [
   "https://www.googleapis.com/auth/youtube.upload",
   "https://www.googleapis.com/auth/youtube.readonly",
+  // Required to change the visibility of a video that is already uploaded.
+  "https://www.googleapis.com/auth/youtube.force-ssl",
 ].join(" ");
 
 export type YouTubeChannelOption = {

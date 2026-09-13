@@ -139,20 +139,45 @@ export const setVideoApproval = createServerFn({ method: "POST" })
       .update({ approved: data.approved })
       .eq("id", data.videoId);
     if (error) throw new Error(error.message);
-    // Approving also schedules the video so the publish worker picks it up.
-    // Unapproving pulls it back out of the schedule.
-    if (data.approved) {
-      await context.supabase
-        .from("publish_queue")
-        .update({ status: "scheduled" })
-        .eq("generated_video_id", data.videoId)
-        .eq("status", "awaiting_approval");
-    } else {
+
+    // Unapproving pulls a not-yet-published video back out of the queue.
+    if (!data.approved) {
       await context.supabase
         .from("publish_queue")
         .update({ status: "awaiting_approval" })
         .eq("generated_video_id", data.videoId)
         .eq("status", "scheduled");
+      return { ok: true, published: false as const };
     }
-    return { ok: true };
+
+    // Approving publishes straight away: mark the queue row due now, then
+    // upload inline. A failure is recorded on the row, never thrown past the
+    // approval write, so the operator can retry.
+    const now = new Date().toISOString();
+    await context.supabase
+      .from("publish_queue")
+      .update({ status: "scheduled", scheduled_for: now })
+      .eq("generated_video_id", data.videoId)
+      .in("status", ["awaiting_approval", "failed", "cancelled"]);
+
+    const { data: queued } = await context.supabase
+      .from("publish_queue")
+      .select("id, status")
+      .eq("generated_video_id", data.videoId)
+      .eq("status", "scheduled")
+      .order("scheduled_for", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (!queued) return { ok: true, published: false as const };
+
+    try {
+      const { publishQueueItem } = await import("./publish.server");
+      const result = await publishQueueItem(queued.id, "public");
+      return { ok: true, published: true as const, url: result.url };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Publish failed.";
+      return { ok: true, published: false as const, error: message };
+    }
   });
+
