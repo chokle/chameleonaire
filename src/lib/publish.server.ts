@@ -97,7 +97,7 @@ export async function setYouTubePrivacy(
 /** Publishes one queue row end to end: render if needed, upload, record. */
 export async function publishQueueItem(
   queueId: string,
-  privacy: Privacy = "private",
+  privacy: Privacy = "public",
 ): Promise<{ youtubeVideoId: string; url: string; privacy: Privacy }> {
   const db = await admin();
 
