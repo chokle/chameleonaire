@@ -142,15 +142,21 @@ function ChannelDetail() {
 
   const approve = useServerFn(setVideoApproval);
   const approving = useMutation({
-    mutationFn: async ({ videoId, approved }: { videoId: string; approved: boolean }) => {
-      await approve({ data: { videoId, approved } });
-    },
-    onSuccess: () => {
+    mutationFn: async ({ videoId, approved }: { videoId: string; approved: boolean }) =>
+      (await approve({ data: { videoId, approved } })) as {
+        published?: boolean;
+        url?: string;
+        error?: string;
+      },
+    onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["channel-videos", id] });
       qc.invalidateQueries({ queryKey: ["queue"] });
+      if (r?.published && r.url) toast.success(`Published publicly — ${r.url}`);
+      else if (r?.error) toast.error(`Approved, but publishing failed: ${r.error}`);
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   const generating = useMutation({
     mutationFn: () => spawn({ data: { channelId: id, count: 3 } }),
