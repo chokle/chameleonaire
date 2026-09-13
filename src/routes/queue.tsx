@@ -230,6 +230,68 @@ function Queue() {
         </CardContent>
       </Card>
 
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            Live status
+            {isFetching ? <Loader2 className="size-3.5 animate-spin text-muted-foreground" /> : null}
+            <span className="ml-auto text-xs font-normal text-muted-foreground">
+              refreshes every 10s
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {rows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nothing in flight. Anything you approve shows its upload progress here.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {rows.slice(0, 12).map((q) => {
+                const v = q.generated_videos as QueueVideo | null;
+                const c = q.channels as { name?: string } | null;
+                const stage = uploadStage(q.status, v);
+                return (
+                  <li key={`feed-${q.id}`} className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="min-w-0 flex-1 truncate text-sm font-medium">
+                        {v?.title ?? "untitled"}
+                      </p>
+                      <Badge
+                        variant={
+                          stage.tone === "ok" || stage.tone === "busy" ? "default" : "secondary"
+                        }
+                      >
+                        {stage.label}
+                      </Badge>
+                      {v?.youtube_video_id ? (
+                        <a
+                          className="text-xs text-primary underline"
+                          href={`https://youtube.com/watch?v=${v.youtube_video_id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          watch
+                        </a>
+                      ) : null}
+                    </div>
+                    <Progress value={stage.percent} className="h-1.5" />
+                    <p className="text-xs text-muted-foreground">
+                      {c?.name} · {q.status.replace(/_/g, " ")}
+                      {q.published_at ? ` · published ${new Date(q.published_at).toLocaleString()}` : ""}
+                    </p>
+                    {q.last_error || v?.render_error ? (
+                      <p className="text-xs text-destructive">{q.last_error ?? v?.render_error}</p>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -243,21 +305,7 @@ function Queue() {
             ) : (
               <ul className="divide-y divide-border/70">
                 {rows.map((q) => {
-                  const v = q.generated_videos as
-                    | {
-                        id?: string;
-                        title?: string;
-                        hook?: string | null;
-                        script?: string | null;
-                        thumbnail_prompt?: string | null;
-                        tags?: string[] | null;
-                        duration_target?: number | null;
-                        approved?: boolean;
-                        video_url?: string | null;
-                        youtube_video_id?: string | null;
-                        blueprints?: { confidence?: number | null } | null;
-                      }
-                    | null;
+                  const v = q.generated_videos as QueueVideo | null;
                   const c = q.channels as { name?: string } | null;
                   const live = Boolean(v?.youtube_video_id);
                   const conf = v ? scoreVideoConfidence(v, v.blueprints?.confidence ?? null) : null;
@@ -294,6 +342,24 @@ function Queue() {
                         >
                           <Eye className="mr-1 size-4" />
                           Review
+                        </Button>
+                      ) : null}
+                      {v?.id ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            setEditing({
+                              id: v.id as string,
+                              title: v.title ?? "",
+                              description: v.description ?? "",
+                              tags: v.tags ?? [],
+                              locked: live,
+                            })
+                          }
+                        >
+                          <Pencil className="mr-1 size-4" />
+                          Details
                         </Button>
                       ) : null}
                       {q.status === "awaiting_approval" ? (
@@ -385,6 +451,11 @@ function Queue() {
         videoId={reviewId}
         open={Boolean(reviewId)}
         onOpenChange={(o) => !o && setReviewId(null)}
+      />
+      <QueueMetadataDialog
+        video={editing}
+        open={Boolean(editing)}
+        onOpenChange={(o) => !o && setEditing(null)}
       />
     </AppShell>
   );
