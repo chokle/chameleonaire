@@ -355,7 +355,11 @@ function ChannelDetail() {
                         onClick={() => approving.mutate({ videoId: v.id, approved: !v.approved })}
                         disabled={approving.isPending}
                       >
-                        {v.approved ? "Approved — revoke" : "Approve for publish"}
+                        {approving.isPending
+                          ? "Publishing…"
+                          : v.approved
+                            ? "Approved — revoke"
+                            : "Approve & publish"}
                       </Button>
                     </div>
                     {v.render_status === "rendering" ? (
