@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getAutoSchedule, saveAutoSchedule } from "@/lib/auto-schedule.functions";
-import { CalendarClock, GripVertical, Play, Sparkles } from "lucide-react";
+import { CalendarClock, GripVertical, PenLine, Play, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
@@ -285,6 +285,13 @@ function StudioPage() {
     <AppShell
       title="Studio"
       subtitle="Drag a suggestion into Do this to run it. Drag a video across the board to approve, schedule or publish it."
+      action={
+        <Button variant="secondary" asChild>
+          <Link to="/templates">
+            <PenLine className="mr-1 size-4" /> Write a script
+          </Link>
+        </Button>
+      }
     >
       <DndContext onDragEnd={onDragEnd}>
         <div className="grid gap-6 lg:grid-cols-3">

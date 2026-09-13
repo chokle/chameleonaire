@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Check, Eye, Loader2, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
+import { Check, Eye, Loader2, Pencil, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,44 @@ import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact, scoreVideoConfidence } from "@/lib/domain";
 import { VideoReviewDialog } from "@/components/VideoReviewDialog";
+import { QueueMetadataDialog, type QueueVideoMeta } from "@/components/QueueMetadataDialog";
+import { Progress } from "@/components/ui/progress";
+
+type QueueVideo = {
+  id?: string;
+  title?: string;
+  hook?: string | null;
+  script?: string | null;
+  description?: string | null;
+  thumbnail_prompt?: string | null;
+  tags?: string[] | null;
+  duration_target?: number | null;
+  approved?: boolean;
+  status?: string | null;
+  render_status?: string | null;
+  render_error?: string | null;
+  video_url?: string | null;
+  youtube_video_id?: string | null;
+  blueprints?: { confidence?: number | null } | null;
+};
+
+/** Where a queued video sits on its way to YouTube, as a single progress step. */
+function uploadStage(status: string, v: QueueVideo | null) {
+  if (v?.youtube_video_id) return { percent: 100, label: "Live on YouTube", tone: "ok" as const };
+  if (status === "failed") return { percent: 100, label: "Upload failed", tone: "bad" as const };
+  if (status === "cancelled") return { percent: 0, label: "Cancelled", tone: "bad" as const };
+  if (status === "publishing") return { percent: 80, label: "Uploading to YouTube…", tone: "busy" as const };
+  if (v?.render_status === "failed") return { percent: 35, label: "Render failed", tone: "bad" as const };
+  if (v?.video_url || v?.render_status === "done")
+    return {
+      percent: 60,
+      label: status === "scheduled" ? "Rendered — waiting to upload" : "Rendered — needs approval",
+      tone: "ok" as const,
+    };
+  if (v?.render_status === "rendering")
+    return { percent: 30, label: "Rendering video…", tone: "busy" as const };
+  return { percent: 12, label: status === "scheduled" ? "Queued for render" : "Waiting for approval", tone: "idle" as const };
+}
 
 export const Route = createFileRoute("/queue")({
   head: () => ({
@@ -37,7 +75,9 @@ export const Route = createFileRoute("/queue")({
 function Queue() {
   const qc = useQueryClient();
   const [reviewId, setReviewId] = useState<string | null>(null);
-  const { data: queue } = useQuery(queueQuery);
+  const [editing, setEditing] = useState<QueueVideoMeta | null>(null);
+  // Live feed: refresh while renders and uploads are in flight.
+  const { data: queue, isFetching } = useQuery({ ...queueQuery, refetchInterval: 10_000 });
   const { data: snaps } = useQuery(snapshotsQuery);
   const loop = useServerFn(runFeedbackLoop);
   const publish = useServerFn(publishNow);
@@ -190,6 +230,68 @@ function Queue() {
         </CardContent>
       </Card>
 
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            Live status
+            {isFetching ? <Loader2 className="size-3.5 animate-spin text-muted-foreground" /> : null}
+            <span className="ml-auto text-xs font-normal text-muted-foreground">
+              refreshes every 10s
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {rows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Nothing in flight. Anything you approve shows its upload progress here.
+            </p>
+          ) : (
+            <ul className="space-y-4">
+              {rows.slice(0, 12).map((q) => {
+                const v = q.generated_videos as QueueVideo | null;
+                const c = q.channels as { name?: string } | null;
+                const stage = uploadStage(q.status, v);
+                return (
+                  <li key={`feed-${q.id}`} className="space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="min-w-0 flex-1 truncate text-sm font-medium">
+                        {v?.title ?? "untitled"}
+                      </p>
+                      <Badge
+                        variant={
+                          stage.tone === "ok" || stage.tone === "busy" ? "default" : "secondary"
+                        }
+                      >
+                        {stage.label}
+                      </Badge>
+                      {v?.youtube_video_id ? (
+                        <a
+                          className="text-xs text-primary underline"
+                          href={`https://youtube.com/watch?v=${v.youtube_video_id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          watch
+                        </a>
+                      ) : null}
+                    </div>
+                    <Progress value={stage.percent} className="h-1.5" />
+                    <p className="text-xs text-muted-foreground">
+                      {c?.name} · {q.status.replace(/_/g, " ")}
+                      {q.published_at ? ` · published ${new Date(q.published_at).toLocaleString()}` : ""}
+                    </p>
+                    {q.last_error || v?.render_error ? (
+                      <p className="text-xs text-destructive">{q.last_error ?? v?.render_error}</p>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -203,21 +305,7 @@ function Queue() {
             ) : (
               <ul className="divide-y divide-border/70">
                 {rows.map((q) => {
-                  const v = q.generated_videos as
-                    | {
-                        id?: string;
-                        title?: string;
-                        hook?: string | null;
-                        script?: string | null;
-                        thumbnail_prompt?: string | null;
-                        tags?: string[] | null;
-                        duration_target?: number | null;
-                        approved?: boolean;
-                        video_url?: string | null;
-                        youtube_video_id?: string | null;
-                        blueprints?: { confidence?: number | null } | null;
-                      }
-                    | null;
+                  const v = q.generated_videos as QueueVideo | null;
                   const c = q.channels as { name?: string } | null;
                   const live = Boolean(v?.youtube_video_id);
                   const conf = v ? scoreVideoConfidence(v, v.blueprints?.confidence ?? null) : null;
@@ -254,6 +342,24 @@ function Queue() {
                         >
                           <Eye className="mr-1 size-4" />
                           Review
+                        </Button>
+                      ) : null}
+                      {v?.id ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() =>
+                            setEditing({
+                              id: v.id as string,
+                              title: v.title ?? "",
+                              description: v.description ?? "",
+                              tags: v.tags ?? [],
+                              locked: live,
+                            })
+                          }
+                        >
+                          <Pencil className="mr-1 size-4" />
+                          Details
                         </Button>
                       ) : null}
                       {q.status === "awaiting_approval" ? (
@@ -345,6 +451,11 @@ function Queue() {
         videoId={reviewId}
         open={Boolean(reviewId)}
         onOpenChange={(o) => !o && setReviewId(null)}
+      />
+      <QueueMetadataDialog
+        video={editing}
+        open={Boolean(editing)}
+        onOpenChange={(o) => !o && setEditing(null)}
       />
     </AppShell>
   );
