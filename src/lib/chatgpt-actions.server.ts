@@ -259,9 +259,37 @@ export async function setVideoApprovalForUser(userId: string, videoId: string, a
       .update({ status: "awaiting_approval" })
       .eq("generated_video_id", videoId)
       .eq("status", "scheduled");
+    return { video: data, next: "Approval removed." };
   }
-  return { video: data, next: approved ? "Now call schedule_video or publish_now." : "Approval removed." };
+
+  // Approval publishes immediately, public, on the channel's linked YouTube account.
+  await supabase
+    .from("publish_queue")
+    .update({ status: "scheduled", scheduled_for: new Date().toISOString() })
+    .eq("generated_video_id", videoId)
+    .in("status", ["awaiting_approval", "failed", "cancelled"]);
+
+  const { data: queued } = await supabase
+    .from("publish_queue")
+    .select("id")
+    .eq("generated_video_id", videoId)
+    .eq("status", "scheduled")
+    .order("scheduled_for", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (!queued) return { video: data, next: "Approved, but no queue item was found to publish." };
+
+  try {
+    const { publishQueueItem } = await import("./publish.server");
+    const result = await publishQueueItem(queued.id, "public");
+    return { video: data, published: true, url: result.url, next: `Published publicly at ${result.url}.` };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Publish failed.";
+    return { video: data, published: false, error: message, next: `Approved, but publishing failed: ${message}` };
+  }
 }
+
 
 /** Full detail for a human/AI review pass before approving a rendered video. */
 export async function reviewVideoForUser(userId: string, videoId: string) {
