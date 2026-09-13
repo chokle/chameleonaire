@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Check, Eye, Loader2, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
+import { Check, Eye, Loader2, Pencil, PlayCircle, RefreshCw, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,44 @@ import { runFeedbackLoop } from "@/lib/chameleon.functions";
 import { publishNow, runPublishTick } from "@/lib/publish.functions";
 import { money, compact, scoreVideoConfidence } from "@/lib/domain";
 import { VideoReviewDialog } from "@/components/VideoReviewDialog";
+import { QueueMetadataDialog, type QueueVideoMeta } from "@/components/QueueMetadataDialog";
+import { Progress } from "@/components/ui/progress";
+
+type QueueVideo = {
+  id?: string;
+  title?: string;
+  hook?: string | null;
+  script?: string | null;
+  description?: string | null;
+  thumbnail_prompt?: string | null;
+  tags?: string[] | null;
+  duration_target?: number | null;
+  approved?: boolean;
+  status?: string | null;
+  render_status?: string | null;
+  render_error?: string | null;
+  video_url?: string | null;
+  youtube_video_id?: string | null;
+  blueprints?: { confidence?: number | null } | null;
+};
+
+/** Where a queued video sits on its way to YouTube, as a single progress step. */
+function uploadStage(status: string, v: QueueVideo | null) {
+  if (v?.youtube_video_id) return { percent: 100, label: "Live on YouTube", tone: "ok" as const };
+  if (status === "failed") return { percent: 100, label: "Upload failed", tone: "bad" as const };
+  if (status === "cancelled") return { percent: 0, label: "Cancelled", tone: "bad" as const };
+  if (status === "publishing") return { percent: 80, label: "Uploading to YouTube…", tone: "busy" as const };
+  if (v?.render_status === "failed") return { percent: 35, label: "Render failed", tone: "bad" as const };
+  if (v?.video_url || v?.render_status === "done")
+    return {
+      percent: 60,
+      label: status === "scheduled" ? "Rendered — waiting to upload" : "Rendered — needs approval",
+      tone: "ok" as const,
+    };
+  if (v?.render_status === "rendering")
+    return { percent: 30, label: "Rendering video…", tone: "busy" as const };
+  return { percent: 12, label: status === "scheduled" ? "Queued for render" : "Waiting for approval", tone: "idle" as const };
+}
 
 export const Route = createFileRoute("/queue")({
   head: () => ({
@@ -37,7 +75,9 @@ export const Route = createFileRoute("/queue")({
 function Queue() {
   const qc = useQueryClient();
   const [reviewId, setReviewId] = useState<string | null>(null);
-  const { data: queue } = useQuery(queueQuery);
+  const [editing, setEditing] = useState<QueueVideoMeta | null>(null);
+  // Live feed: refresh while renders and uploads are in flight.
+  const { data: queue, isFetching } = useQuery({ ...queueQuery, refetchInterval: 10_000 });
   const { data: snaps } = useQuery(snapshotsQuery);
   const loop = useServerFn(runFeedbackLoop);
   const publish = useServerFn(publishNow);
