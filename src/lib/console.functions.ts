@@ -128,6 +128,48 @@ export const setQueueStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/**
+ * Edits the title, description and tags that YouTube will show on the upload.
+ * Ownership is checked through the video's channel before anything is written.
+ */
+export const updateVideoMetadata = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        videoId: uuid,
+        title: z.string().trim().min(1).max(95),
+        description: z.string().trim().max(4900).default(""),
+        tags: z.array(z.string().trim().min(1).max(60)).max(15).default([]),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const db = await admin();
+    const { data: video } = await db
+      .from("generated_videos")
+      .select("id, channel_id")
+      .eq("id", data.videoId)
+      .maybeSingle();
+    if (!video) throw new Error("Video not found.");
+
+    const { data: channel } = await db
+      .from("channels")
+      .select("owner_id")
+      .eq("id", video.channel_id)
+      .maybeSingle();
+    if (!channel || channel.owner_id !== context.userId) {
+      throw new Error("Video not found or not owned by you.");
+    }
+
+    const { error } = await db
+      .from("generated_videos")
+      .update({ title: data.title, description: data.description, tags: data.tags })
+      .eq("id", data.videoId);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
 export const setVideoApproval = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) =>

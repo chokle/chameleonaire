@@ -22,6 +22,38 @@ const templateInput = z.object({
   brand_id: uuid.nullable().default(null),
 });
 
+/**
+ * Writes the cold open (first 8 seconds, spoken verbatim) for a script the
+ * operator has already written, plus a couple of alternates to pick from.
+ */
+export const generateColdOpen = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        script: z.string().trim().min(30).max(20000),
+        title: z.string().trim().max(200).default(""),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const { callAI, parseJSON } = await import("./ai.server");
+    const raw = await callAI({
+      system:
+        "You write cold opens for faceless YouTube videos. A cold open is the first 8 seconds, " +
+        "spoken verbatim: a concrete, high-stakes, curiosity-opening line that makes stopping impossible. " +
+        "It must be EVERGREEN — no dates, years, news, trends or anything that expires. " +
+        "Never reference other creators. Respond with strict JSON only.",
+      prompt:
+        `TITLE: ${data.title || "(untitled)"}\n\nSCRIPT:\n${data.script.slice(0, 12000)}\n\n` +
+        `Return JSON: { "cold_open": string (the best option, 1-2 sentences, under 40 words), ` +
+        `"alternates": string[] (2 other options, same constraints) }`,
+    });
+    const parsed = parseJSON<{ cold_open?: string; alternates?: string[] }>(raw);
+    if (!parsed.cold_open) throw new Error("The engine returned no usable cold open. Try again.");
+    return { coldOpen: parsed.cold_open, alternates: (parsed.alternates ?? []).slice(0, 3) };
+  });
+
 export const listTemplates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
