@@ -42,9 +42,19 @@ export function VideoReviewDialog({
   const approving = useMutation({
     mutationFn: (approved: boolean) =>
       approve({ data: { videoId: videoId as string, approved } }),
-    onSuccess: (_r, approved) => {
+    onSuccess: (r, approved) => {
       qc.invalidateQueries();
-      toast.success(approved ? "Approved. Schedule it when you're ready." : "Approval removed.");
+      if (!approved) {
+        toast.success("Approval removed.");
+        return;
+      }
+      if (r.published) {
+        toast.success(r.url ? `Live: ${r.url}` : "Published to YouTube.");
+      } else if (r.error) {
+        toast.error(`Approved, but the YouTube upload failed: ${r.error}`);
+      } else {
+        toast.success("Approved.");
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
