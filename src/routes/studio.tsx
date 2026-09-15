@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { allVideosQuery, queueQuery } from "@/lib/queries";
 import { getNextActions } from "@/lib/autopilot.functions";
 import { useActionRunner } from "@/lib/useActionRunner";
+import { useCompletedActions, clearActionDone } from "@/lib/completedActions";
 import { setVideoApproval } from "@/lib/console.functions";
 import { publishNow } from "@/lib/publish.functions";
 import { scheduleVideo } from "@/lib/autopilot.functions";
