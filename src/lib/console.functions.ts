@@ -57,6 +57,7 @@ export const createChannel = createServerFn({ method: "POST" })
         divergence: z.number().int().min(0).max(100),
         uploads_per_week: z.number().int().min(1).max(21),
         auto_publish: z.boolean(),
+        gate_override: z.boolean().optional(),
       })
       .parse(data),
   )
