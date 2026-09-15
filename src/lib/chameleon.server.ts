@@ -33,7 +33,8 @@ export async function generateForChannel(channelId: string, count: number, userI
   const brand = channel.brands as Record<string, unknown> | null;
 
   if (!blueprint) throw new Error("Attach a blueprint to this channel first.");
-  if ((blueprint.confidence ?? 0) < DEPLOY_THRESHOLD) {
+  const override = Boolean((channel as { gate_override?: boolean }).gate_override);
+  if (!override && (blueprint.confidence ?? 0) < DEPLOY_THRESHOLD) {
     throw new Error(
       `Blueprint confidence is ${Math.round(blueprint.confidence ?? 0)}% — below the ${DEPLOY_THRESHOLD}% deploy gate.`,
     );
