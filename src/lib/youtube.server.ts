@@ -119,3 +119,54 @@ export async function getRecentVideos(
 }
 
 export type { YTChannel, YTVideo };
+
+/** Resolve a pasted YouTube channel URL / @handle / channel id to a canonical channel id. */
+export async function resolveChannelId(input: string, key: string): Promise<string | null> {
+  const raw = input.trim();
+  if (!raw) return null;
+
+  const direct = /(?:youtube\.com\/channel\/)(UC[\w-]{20,})/i.exec(raw);
+  if (direct?.[1]) return direct[1];
+  if (/^UC[\w-]{20,}$/.test(raw)) return raw;
+
+  // A video link: resolve through the video's channel.
+  const video = /(?:v=|youtu\.be\/|\/shorts\/)([\w-]{8,})/.exec(raw);
+  if (video?.[1]) {
+    const data = await get<{ items?: Array<{ snippet?: { channelId?: string } }> }>(
+      "videos",
+      { part: "snippet", id: video[1] },
+      key,
+    );
+    const id = data.items?.[0]?.snippet?.channelId;
+    if (id) return id;
+  }
+
+  const handleMatch = /@([\w.\-]+)/.exec(raw);
+  if (handleMatch?.[1]) {
+    const data = await get<{ items?: Array<{ id?: string }> }>(
+      "channels",
+      { part: "id", forHandle: `@${handleMatch[1]}` },
+      key,
+    ).catch(() => ({ items: [] }));
+    if (data.items?.[0]?.id) return data.items[0].id!;
+  }
+
+  const legacy = /youtube\.com\/(?:c|user)\/([\w.\-]+)/i.exec(raw);
+  if (legacy?.[1]) {
+    const data = await get<{ items?: Array<{ id?: string }> }>(
+      "channels",
+      { part: "id", forUsername: legacy[1] },
+      key,
+    ).catch(() => ({ items: [] }));
+    if (data.items?.[0]?.id) return data.items[0].id!;
+  }
+
+  // Last resort: search by the most meaningful token in the link.
+  const term = handleMatch?.[1] ?? legacy?.[1] ?? raw.replace(/https?:\/\/\S*?youtube\.com\//i, "");
+  const search = await get<{ items?: Array<{ snippet?: { channelId?: string } }> }>(
+    "search",
+    { part: "snippet", type: "channel", q: term.slice(0, 80), maxResults: "1" },
+    key,
+  ).catch(() => ({ items: [] }));
+  return search.items?.[0]?.snippet?.channelId ?? null;
+}

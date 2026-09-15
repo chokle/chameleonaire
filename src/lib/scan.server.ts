@@ -304,3 +304,123 @@ export async function runPersistentSweep() {
 
   return { refreshed, paused };
 }
+
+/** Import one specific channel from a pasted link so its blueprint can be cloned directly. */
+export async function importChannelFromUrl(args: { url: string; niche?: string | null }) {
+  const key = youtubeKey();
+  if (!key) {
+    throw new Error("Channel links need the YouTube metadata connection, which isn't configured yet.");
+  }
+
+  const { resolveChannelId } = await import("./youtube.server");
+  const channelId = await resolveChannelId(args.url, key);
+  if (!channelId) throw new Error("That link didn't resolve to a YouTube channel. Try the channel's main page URL.");
+
+  const [channel] = await getChannels([channelId], key);
+  if (!channel) throw new Error("That channel could not be read from YouTube.");
+
+  const videos = channel.uploadsPlaylist
+    ? await getRecentVideos(channel.uploadsPlaylist, key, 20).catch(() => [])
+    : [];
+  if (!videos.length) throw new Error("That channel has no public videos to learn from.");
+
+  let niche = (args.niche ?? "").trim();
+  if (!niche) {
+    const guess = await callAI({
+      system: "You classify YouTube channels into a short niche label. Respond with strict JSON only.",
+      prompt:
+        `Channel: ${channel.title}\nRecent titles:\n${videos.slice(0, 12).map((v) => `- ${v.title}`).join("\n")}\n\n` +
+        `Return JSON: { "niche": string (1-3 lowercase words) }`,
+    }).catch(() => "");
+    niche = (guess ? parseJSON<{ niche?: string }>(guess).niche : "")?.trim() || "general";
+  }
+
+  const avgViews = Math.round(videos.reduce((s, v) => s + v.views, 0) / videos.length);
+  const est = estimateProfit(avgViews, niche);
+  const spanDays = Math.max(
+    1,
+    (Date.now() - new Date(videos[videos.length - 1]!.publishedAt).getTime()) / 86_400_000,
+  );
+  const uploadsPerMonth = Number(((videos.length / spanDays) * 30).toFixed(1));
+  const mean = avgViews || 1;
+  const variance = videos.reduce((s, v) => s + Math.pow(v.views - mean, 2), 0) / videos.length / (mean * mean);
+  const consistency = Math.max(0, Math.min(100, Math.round(100 - Math.sqrt(variance) * 60)));
+  const newest = videos.slice(0, 3).reduce((s, v) => s + v.views, 0) / Math.min(3, videos.length);
+  const signals = videos.map((v) => ({
+    engagement: engagementRate(v),
+    retention: retentionProxy(v),
+    ctr: ctrProxy(v, channel.subscribers),
+  }));
+  const mean0 = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+
+  const db = await admin();
+  const { data: scan } = await db
+    .from("scans")
+    .insert({
+      niche,
+      bracket_min: 0,
+      bracket_max: null,
+      source: "youtube_api",
+      status: "complete",
+      is_persistent: false,
+      results_count: 1,
+      last_run_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+
+  const { data: creator, error } = await db
+    .from("creators")
+    .insert({
+      scan_id: scan?.id ?? null,
+      channel_name: channel.title,
+      handle: channel.handle,
+      channel_url: `https://www.youtube.com/channel/${channel.id}`,
+      niche,
+      subscribers: channel.subscribers,
+      avg_views: avgViews,
+      uploads_per_month: uploadsPerMonth,
+      rpm_low: est.rpmLow,
+      rpm_high: est.rpmHigh,
+      est_profit_per_video: est.profit,
+      est_profit_low: est.profitLow,
+      est_profit_high: est.profitHigh,
+      est_monthly: Math.round(est.profit * uploadsPerMonth),
+      view_velocity: Number((newest / mean).toFixed(2)),
+      consistency_score: consistency,
+      format: videos[0] && videos[0].durationSeconds < 90 ? "short-form" : "long-form",
+      data_source: "youtube_api",
+      engagement_rate: Number(mean0(signals.map((s) => s.engagement)).toFixed(3)),
+      retention_proxy: Number(mean0(signals.map((s) => s.retention)).toFixed(1)),
+      ctr_proxy: Number(mean0(signals.map((s) => s.ctr)).toFixed(1)),
+      signal_coverage: 100,
+    } as never)
+    .select("id")
+    .single();
+  if (error || !creator) throw new Error(error?.message ?? "Could not save that channel.");
+
+  await db.from("creator_videos").insert(
+    videos.slice(0, 15).map((v) => ({
+      creator_id: creator.id,
+      title: v.title,
+      video_url: `https://www.youtube.com/watch?v=${v.id}`,
+      views: v.views,
+      duration_seconds: v.durationSeconds,
+      published_at: v.publishedAt,
+      est_profit: estimateProfit(v.views, niche).profit,
+      likes: v.likes,
+      comments: v.comments,
+      engagement_rate: engagementRate(v),
+      retention_proxy: retentionProxy(v),
+      ctr_proxy: ctrProxy(v, channel.subscribers),
+    })) as never,
+  );
+
+  return {
+    creatorId: creator.id,
+    channelName: channel.title,
+    niche,
+    videos: videos.length,
+    estProfit: est.profit,
+  };
+}
