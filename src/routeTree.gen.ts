@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BrandsRouteImport } from './routes/brands'
 import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as ClipsRouteImport } from './routes/clips'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as PerformanceRouteImport } from './routes/performance'
@@ -77,6 +78,11 @@ const BrandsRoute = BrandsRouteImport.update({
 const CalculatorRoute = CalculatorRouteImport.update({
   id: '/calculator',
   path: '/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClipsRoute = ClipsRouteImport.update({
+  id: '/clips',
+  path: '/clips',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -328,6 +334,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/clips': typeof ClipsRoute
   '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
@@ -379,6 +386,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/clips': typeof ClipsRoute
   '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
@@ -431,6 +439,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/brands': typeof BrandsRoute
   '/calculator': typeof CalculatorRoute
+  '/clips': typeof ClipsRoute
   '/library': typeof LibraryRoute
   '/mcp': typeof McpRoute
   '/performance': typeof PerformanceRoute
@@ -484,6 +493,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/clips'
     | '/library'
     | '/mcp'
     | '/performance'
@@ -535,6 +545,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/clips'
     | '/library'
     | '/mcp'
     | '/performance'
@@ -586,6 +597,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/brands'
     | '/calculator'
+    | '/clips'
     | '/library'
     | '/mcp'
     | '/performance'
@@ -638,6 +650,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrandsRoute: typeof BrandsRoute
   CalculatorRoute: typeof CalculatorRoute
+  ClipsRoute: typeof ClipsRoute
   LibraryRoute: typeof LibraryRoute
   McpRoute: typeof McpRoute
   PerformanceRoute: typeof PerformanceRoute
@@ -712,6 +725,13 @@ declare module '@tanstack/react-router' {
       path: '/calculator'
       fullPath: '/calculator'
       preLoaderRoute: typeof CalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clips': {
+      id: '/clips'
+      path: '/clips'
+      fullPath: '/clips'
+      preLoaderRoute: typeof ClipsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -1051,6 +1071,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrandsRoute: BrandsRoute,
   CalculatorRoute: CalculatorRoute,
+  ClipsRoute: ClipsRoute,
   LibraryRoute: LibraryRoute,
   McpRoute: McpRoute,
   PerformanceRoute: PerformanceRoute,

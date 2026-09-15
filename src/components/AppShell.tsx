@@ -17,6 +17,7 @@ import {
   Palette,
   Plug,
   Radar,
+  Scissors,
   Sparkles,
   UserRound,
 } from "lucide-react";
@@ -31,6 +32,7 @@ const NAV = [
   { to: "/brands", label: "Brands", icon: Palette },
   { to: "/channels", label: "Channels", icon: Boxes },
   { to: "/templates", label: "Templates", icon: FileText },
+  { to: "/clips", label: "Clip studio", icon: Scissors },
   { to: "/queue", label: "Queue", icon: CalendarClock },
   { to: "/library", label: "Library", icon: Film },
   { to: "/performance", label: "Performance", icon: LineChart },
