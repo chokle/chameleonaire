@@ -122,6 +122,42 @@ function Scanner() {
       title="Profit scanner"
       subtitle="Choose a niche and an earnings bracket. Profit per video is modelled from public signals — audience size, view velocity, niche RPM bands and sponsor uplift."
     >
+      <Card className="mb-6 spectrum-border">
+        <CardHeader>
+          <CardTitle className="text-base">Copy a channel from its link</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Paste any live channel, handle or video link. We read its public metadata and extract a
+            structure-only blueprint you can deploy.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Input
+              aria-label="YouTube channel link"
+              value={channelLink}
+              onChange={(e) => setChannelLink(e.target.value)}
+              placeholder="https://www.youtube.com/@channelname"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && channelLink.trim().length > 3 && !cloning.isPending) {
+                  cloning.mutate();
+                }
+              }}
+            />
+            <Button
+              onClick={() => cloning.mutate()}
+              disabled={cloning.isPending || channelLink.trim().length < 4}
+            >
+              {cloning.isPending ? (
+                <Loader2 className="mr-1 size-4 animate-spin" />
+              ) : (
+                <Link2 className="mr-1 size-4" />
+              )}
+              {cloning.isPending ? "Copying…" : "Copy blueprint"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
         <Card className="h-fit spectrum-border">
           <CardHeader>
