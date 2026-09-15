@@ -48,6 +48,8 @@ function Scanner() {
   const [count, setCount] = useState(12);
   const [persistent, setPersistent] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
+  const [channelLink, setChannelLink] = useState("");
+  const importLink = useServerFn(importChannelLink);
 
   const bracket = BRACKETS.find((b) => b.id === bracketId)!;
   const creators = useQuery(creatorsQuery());
