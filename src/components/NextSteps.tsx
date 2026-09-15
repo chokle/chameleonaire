@@ -19,9 +19,13 @@ export function NextSteps() {
     queryFn: () => fn({ data: undefined }),
   });
   const { run, running } = useActionRunner(() => qc.invalidateQueries({ queryKey: ["next-actions"] }));
+  const doneIds = useCompletedActions();
 
   const cards = (data?.actions ?? []) as ActionCard[];
-  const [first, ...rest] = cards;
+  const pending = cards.filter((c) => !doneIds.has(c.id));
+  const done = cards.filter((c) => doneIds.has(c.id));
+  const [first, ...rest] = pending;
+
 
   return (
     <Card>
