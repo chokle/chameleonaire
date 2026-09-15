@@ -53,6 +53,7 @@ function Channels() {
   const [divergence, setDivergence] = useState(25);
   const [uploads, setUploads] = useState(3);
   const [autoPublish, setAutoPublish] = useState(true);
+  const [gateOverride, setGateOverride] = useState(false);
 
   const allBlueprints = (blueprints.data ?? []).slice().sort(
     (a, b) => Number(b.confidence) - Number(a.confidence),
@@ -71,6 +72,7 @@ function Channels() {
           divergence,
           uploads_per_week: uploads,
           auto_publish: autoPublish,
+          gate_override: gateOverride,
         },
       });
     },
@@ -132,11 +134,25 @@ function Channels() {
                 </SelectContent>
               </Select>
               {selectedLocked ? (
-                <p className="text-xs text-muted-foreground">
-                  This blueprint sits below the {DEPLOY_THRESHOLD}% gate. You can still spawn the
-                  channel and connect YouTube — video generation stays locked until confidence
-                  clears the gate.
-                </p>
+                <div className="space-y-2 rounded-lg border border-border/70 p-3">
+                  <p className="text-xs text-muted-foreground">
+                    This blueprint sits below the {DEPLOY_THRESHOLD}% gate, so video generation is
+                    normally locked until confidence clears it.
+                  </p>
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium">Override the gate</p>
+                      <p className="text-xs text-muted-foreground">
+                        Generate anyway, at your own risk.
+                      </p>
+                    </div>
+                    <Switch
+                      aria-label="Override the confidence gate"
+                      checked={gateOverride}
+                      onCheckedChange={setGateOverride}
+                    />
+                  </div>
+                </div>
               ) : null}
             </div>
 

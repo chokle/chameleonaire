@@ -30,7 +30,9 @@ import {
   youtubeDisconnect,
   youtubeReady,
 } from "@/lib/publish.functions";
-import { setVideoApproval } from "@/lib/console.functions";
+import { setVideoApproval, setChannelGateOverride } from "@/lib/console.functions";
+import { Switch } from "@/components/ui/switch";
+import { DEPLOY_THRESHOLD } from "@/lib/domain";
 
 export const Route = createFileRoute("/channels/$id")({
   head: ({ params }) => {
@@ -168,6 +170,16 @@ function ChannelDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const overrideFn = useServerFn(setChannelGateOverride);
+  const overriding = useMutation({
+    mutationFn: (on: boolean) => overrideFn({ data: { id, gate_override: on } }),
+    onSuccess: (r: { gate_override: boolean }) => {
+      qc.invalidateQueries({ queryKey: ["channel", id] });
+      toast.success(r.gate_override ? "Override on — generation unlocked." : "Override off.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const thumbing = useMutation({
     mutationFn: (videoId: string) => thumb({ data: { videoId } }),
     onSuccess: () => {
@@ -247,6 +259,28 @@ function ChannelDetail() {
               </Button>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">Confidence gate</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-3">
+          <div className="min-w-[220px] flex-1">
+            <p className="text-sm">
+              Blueprint confidence {Math.round(Number(bp?.confidence ?? 0))}% · gate {DEPLOY_THRESHOLD}%
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Manual override lets this channel generate videos even below the gate.
+            </p>
+          </div>
+          <Switch
+            aria-label="Manual override of the confidence gate"
+            checked={Boolean((channel as { gate_override?: boolean }).gate_override)}
+            disabled={overriding.isPending}
+            onCheckedChange={(v) => overriding.mutate(v)}
+          />
         </CardContent>
       </Card>
 
