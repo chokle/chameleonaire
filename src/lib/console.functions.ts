@@ -64,9 +64,25 @@ export const createChannel = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("channels")
-      .insert({ ...data, owner_id: context.userId });
+      .insert({ ...data, gate_override: data.gate_override ?? false, owner_id: context.userId });
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/** Manual override: let a channel generate from a blueprint below the confidence gate. */
+export const setChannelGateOverride = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ id: uuid, gate_override: z.boolean() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("channels")
+      .update({ gate_override: data.gate_override })
+      .eq("id", data.id)
+      .eq("owner_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true, gate_override: data.gate_override };
   });
 
 export const deleteChannel = createServerFn({ method: "POST" })
