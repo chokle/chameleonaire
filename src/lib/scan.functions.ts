@@ -24,3 +24,16 @@ export const rescanPersistent = createServerFn({ method: "POST" })
   const { runPersistentSweep } = await import("./scan.server");
   return runPersistentSweep();
 });
+
+const ChannelLinkInput = z.object({
+  url: z.string().trim().min(4).max(400),
+  niche: z.string().trim().max(80).nullable().default(null),
+});
+
+export const importChannelLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ChannelLinkInput.parse(input))
+  .handler(async ({ data }) => {
+    const { importChannelFromUrl } = await import("./scan.server");
+    return importChannelFromUrl({ url: data.url, niche: data.niche });
+  });
