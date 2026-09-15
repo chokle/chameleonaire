@@ -286,11 +286,18 @@ function StudioPage() {
       title="Studio"
       subtitle="Drag a suggestion into Do this to run it. Drag a video across the board to approve, schedule or publish it."
       action={
-        <Button variant="secondary" asChild>
-          <Link to="/templates">
-            <PenLine className="mr-1 size-4" /> Write a script
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" asChild>
+            <Link to="/clips">
+              <Scissors className="mr-1 size-4" /> Clip studio
+            </Link>
+          </Button>
+          <Button variant="secondary" asChild>
+            <Link to="/templates">
+              <PenLine className="mr-1 size-4" /> Write a script
+            </Link>
+          </Button>
+        </div>
       }
     >
       <DndContext onDragEnd={onDragEnd}>
