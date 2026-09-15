@@ -72,6 +72,25 @@ export function NextSteps() {
             ))}
           </>
         )}
+        {done.slice(0, 5).map((c) => (
+          <div
+            key={c.id}
+            className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/30 p-3"
+          >
+            <Check className="size-4 shrink-0 text-primary" />
+            <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground line-through">
+              {c.title}
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="shrink-0 text-xs"
+              onClick={() => clearActionDone(c.id)}
+            >
+              Undo
+            </Button>
+          </div>
+        ))}
       </CardContent>
     </Card>
   );
