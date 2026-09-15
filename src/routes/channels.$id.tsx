@@ -33,6 +33,7 @@ import {
 import { setVideoApproval, setChannelGateOverride } from "@/lib/console.functions";
 import { Switch } from "@/components/ui/switch";
 import { DEPLOY_THRESHOLD } from "@/lib/domain";
+import { SourceChannels } from "@/components/SourceChannels";
 
 export const Route = createFileRoute("/channels/$id")({
   head: ({ params }) => {
@@ -197,7 +198,11 @@ function ChannelDetail() {
     );
   }
 
-  const bp = channel.blueprints as { name?: string; confidence?: number } | null;
+  const bp = channel.blueprints as {
+    name?: string;
+    confidence?: number;
+    source_creator_ids?: string[];
+  } | null;
   const brand = channel.brands as { name?: string } | null;
 
   return (
@@ -283,6 +288,10 @@ function ChannelDetail() {
           />
         </CardContent>
       </Card>
+
+      <div className="mb-6">
+        <SourceChannels ids={bp?.source_creator_ids ?? []} />
+      </div>
 
       <Card>
         <CardHeader>

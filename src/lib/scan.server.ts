@@ -94,6 +94,9 @@ async function scanViaApi(args: ScanArgs, key: string) {
         retention_proxy: Number(mean0(vidSignals.map((s) => s.retention)).toFixed(1)),
         ctr_proxy: Number(mean0(vidSignals.map((s) => s.ctr)).toFixed(1)),
         signal_coverage: 100,
+        avatar_url: ch.avatarUrl,
+        banner_url: ch.bannerUrl,
+        description: ch.description,
       },
       videos: videos.slice(0, 10).map((v) => ({
         title: v.title,
@@ -394,6 +397,9 @@ export async function importChannelFromUrl(args: { url: string; niche?: string |
       retention_proxy: Number(mean0(signals.map((s) => s.retention)).toFixed(1)),
       ctr_proxy: Number(mean0(signals.map((s) => s.ctr)).toFixed(1)),
       signal_coverage: 100,
+      avatar_url: channel.avatarUrl,
+      banner_url: channel.bannerUrl,
+      description: channel.description,
     } as never)
     .select("id")
     .single();

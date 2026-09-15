@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { blueprintQuery } from "@/lib/queries";
 import { DEPLOY_THRESHOLD, type BlueprintEvidence, type StrategyBlueprint } from "@/lib/domain";
 import { refineBlueprint } from "@/lib/blueprint.functions";
+import { SourceChannels } from "@/components/SourceChannels";
 
 export const Route = createFileRoute("/blueprints/$id")({
   head: ({ params }) => {
@@ -181,6 +182,9 @@ function BlueprintDetail() {
           </CardContent>
         </Card>
 
+        <div className="space-y-6">
+        <SourceChannels ids={(data.source_creator_ids ?? []) as string[]} title="Source channels" />
+
         <Card className="h-fit">
           <CardHeader>
             <CardTitle className="text-base">Evidence</CardTitle>
@@ -209,6 +213,7 @@ function BlueprintDetail() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </AppShell>
   );

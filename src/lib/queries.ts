@@ -83,6 +83,23 @@ export const blueprintQuery = (id: string) =>
     },
   });
 
+/** The real source channels a blueprint was decoded from — picture, about text, numbers. */
+export const blueprintSourcesQuery = (ids: string[]) =>
+  queryOptions({
+    queryKey: ["blueprint-sources", [...ids].sort().join(",")],
+    queryFn: async () => {
+      if (!ids.length || !(await signedIn())) return [];
+      const { data, error } = await supabase
+        .from("creators")
+        .select(
+          "id, channel_name, handle, channel_url, niche, subscribers, avg_views, est_profit_per_video, avatar_url, banner_url, description",
+        )
+        .in("id", ids);
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+
 export const brandsQuery = queryOptions({
   queryKey: ["brands"],
   queryFn: async () => {
