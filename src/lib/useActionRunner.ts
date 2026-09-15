@@ -101,7 +101,9 @@ export function useActionRunner(onDone?: () => void) {
           navigate({ to: "/channels" });
           break;
       }
+      markActionDone(card.id);
       await qc.invalidateQueries();
+      await qc.refetchQueries({ queryKey: ["next-actions"] });
       onDone?.();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That action failed.");
