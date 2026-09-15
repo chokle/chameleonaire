@@ -218,7 +218,11 @@ function StudioPage() {
     qc.invalidateQueries({ queryKey: ["next-actions"] });
   });
 
-  const cards = (actions.data?.actions ?? []) as ActionCard[];
+  const allCards = (actions.data?.actions ?? []) as ActionCard[];
+  const cards = [
+    ...allCards.filter((c) => !doneIds.has(c.id)),
+    ...allCards.filter((c) => doneIds.has(c.id)),
+  ];
   const rows = videos.data ?? [];
   const queueRows = queue.data ?? [];
 
