@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getAutoSchedule, saveAutoSchedule } from "@/lib/auto-schedule.functions";
-import { CalendarClock, GripVertical, PenLine, Play, Sparkles } from "lucide-react";
+import { CalendarClock, GripVertical, PenLine, Play, Scissors, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/studio")({
   head: () => ({
