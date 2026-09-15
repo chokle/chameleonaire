@@ -262,6 +262,28 @@ function ChannelDetail() {
         </CardContent>
       </Card>
 
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-base">Confidence gate</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-3">
+          <div className="min-w-[220px] flex-1">
+            <p className="text-sm">
+              Blueprint confidence {Math.round(Number(bp?.confidence ?? 0))}% · gate {DEPLOY_THRESHOLD}%
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Manual override lets this channel generate videos even below the gate.
+            </p>
+          </div>
+          <Switch
+            aria-label="Manual override of the confidence gate"
+            checked={Boolean((channel as { gate_override?: boolean }).gate_override)}
+            disabled={overriding.isPending}
+            onCheckedChange={(v) => overriding.mutate(v)}
+          />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Chameleonized output ({videos?.length ?? 0})</CardTitle>
