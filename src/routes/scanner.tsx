@@ -15,7 +15,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { BRACKETS, compact, money } from "@/lib/domain";
 import { creatorsQuery } from "@/lib/queries";
-import { runScan } from "@/lib/scan.functions";
+import { importChannelLink, runScan } from "@/lib/scan.functions";
 import { extractBlueprint } from "@/lib/blueprint.functions";
 
 export const Route = createFileRoute("/scanner")({
