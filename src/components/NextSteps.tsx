@@ -44,6 +44,7 @@ export function NextSteps() {
           <p className="text-sm text-muted-foreground">You are all caught up.</p>
         ) : (
           <>
+
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
               <Badge className="mb-2">Do this first</Badge>
               <p className="font-medium">{first.title}</p>
