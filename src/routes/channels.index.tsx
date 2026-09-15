@@ -53,6 +53,7 @@ function Channels() {
   const [divergence, setDivergence] = useState(25);
   const [uploads, setUploads] = useState(3);
   const [autoPublish, setAutoPublish] = useState(true);
+  const [gateOverride, setGateOverride] = useState(false);
 
   const allBlueprints = (blueprints.data ?? []).slice().sort(
     (a, b) => Number(b.confidence) - Number(a.confidence),
