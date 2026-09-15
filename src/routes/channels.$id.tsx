@@ -170,6 +170,16 @@ function ChannelDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const overrideFn = useServerFn(setChannelGateOverride);
+  const overriding = useMutation({
+    mutationFn: (on: boolean) => overrideFn({ data: { id, gate_override: on } }),
+    onSuccess: (r: { gate_override: boolean }) => {
+      qc.invalidateQueries({ queryKey: ["channel", id] });
+      toast.success(r.gate_override ? "Override on — generation unlocked." : "Override off.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const thumbing = useMutation({
     mutationFn: (videoId: string) => thumb({ data: { videoId } }),
     onSuccess: () => {
