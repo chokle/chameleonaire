@@ -72,6 +72,7 @@ function Channels() {
           divergence,
           uploads_per_week: uploads,
           auto_publish: autoPublish,
+          gate_override: gateOverride,
         },
       });
     },
