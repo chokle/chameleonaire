@@ -30,7 +30,9 @@ import {
   youtubeDisconnect,
   youtubeReady,
 } from "@/lib/publish.functions";
-import { setVideoApproval } from "@/lib/console.functions";
+import { setVideoApproval, setChannelGateOverride } from "@/lib/console.functions";
+import { Switch } from "@/components/ui/switch";
+import { DEPLOY_THRESHOLD } from "@/lib/domain";
 
 export const Route = createFileRoute("/channels/$id")({
   head: ({ params }) => {
