@@ -217,6 +217,7 @@ function StudioPage() {
   const { run, running } = useActionRunner(() => {
     qc.invalidateQueries({ queryKey: ["next-actions"] });
   });
+  const doneIds = useCompletedActions();
 
   const allCards = (actions.data?.actions ?? []) as ActionCard[];
   const cards = [
