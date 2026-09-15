@@ -124,6 +124,7 @@ export type Database = {
           created_at: string
           divergence: number
           est_monthly: number
+          gate_override: boolean
           id: string
           name: string
           owner_id: string
@@ -141,6 +142,7 @@ export type Database = {
           created_at?: string
           divergence?: number
           est_monthly?: number
+          gate_override?: boolean
           id?: string
           name: string
           owner_id: string
@@ -158,6 +160,7 @@ export type Database = {
           created_at?: string
           divergence?: number
           est_monthly?: number
+          gate_override?: boolean
           id?: string
           name?: string
           owner_id?: string
