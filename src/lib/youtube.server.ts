@@ -8,6 +8,9 @@ type YTChannel = {
   totalViews: number;
   videoCount: number;
   uploadsPlaylist: string | null;
+  avatarUrl: string | null;
+  bannerUrl: string | null;
+  description: string;
 };
 
 type YTVideo = {
@@ -68,11 +71,21 @@ export async function getChannels(ids: string[], key: string): Promise<YTChannel
   const data = await get<{
     items?: Array<{
       id: string;
-      snippet?: { title?: string; customUrl?: string };
+      snippet?: {
+        title?: string;
+        customUrl?: string;
+        description?: string;
+        thumbnails?: Record<string, { url?: string }>;
+      };
+      brandingSettings?: { image?: { bannerExternalUrl?: string } };
       statistics?: { subscriberCount?: string; viewCount?: string; videoCount?: string };
       contentDetails?: { relatedPlaylists?: { uploads?: string } };
     }>;
-  }>("channels", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
+  }>(
+    "channels",
+    { part: "snippet,statistics,contentDetails,brandingSettings", id: ids.join(",") },
+    key,
+  );
 
   return (data.items ?? []).map((c) => ({
     id: c.id,
@@ -82,6 +95,13 @@ export async function getChannels(ids: string[], key: string): Promise<YTChannel
     totalViews: Number(c.statistics?.viewCount ?? 0),
     videoCount: Number(c.statistics?.videoCount ?? 0),
     uploadsPlaylist: c.contentDetails?.relatedPlaylists?.uploads ?? null,
+    avatarUrl:
+      c.snippet?.thumbnails?.["high"]?.url ??
+      c.snippet?.thumbnails?.["medium"]?.url ??
+      c.snippet?.thumbnails?.["default"]?.url ??
+      null,
+    bannerUrl: c.brandingSettings?.image?.bannerExternalUrl ?? null,
+    description: (c.snippet?.description ?? "").slice(0, 4000),
   }));
 }
 
