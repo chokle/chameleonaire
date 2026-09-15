@@ -84,6 +84,30 @@ function Scanner() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const cloning = useMutation({
+    mutationFn: async () => {
+      const imported = (await importLink({ data: { url: channelLink.trim(), niche: null } })) as {
+        creatorId: string;
+        channelName: string;
+      };
+      const bp = (await extract({ data: { creatorIds: [imported.creatorId] } })) as {
+        id: string;
+        confidence: number;
+      };
+      return { imported, bp };
+    },
+    onSuccess: ({ imported, bp }) => {
+      qc.invalidateQueries({ queryKey: ["creators"] });
+      qc.invalidateQueries({ queryKey: ["blueprints"] });
+      setChannelLink("");
+      toast.success(
+        `Copied ${imported.channelName} at ${Math.round(Number(bp.confidence))}% confidence.`,
+      );
+      navigate({ to: "/blueprints/$id", params: { id: bp.id } });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const rows = (creators.data ?? []).filter(
     (c) =>
       Number(c.est_profit_per_video) >= bracket.min &&
