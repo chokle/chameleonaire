@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getNextActions } from "@/lib/autopilot.functions";
 import { useActionRunner } from "@/lib/useActionRunner";
+import { useCompletedActions, clearActionDone } from "@/lib/completedActions";
 import type { ActionCard } from "@/lib/recommendations";
-import { ListChecks } from "lucide-react";
+import { Check, ListChecks } from "lucide-react";
 
 /** Always-on checklist: the single most valuable action first, everything else under it. */
 export function NextSteps() {
