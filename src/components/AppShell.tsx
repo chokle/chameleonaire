@@ -17,6 +17,7 @@ import {
   Palette,
   Plug,
   Radar,
+  Scissors,
   Sparkles,
   UserRound,
 } from "lucide-react";
