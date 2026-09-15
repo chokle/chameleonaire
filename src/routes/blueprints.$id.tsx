@@ -213,6 +213,7 @@ function BlueprintDetail() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </AppShell>
   );
