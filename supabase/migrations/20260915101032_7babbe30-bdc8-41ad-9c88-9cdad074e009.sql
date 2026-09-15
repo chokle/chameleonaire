@@ -1,0 +1,1 @@
+ALTER TABLE public.channels ADD COLUMN IF NOT EXISTS gate_override boolean NOT NULL DEFAULT false;
