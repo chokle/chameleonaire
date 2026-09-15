@@ -25,7 +25,9 @@ export type Database = {
           id: string
           name: string
           niche: string
+          notes: string | null
           parent_id: string | null
+          pinned: boolean
           signal_coverage: number
           source_creator_ids: string[]
           status: string
@@ -43,7 +45,9 @@ export type Database = {
           id?: string
           name: string
           niche?: string
+          notes?: string | null
           parent_id?: string | null
+          pinned?: boolean
           signal_coverage?: number
           source_creator_ids?: string[]
           status?: string
@@ -61,7 +65,9 @@ export type Database = {
           id?: string
           name?: string
           niche?: string
+          notes?: string | null
           parent_id?: string | null
+          pinned?: boolean
           signal_coverage?: number
           source_creator_ids?: string[]
           status?: string
@@ -290,13 +296,16 @@ export type Database = {
       }
       creators: {
         Row: {
+          avatar_url: string | null
           avg_views: number
+          banner_url: string | null
           channel_name: string
           channel_url: string | null
           consistency_score: number
           created_at: string
           ctr_proxy: number | null
           data_source: string
+          description: string | null
           engagement_rate: number
           est_monthly: number
           est_profit_high: number
@@ -318,13 +327,16 @@ export type Database = {
           view_velocity: number
         }
         Insert: {
+          avatar_url?: string | null
           avg_views?: number
+          banner_url?: string | null
           channel_name: string
           channel_url?: string | null
           consistency_score?: number
           created_at?: string
           ctr_proxy?: number | null
           data_source?: string
+          description?: string | null
           engagement_rate?: number
           est_monthly?: number
           est_profit_high?: number
@@ -346,13 +358,16 @@ export type Database = {
           view_velocity?: number
         }
         Update: {
+          avatar_url?: string | null
           avg_views?: number
+          banner_url?: string | null
           channel_name?: string
           channel_url?: string | null
           consistency_score?: number
           created_at?: string
           ctr_proxy?: number | null
           data_source?: string
+          description?: string | null
           engagement_rate?: number
           est_monthly?: number
           est_profit_high?: number
