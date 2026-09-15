@@ -319,26 +319,37 @@ function StudioPage() {
               ) : cards.length === 0 ? (
                 <p className="text-sm text-muted-foreground">Nothing pending.</p>
               ) : (
-                cards.map((c) => (
-                  <DraggableCard key={c.id} id={`action:${c.id}`}>
-                    <p className="text-sm font-medium">{c.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{c.why}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <Badge variant="secondary" className="text-[10px]">
-                        {c.impact}
-                      </Badge>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="ml-auto h-7 px-2 text-xs"
-                        disabled={running === c.id}
-                        onClick={() => run(c)}
+                cards.map((c) => {
+                  const isDone = doneIds.has(c.id);
+                  return (
+                    <DraggableCard key={c.id} id={`action:${c.id}`}>
+                      <p
+                        className={
+                          isDone
+                            ? "text-sm font-medium text-muted-foreground line-through"
+                            : "text-sm font-medium"
+                        }
                       >
-                        {running === c.id ? "Running…" : "Run"}
-                      </Button>
-                    </div>
-                  </DraggableCard>
-                ))
+                        {c.title}
+                      </p>
+                      {!isDone && <p className="mt-1 text-xs text-muted-foreground">{c.why}</p>}
+                      <div className="mt-2 flex items-center gap-2">
+                        <Badge variant="secondary" className="text-[10px]">
+                          {isDone ? "Done" : c.impact}
+                        </Badge>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="ml-auto h-7 px-2 text-xs"
+                          disabled={running === c.id}
+                          onClick={() => (isDone ? clearActionDone(c.id) : run(c))}
+                        >
+                          {running === c.id ? "Running…" : isDone ? "Undo" : "Run"}
+                        </Button>
+                      </div>
+                    </DraggableCard>
+                  );
+                })
               )}
             </CardContent>
           </Card>
