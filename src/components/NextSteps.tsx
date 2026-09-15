@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getNextActions } from "@/lib/autopilot.functions";
 import { useActionRunner } from "@/lib/useActionRunner";
+import { useCompletedActions, clearActionDone } from "@/lib/completedActions";
 import type { ActionCard } from "@/lib/recommendations";
-import { ListChecks } from "lucide-react";
+import { Check, ListChecks } from "lucide-react";
 
 /** Always-on checklist: the single most valuable action first, everything else under it. */
 export function NextSteps() {
@@ -18,9 +19,13 @@ export function NextSteps() {
     queryFn: () => fn({ data: undefined }),
   });
   const { run, running } = useActionRunner(() => qc.invalidateQueries({ queryKey: ["next-actions"] }));
+  const doneIds = useCompletedActions();
 
   const cards = (data?.actions ?? []) as ActionCard[];
-  const [first, ...rest] = cards;
+  const pending = cards.filter((c) => !doneIds.has(c.id));
+  const done = cards.filter((c) => doneIds.has(c.id));
+  const [first, ...rest] = pending;
+
 
   return (
     <Card>
@@ -39,6 +44,7 @@ export function NextSteps() {
           <p className="text-sm text-muted-foreground">You are all caught up.</p>
         ) : (
           <>
+
             <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
               <Badge className="mb-2">Do this first</Badge>
               <p className="font-medium">{first.title}</p>
@@ -66,6 +72,25 @@ export function NextSteps() {
             ))}
           </>
         )}
+        {done.slice(0, 5).map((c) => (
+          <div
+            key={c.id}
+            className="flex items-center gap-3 rounded-lg border border-border/50 bg-muted/30 p-3"
+          >
+            <Check className="size-4 shrink-0 text-primary" />
+            <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground line-through">
+              {c.title}
+            </p>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="shrink-0 text-xs"
+              onClick={() => clearActionDone(c.id)}
+            >
+              Undo
+            </Button>
+          </div>
+        ))}
       </CardContent>
     </Card>
   );

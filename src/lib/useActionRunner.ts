@@ -10,6 +10,7 @@ import { chameleonize } from "./chameleon.functions";
 import { renderVideo, publishNow } from "./publish.functions";
 import { setVideoApproval } from "./console.functions";
 import { startAutopilot, scheduleVideo } from "./autopilot.functions";
+import { markActionDone } from "./completedActions";
 
 /** One place that knows how to actually run a recommended action card. */
 export function useActionRunner(onDone?: () => void) {
@@ -100,7 +101,9 @@ export function useActionRunner(onDone?: () => void) {
           navigate({ to: "/channels" });
           break;
       }
+      markActionDone(card.id);
       await qc.invalidateQueries();
+      await qc.refetchQueries({ queryKey: ["next-actions"] });
       onDone?.();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "That action failed.");
