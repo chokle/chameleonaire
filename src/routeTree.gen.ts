@@ -20,6 +20,7 @@ import { Route as PerformanceRouteImport } from './routes/performance'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as QueueRouteImport } from './routes/queue'
+import { Route as RepurposeRouteImport } from './routes/repurpose'
 import { Route as ScannerRouteImport } from './routes/scanner'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StudioRouteImport } from './routes/studio'
@@ -113,6 +114,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const QueueRoute = QueueRouteImport.update({
   id: '/queue',
   path: '/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RepurposeRoute = RepurposeRouteImport.update({
+  id: '/repurpose',
+  path: '/repurpose',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ScannerRoute = ScannerRouteImport.update({
@@ -341,6 +347,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
+  '/repurpose': typeof RepurposeRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
@@ -393,6 +400,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
+  '/repurpose': typeof RepurposeRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
@@ -446,6 +454,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
   '/queue': typeof QueueRoute
+  '/repurpose': typeof RepurposeRoute
   '/scanner': typeof ScannerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/studio': typeof StudioRoute
@@ -500,6 +509,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/queue'
+    | '/repurpose'
     | '/scanner'
     | '/sitemap.xml'
     | '/studio'
@@ -552,6 +562,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/queue'
+    | '/repurpose'
     | '/scanner'
     | '/sitemap.xml'
     | '/studio'
@@ -604,6 +615,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/profile'
     | '/queue'
+    | '/repurpose'
     | '/scanner'
     | '/sitemap.xml'
     | '/studio'
@@ -657,6 +669,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
   QueueRoute: typeof QueueRoute
+  RepurposeRoute: typeof RepurposeRoute
   ScannerRoute: typeof ScannerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StudioRoute: typeof StudioRoute
@@ -774,6 +787,13 @@ declare module '@tanstack/react-router' {
       path: '/queue'
       fullPath: '/queue'
       preLoaderRoute: typeof QueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/repurpose': {
+      id: '/repurpose'
+      path: '/repurpose'
+      fullPath: '/repurpose'
+      preLoaderRoute: typeof RepurposeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/scanner': {
@@ -1078,6 +1098,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
   QueueRoute: QueueRoute,
+  RepurposeRoute: RepurposeRoute,
   ScannerRoute: ScannerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StudioRoute: StudioRoute,
