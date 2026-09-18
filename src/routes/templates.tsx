@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { channelsQuery } from "@/lib/queries";
+import { blueprintsQuery, channelsQuery } from "@/lib/queries";
 import {
   createVideoFromTemplate,
   deleteTemplate,
@@ -90,19 +90,30 @@ function Templates() {
     queryFn: () => list({}),
   });
   const { data: channels } = useQuery(channelsQuery);
+  const { data: blueprints } = useQuery(blueprintsQuery);
 
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [channelId, setChannelId] = useState<string>("");
+  const [blueprintId, setBlueprintId] = useState<string>("");
   const [alternates, setAlternates] = useState<string[]>([]);
+  const [figures, setFigures] = useState<string[]>([]);
 
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
 
   const coldOpen = useServerFn(generateColdOpen);
   const writingHook = useMutation({
-    mutationFn: () => coldOpen({ data: { script: draft.script, title: draft.title } }),
-    onSuccess: (r: { coldOpen: string; alternates: string[] }) => {
+    mutationFn: () =>
+      coldOpen({
+        data: {
+          script: draft.script,
+          title: draft.title,
+          blueprintId: blueprintId || null,
+        },
+      }),
+    onSuccess: (r: { coldOpen: string; alternates: string[]; figures?: string[] }) => {
       set({ hook: r.coldOpen });
       setAlternates(r.alternates ?? []);
+      setFigures(r.figures ?? []);
       toast.success("Cold open written — swap in an alternate if you prefer.");
     },
     onError: (e: Error) => toast.error(e.message),
