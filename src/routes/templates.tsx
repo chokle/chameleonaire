@@ -214,6 +214,19 @@ function Templates() {
             <div className="space-y-1.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Label htmlFor="tpl-hook">Cold open (first 8 seconds)</Label>
+                <Select value={blueprintId} onValueChange={(v) => setBlueprintId(v === "none" ? "" : v)}>
+                  <SelectTrigger className="w-56" aria-label="Blueprint for figures">
+                    <SelectValue placeholder="Blueprint for real figures…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No blueprint (generic)</SelectItem>
+                    {(blueprints ?? []).map((b) => (
+                      <SelectItem key={b.id} value={b.id}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -240,6 +253,18 @@ function Templates() {
                 onChange={(e) => set({ hook: e.target.value })}
                 placeholder="The first line viewers hear — write it, or generate it from the script."
               />
+              {figures.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {figures.map((f) => (
+                    <span
+                      key={f}
+                      className="rounded-full border border-border/70 bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                    >
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
               {alternates.length > 0 ? (
                 <div className="space-y-1 pt-1">
                   <p className="text-xs text-muted-foreground">Other options — tap to use:</p>
