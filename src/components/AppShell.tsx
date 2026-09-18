@@ -17,6 +17,8 @@ import {
   Palette,
   Plug,
   Radar,
+  Recycle,
+
   Scissors,
   Sparkles,
   UserRound,
@@ -33,6 +35,8 @@ const NAV = [
   { to: "/channels", label: "Channels", icon: Boxes },
   { to: "/templates", label: "Templates", icon: FileText },
   { to: "/clips", label: "Clip studio", icon: Scissors },
+  { to: "/repurpose", label: "Repurpose", icon: Recycle },
+
   { to: "/queue", label: "Queue", icon: CalendarClock },
   { to: "/library", label: "Library", icon: Film },
   { to: "/performance", label: "Performance", icon: LineChart },

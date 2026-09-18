@@ -33,11 +33,14 @@ export const generateColdOpen = createServerFn({ method: "POST" })
       .object({
         script: z.string().trim().min(30).max(20000),
         title: z.string().trim().max(200).default(""),
+        blueprintId: uuid.nullable().default(null),
       })
       .parse(data),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const { callAI, parseJSON } = await import("./ai.server");
+    const { figuresForBlueprint, figuresPrompt } = await import("./blueprint-figures.server");
+    const figures = await figuresForBlueprint(context.supabase, data.blueprintId);
     const raw = await callAI({
       system:
         "You write cold opens for faceless YouTube videos. A cold open is the first 8 seconds, " +
@@ -45,14 +48,20 @@ export const generateColdOpen = createServerFn({ method: "POST" })
         "It must be EVERGREEN — no dates, years, news, trends or anything that expires. " +
         "Never reference other creators. Respond with strict JSON only.",
       prompt:
-        `TITLE: ${data.title || "(untitled)"}\n\nSCRIPT:\n${data.script.slice(0, 12000)}\n\n` +
-        `Return JSON: { "cold_open": string (the best option, 1-2 sentences, under 40 words), ` +
+        `TITLE: ${data.title || "(untitled)"}\n\nSCRIPT:\n${data.script.slice(0, 12000)}\n` +
+        figuresPrompt(figures) +
+        `\nReturn JSON: { "cold_open": string (the best option, 1-2 sentences, under 40 words), ` +
         `"alternates": string[] (2 other options, same constraints) }`,
     });
     const parsed = parseJSON<{ cold_open?: string; alternates?: string[] }>(raw);
     if (!parsed.cold_open) throw new Error("The engine returned no usable cold open. Try again.");
-    return { coldOpen: parsed.cold_open, alternates: (parsed.alternates ?? []).slice(0, 3) };
+    return {
+      coldOpen: parsed.cold_open,
+      alternates: (parsed.alternates ?? []).slice(0, 3),
+      figures: figures.claims,
+    };
   });
+
 
 export const listTemplates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
